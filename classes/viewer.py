@@ -3,7 +3,8 @@ class Viewer():
     def __init__(self):
         self.__channels = []
         self.__rewind_state = False
-        self.__speed = 1
+        self.__cine_speed = 1
+        self.__zoom = 1
         pass
     
     def play(self):
@@ -32,13 +33,13 @@ class Viewer():
     
     
     @property
-    def speed(self):
-        return self.__speed
+    def cine_speed(self):
+        return self.__cine_speed
     
-    @speed.setter
-    def speed(self , new_speed):
+    @cine_speed.setter
+    def cine_speed(self , new_speed):
         if(new_speed > 0):
-            self.__speed = new_speed
+            self.__cine_speed = new_speed
         else: 
             raise Exception("Speed of cine must be greater than zero")
         pass
@@ -54,4 +55,14 @@ class Viewer():
     @property
     def channels(self):
         return self.__channels
-
+    
+    @property
+    def zoom(self):
+        return self.__zoom
+    
+    @zoom.setter
+    def zoom(self , new_zoom):
+        if(new_zoom > 0 ):
+            self.__zoom = new_zoom
+        else:
+            raise Exception("Value of zoom must be greater than zero")
