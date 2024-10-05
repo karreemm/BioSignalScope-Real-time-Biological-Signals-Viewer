@@ -23,28 +23,28 @@ class CustomSignal():
     
     @signal.setter
     def signal(self, value):
-        if value.isinstance(list):
+        if isinstance(value,list):
             self.__signal = value
         else:
             raise Exception("the signal must be a list")
         
     @color.setter
     def color(self, value): ## this function could be modified accourding to the gui
-        if value.isinstance(str):
+        if isinstance(value,str):
             self.__color = value
         else :
             raise Exception("the color must be a string")  
         
     @label.setter
     def label(self, value): 
-        if value.isinstance(str):
+        if isinstance(value,str):
             self.__label = value
         else :
             raise Exception("the label must be a string")  
         
     @visability.setter
     def visability(self, value): 
-        if value.isinstance(bool):
+        if isinstance(value,bool):
             self.__visability = value
         else :
             raise Exception("the visability must be a boolean")  
