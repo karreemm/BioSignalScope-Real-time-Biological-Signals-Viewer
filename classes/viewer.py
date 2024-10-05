@@ -1,3 +1,4 @@
+from channel import CustomSignal
 class Viewer():
     def __init__(self):
         self.__channels = []
@@ -21,10 +22,10 @@ class Viewer():
         pass
     
     def add_channel(self , new_channel):
-        if new_channel.isinstance(Signal):
+        if isinstance(new_channel , CustomSignal):
             self.__channels.append(new_channel)
         else:
-            raise Exception("The new channel must be of class Signal")
+            raise Exception("The new channel must be of class CustomSignal")
     
     def remove_channel(self , to_be_removed_channel):
         self.__channels.remove(to_be_removed_channel)
