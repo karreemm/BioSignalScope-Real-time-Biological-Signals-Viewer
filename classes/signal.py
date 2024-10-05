@@ -49,6 +49,9 @@ class Signal():
         else :
             raise Exception("the visability must be a boolean")  
         
+    def __len__(self):
+        return len(self.__signal)
+        
     def get_mean():
         pass
     
