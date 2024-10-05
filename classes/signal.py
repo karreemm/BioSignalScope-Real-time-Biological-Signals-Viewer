@@ -48,6 +48,20 @@ class Signal():
             self.__visability = value
         else :
             raise Exception("the visability must be a boolean")  
+        
+    def get_mean():
+        pass
     
+    def get_std():
+        pass 
+    
+    def get_min():
+        pass 
+    
+    def get_max():
+        pass
+    
+    def get_duration():
+        pass  
     
         
