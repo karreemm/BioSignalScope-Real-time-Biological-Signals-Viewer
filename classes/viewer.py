@@ -8,12 +8,15 @@ class Viewer():
         pass
     
     def play(self):
+        self.__is_linked_paused = not self.__is_linked_paused
         pass
     
     def pause(self):
+        self.__is_linked_paused = not self.__is_linked_paused
         pass
     
     def rewind(self):
+        self.__linked_rewind_state = not self.__linked_rewind_state
         pass    
     
     def zoom_in(self):
@@ -48,9 +51,9 @@ class Viewer():
     def rewind_state(self):
         return self.__rewind_state
     
-    @rewind_state.setter
-    def rewind_state(self, new_rewind_state):
-        self.__rewind_state = new_rewind_state
+    # @rewind_state.setter
+    # def rewind_state(self, new_rewind_state):
+    #     self.__rewind_state = new_rewind_state
     
     @property
     def channels(self):
