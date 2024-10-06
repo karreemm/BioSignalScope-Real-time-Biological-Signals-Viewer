@@ -1,0 +1,13 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+  <qresource>
+    <file>Images/browse.png</file>
+    <file>Images/downArrow.png</file>
+    <file>Images/pause.png</file>
+    <file>Images/play.png</file>
+    <file>Images/realTime.png</file>
+    <file>Images/replay.png</file>
+    <file>Images/upArrow.png</file>
+    <file>Images/signal.png</file>
+  </qresource>
+</RCC>
