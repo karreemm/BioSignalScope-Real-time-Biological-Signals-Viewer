@@ -59,3 +59,4 @@ class Linker():
     @property
     def is_linked_paused(self):
         return self.__is_linked_paused
+    
