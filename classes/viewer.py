@@ -21,41 +21,57 @@ class Viewer(pg.PlotWidget):
         self.counter = 0
         self.time_window = 1000
         
+        self.max_signals_value = -inf
+        self.min_signals_value = inf    
         
-            
+        ## range trackers
+        self.x_range_tracker_min, self.x_range_tracker_max = 0,1000
+        self.y_range_tracker_min, self.y_range_tracker_max = 0,1000
+        
+        
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_signal)
-        self.play()
+        # self.play()
         
         
     def update_signal(self):
         if self.time_window + self.counter < len(self.x_axis):
             self.counter += 10
-            for channel in self.__channels:
-                self.plot(self.x_axis,channel.signal)
+            print(f"{self.viewRange()} range in updating")
         else:
             self.counter = 0
         self.setXRange(min(self.x_axis[self.counter:self.counter + self.time_window]), max(self.x_axis[self.counter:self.counter + self.time_window])  )
+        # self.setXRange(self.viewRange()[0][0]+self.counter, self.viewRange()[0][1]+self.counter)
             
         min_interval_value = inf
         max_interval_value = -inf
-        # for channel in self.__channels:
-        #     min_channel_interval_value = min(channel.signal[self.counter:self.counter + self.time_window])
-        #     if min_channel_interval_value < min_interval_value:
-        #         min_interval_value = min_channel_interval_value
-        #     max_channel_interval_value = max(channel.signal[self.counter:self.counter + self.time_window])
-        #     if max_channel_interval_value > max_interval_value:
-        #         max_interval_value = max_channel_interval_value
+        for channel in self.__channels:
+            min_channel_interval_value = min(channel.signal[self.counter:self.counter + self.time_window])
+            if min_channel_interval_value < min_interval_value:
+                min_interval_value = min_channel_interval_value
+            max_channel_interval_value = max(channel.signal[self.counter:self.counter + self.time_window])
+            if max_channel_interval_value > max_interval_value:
+                max_interval_value = max_channel_interval_value
 
-        # self.setYRange(min_interval_value, max_interval_value)
+        self.setYRange(min_interval_value, max_interval_value)
+        self.x_range_tracker_min, self.x_range_tracker_max = min(self.x_axis[self.counter:self.counter + self.time_window]), max(self.x_axis[self.counter:self.counter + self.time_window])
+        self.y_range_tracker_min, self.y_range_tracker_max = 0,1000
             
     def play(self):
         self.play_state = True
         self.timer.start(self.__cine_speed)
+        self.setXRange(self.viewRange()[0][0], self.viewRange()[0][1])
+        self.setYRange(self.viewRange()[1][0], self.viewRange()[1][1])
+        self.counter = int(max(0,self.viewRange()[0][0]))
+        print(f"{self.counter} this is counter from the play")
+        self.setLimits(xMin = 0, xMax = self.x_axis[-1], yMin = self.min_signals_value, yMax = self.max_signals_value)
+        
+        # print(f'{self.viewRange()} mm')
         
     def pause(self):
         self.play_state = False
         self.timer.stop()
+        
     
     def rewind(self):
         self.__linked_rewind_state = not self.__linked_rewind_state
@@ -71,6 +87,12 @@ class Viewer(pg.PlotWidget):
         if isinstance(new_channel , CustomSignal):
             self.__channels.append(new_channel)
             self.x_axis = list(range(max([len(signal) for signal in self.__channels]))) ## max len in the signals imported
+            for channel in self.__channels:
+                self.plot(self.x_axis,channel.signal)
+                if min(channel.signal) < self.min_signals_value:
+                    self.min_signals_value = min(channel.signal)
+                if max(channel.signal) > self.max_signals_value:
+                    self.max_signals_value = max(channel.signal)
         else:
             raise Exception("The new channel must be of class CustomSignal")
     
