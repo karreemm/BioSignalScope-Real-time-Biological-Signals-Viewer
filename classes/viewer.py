@@ -60,7 +60,7 @@ class Viewer(pg.PlotWidget):
         if self.play_state == False:
             self.play_state = True
             self.timer.start(self.__cine_speed)
-            print(self.__cine_speed)
+            # print(self.__cine_speed)
             self.setXRange(self.viewRange()[0][0]+50, self.viewRange()[0][0]+1000)
             self.setYRange(self.viewRange()[1][0], self.viewRange()[1][1])
             self.counter = int(max(0,self.viewRange()[0][0]))
@@ -101,10 +101,14 @@ class Viewer(pg.PlotWidget):
         self.__channels.remove(to_be_removed_channel)
     
     def scrolling_x_axis_scrollbar_effect(self , slidebar_current_value):
+            self.blockSignals(True)
             self.setXRange(slidebar_current_value, slidebar_current_value+1000)
+            self.blockSignals(False)
             
     def scrolling_y_axis_scrollbar_effect(self , slidebar_current_value):
-            self.setYRange(slidebar_current_value, slidebar_current_value+200)
+            self.blockSignals(True)
+            self.setYRange(slidebar_current_value, slidebar_current_value + self.max_signals_value - self.min_signals_value)
+            self.blockSignals(False)
         
     @property
     def cine_speed(self):

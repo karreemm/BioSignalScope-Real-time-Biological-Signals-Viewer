@@ -16,6 +16,7 @@ class TestWindow(QMainWindow):
         self.play_button = QPushButton("play")
         self.stop_button = QPushButton("stop")
         self.current_x_axis_start_value = 0
+        self.current_y_axis_start_value = 0
         ## slider feature
         self.cine_scrollbar = QSlider()
         self.cine_scrollbar.setMaximum(300)
@@ -49,22 +50,30 @@ class TestWindow(QMainWindow):
         
         self.scrolling_x_axis_scrollbar.setMaximum(self.plot_widget.x_axis[-1])
         self.scrolling_x_axis_scrollbar.valueChanged.connect(lambda: self.plot_widget.scrolling_x_axis_scrollbar_effect(self.scrolling_x_axis_scrollbar.value()))
-        self.scrolling_x_axis_scrollbar.setValue(self.plot_widget.x_axis[-1])
+        # self.scrolling_x_axis_scrollbar.setValue(self.plot_widget.x_axis[-1])
         
         self.cine_scrollbar.sliderReleased.connect(lambda : self.plot_widget.cine_speed(self.cine_scrollbar.value()))# slider feature 
         
         self.scrolling_y_axis_scrollbar.setMinimum(self.plot_widget.min_signals_value)
         self.scrolling_y_axis_scrollbar.setMaximum(self.plot_widget.max_signals_value)
         self.scrolling_y_axis_scrollbar.valueChanged.connect(lambda: self.plot_widget.scrolling_y_axis_scrollbar_effect(self.scrolling_y_axis_scrollbar.value()))
+        # self.scrolling_y_axis_scrollbar.valueChanged.connect(lambda: self.plot_widget.scrolling_y_axis_scrollbar_effect(self.current_y_axis_start_value))
 
         self.viewBox.sigRangeChanged.connect(self.set_sliders_value)
     
     def set_sliders_value(self , view,ranges):
         x_axis_slider_value = ranges[0][0]
         y_axis_slider_value = ranges[1][0]
-        print(x_axis_slider_value)
-        # self.scrolling_x_axis_scrollbar.setValue(int(x_axis_slider_value))
-        # self.scrolling_y_axis_scrollbar.setValue(int(y_axis_slider_value))
+        self.scrolling_x_axis_scrollbar.blockSignals(True)
+        self.scrolling_x_axis_scrollbar.setValue(int(x_axis_slider_value))
+        self.scrolling_x_axis_scrollbar.blockSignals(False)
+        self.scrolling_y_axis_scrollbar.blockSignals(True)
+        self.scrolling_y_axis_scrollbar.setValue(int(y_axis_slider_value))
+        self.scrolling_y_axis_scrollbar.blockSignals(False)
+        # self.current_x_axis_start_value = int(x_axis_slider_value)
+        # print(x_axis_slider_value)
+        # return
+        # self.current_y_axis_start_value = int(y_axis_slider_value)
         
 
 def main():
