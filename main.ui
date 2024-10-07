@@ -6,107 +6,110 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1122</width>
-    <height>749</height>
+    <width>1138</width>
+    <height>708</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: #0B192C;
+   <string notr="true">QToolTip {
+    background-color: #0B192C;   /* Deep blue background */
+    color: #FFFFFF;              /* White text */
+    border: 1px solid #29C7AC;   /* Greenish-blue border */
+    padding: 5px;                /* Padding around the text */
+    border-radius: 8px;          /* Rounded corners */
+    font-size: 14px;             /* Adjust font size */
+}
+
+* {
+background-color: #0B192C;
 color: #29C7AC;
 font-size: 18px;
+}
+
+
+
+
+
 
 
 
 </string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <property name="styleSheet">
-    <string notr="true">margin: 0px 10px</string>
-   </property>
-   <layout class="QGridLayout" name="gridLayout_2">
-    <property name="verticalSpacing">
-     <number>20</number>
-    </property>
+   <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <widget class="QLabel" name="label">
-      <property name="maximumSize">
+     <widget class="QStackedWidget" name="stackedWidget">
+      <property name="minimumSize">
        <size>
-        <width>16777215</width>
-        <height>100</height>
+        <width>0</width>
+        <height>40</height>
        </size>
       </property>
-      <property name="font">
-       <font>
-        <pointsize>-1</pointsize>
-       </font>
+      <property name="currentIndex">
+       <number>0</number>
       </property>
-      <property name="styleSheet">
-       <string notr="true">font-size: 30px;
-
-</string>
-      </property>
-      <property name="text">
-       <string>Team Name</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <property name="spacing">
-       <number>15</number>
-      </property>
-      <item>
-       <widget class="QFrame" name="frame">
-        <property name="minimumSize">
-         <size>
-          <width>700</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color: #1E3E62;
-border-radius: 10px</string>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::StyledPanel</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Raised</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <property name="spacing">
-         <number>10</number>
-        </property>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_5">
+      <widget class="QWidget" name="MainPage">
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="2" column="0">
+         <layout class="QHBoxLayout" name="horizontalLayout">
           <property name="spacing">
+           <number>15</number>
+          </property>
+          <property name="topMargin">
            <number>30</number>
           </property>
           <item>
-           <widget class="QPushButton" name="BrowseButtonGraph1">
+           <widget class="QFrame" name="frame">
             <property name="minimumSize">
              <size>
-              <width>40</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>70</width>
-              <height>16777215</height>
+              <width>700</width>
+              <height>240</height>
              </size>
             </property>
             <property name="styleSheet">
-             <string notr="true">QPushButton {
+             <string notr="true">background-color: #1E3E62;
+border-radius: 10px</string>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout">
+            <property name="spacing">
+             <number>10</number>
+            </property>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_5">
+              <property name="spacing">
+               <number>30</number>
+              </property>
+              <item>
+               <widget class="QPushButton" name="BrowseButtonGraph1">
+                <property name="minimumSize">
+                 <size>
+                  <width>40</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>70</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Upload Signal</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QPushButton {
     background-color: #0B192C;
     border-radius: 8px;
     padding: 10px;
@@ -114,38 +117,41 @@ border-radius: 10px</string>
 QPushButton:hover {
     background-color: #142A4A;
 }</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="Images.qrc">
-              <normaloff>:/Images/browse.png</normaloff>:/Images/browse.png</iconset>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>30</width>
-              <height>30</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="RealTimeButtonGraph1">
-            <property name="minimumSize">
-             <size>
-              <width>40</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>70</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QPushButton {
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="Images.qrc">
+                  <normaloff>:/Images/browse.png</normaloff>:/Images/browse.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>30</width>
+                  <height>30</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="RealTimeButtonGraph1">
+                <property name="minimumSize">
+                 <size>
+                  <width>40</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>70</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Add Real-Time Signal</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QPushButton {
     background-color: #0B192C;
     border-radius: 8px;
     padding: 10px;
@@ -153,38 +159,41 @@ QPushButton:hover {
 QPushButton:hover {
     background-color: #142A4A;
 }</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="Images.qrc">
-              <normaloff>:/Images/realTime.png</normaloff>:/Images/realTime.png</iconset>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>30</width>
-              <height>30</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="PlayPauseButtonGraph1">
-            <property name="minimumSize">
-             <size>
-              <width>40</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>70</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QPushButton {
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="Images.qrc">
+                  <normaloff>:/Images/realTime.png</normaloff>:/Images/realTime.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>30</width>
+                  <height>30</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="PlayPauseButtonGraph1">
+                <property name="minimumSize">
+                 <size>
+                  <width>40</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>70</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Play/Pause</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QPushButton {
     background-color: #0B192C;
     border-radius: 8px;
     padding: 10px;
@@ -192,38 +201,41 @@ QPushButton:hover {
 QPushButton:hover {
     background-color: #142A4A;
 }</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="Images.qrc">
-              <normaloff>:/Images/pause.png</normaloff>:/Images/pause.png</iconset>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>30</width>
-              <height>30</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="ReplayButtonGraph1">
-            <property name="minimumSize">
-             <size>
-              <width>40</width>
-              <height>49</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>70</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QPushButton {
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="Images.qrc">
+                  <normaloff>:/Images/pause.png</normaloff>:/Images/pause.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>30</width>
+                  <height>30</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="ReplayButtonGraph1">
+                <property name="minimumSize">
+                 <size>
+                  <width>40</width>
+                  <height>49</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>70</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Replay</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QPushButton {
     background-color: #0B192C;
     border-radius: 8px;
     padding: 10px;
@@ -231,67 +243,67 @@ QPushButton:hover {
 QPushButton:hover {
     background-color: #142A4A;
 }</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="Images.qrc">
-              <normaloff>:/Images/replay.png</normaloff>:/Images/replay.png</iconset>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>30</width>
-              <height>30</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_3">
-          <item>
-           <widget class="QLabel" name="label_2">
-            <property name="minimumSize">
-             <size>
-              <width>100</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>120</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true"/>
-            </property>
-            <property name="text">
-             <string>Choose Signal: </string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QComboBox" name="SignalsComboBoxGraph1">
-            <property name="minimumSize">
-             <size>
-              <width>100</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>400</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QComboBox {
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="Images.qrc">
+                  <normaloff>:/Images/replay.png</normaloff>:/Images/replay.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>30</width>
+                  <height>30</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_3">
+              <item>
+               <widget class="QLabel" name="label_2">
+                <property name="minimumSize">
+                 <size>
+                  <width>100</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>120</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
+                <property name="text">
+                 <string>Choose Signal: </string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="SignalsComboBoxGraph1">
+                <property name="minimumSize">
+                 <size>
+                  <width>100</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>400</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QComboBox {
     background-color: #0B192C;
     color: #FFFFFF;
     border: 2px solid #29C7AC; /* Updated to new color */
@@ -311,76 +323,76 @@ QComboBox QAbstractItemView {
     border: 1px solid #29C7AC; /* Updated to new color */
 }
 </string>
-            </property>
-            <item>
-             <property name="text">
-              <string>Signal 1</string>
-             </property>
-             <property name="icon">
-              <iconset resource="Images.qrc">
-               <normaloff>:/Images/signal.png</normaloff>:/Images/signal.png</iconset>
-             </property>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>Signal 1</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="Images.qrc">
+                   <normaloff>:/Images/signal.png</normaloff>:/Images/signal.png</iconset>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Signal 2</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="Images.qrc">
+                   <normaloff>:/Images/signal.png</normaloff>:/Images/signal.png</iconset>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Signal 3</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="Images.qrc">
+                   <normaloff>:/Images/signal.png</normaloff>:/Images/signal.png</iconset>
+                 </property>
+                </item>
+               </widget>
+              </item>
+             </layout>
             </item>
             <item>
-             <property name="text">
-              <string>Signal 2</string>
-             </property>
-             <property name="icon">
-              <iconset resource="Images.qrc">
-               <normaloff>:/Images/signal.png</normaloff>:/Images/signal.png</iconset>
-             </property>
+             <widget class="QLabel" name="ColorChangeGraph1">
+              <property name="minimumSize">
+               <size>
+                <width>100</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>400</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true"/>
+              </property>
+              <property name="text">
+               <string>Change Color</string>
+              </property>
+             </widget>
             </item>
             <item>
-             <property name="text">
-              <string>Signal 3</string>
-             </property>
-             <property name="icon">
-              <iconset resource="Images.qrc">
-               <normaloff>:/Images/signal.png</normaloff>:/Images/signal.png</iconset>
-             </property>
-            </item>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <widget class="QLabel" name="ColorChangeGraph1">
-          <property name="minimumSize">
-           <size>
-            <width>100</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>400</width>
-            <height>40</height>
-           </size>
-          </property>
-          <property name="styleSheet">
-           <string notr="true"/>
-          </property>
-          <property name="text">
-           <string>Change Color</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="SignalTitleInputGraph1">
-          <property name="minimumSize">
-           <size>
-            <width>100</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>440</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QLineEdit {
+             <widget class="QLineEdit" name="SignalTitleInputGraph1">
+              <property name="minimumSize">
+               <size>
+                <width>100</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>440</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLineEdit {
     background-color: #0B192C;       /* Dark background */
     color: #FFFFFF;                  /* White text */
     border: 2px solid #29C7AC;       /* New greenish border */
@@ -410,43 +422,43 @@ QLineEdit:disabled {
     border: 2px solid #666666;       /* Gray border when disabled */
 }
 </string>
-          </property>
-          <property name="placeholderText">
-           <string>Change Signal Title</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
-          <property name="spacing">
-           <number>20</number>
-          </property>
-          <item>
-           <widget class="QLabel" name="label_4">
-            <property name="maximumSize">
-             <size>
-              <width>100</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true"/>
-            </property>
-            <property name="text">
-             <string>Speed: </string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QSlider" name="SpeedSliderGraph1">
-            <property name="maximumSize">
-             <size>
-              <width>300</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QSlider::groove:horizontal {
+              </property>
+              <property name="placeholderText">
+               <string>Change Signal Title</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_4">
+              <property name="spacing">
+               <number>20</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="label_4">
+                <property name="maximumSize">
+                 <size>
+                  <width>100</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
+                <property name="text">
+                 <string>Speed: </string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSlider" name="SpeedSliderGraph1">
+                <property name="maximumSize">
+                 <size>
+                  <width>300</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QSlider::groove:horizontal {
     border: 1px solid #29C7AC; /* New greenish-blue border */
     height: 8px;
     background: #0B192C; /* Deep blue background */
@@ -476,159 +488,129 @@ QSlider::add-page:horizontal {
     border-radius: 4px;
 }
 </string>
-            </property>
-            <property name="minimum">
-             <number>1</number>
-            </property>
-            <property name="maximum">
-             <number>5</number>
-            </property>
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="tickPosition">
-             <enum>QSlider::TicksBothSides</enum>
-            </property>
-            <property name="tickInterval">
-             <number>1</number>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
-          <item>
-           <widget class="QPushButton" name="MoveToGraph2Button">
-            <property name="maximumSize">
-             <size>
-              <width>150</width>
-              <height>40</height>
-             </size>
-            </property>
-            <property name="layoutDirection">
-             <enum>Qt::RightToLeft</enum>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QPushButton {
+                </property>
+                <property name="minimum">
+                 <number>1</number>
+                </property>
+                <property name="maximum">
+                 <number>5</number>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="tickPosition">
+                 <enum>QSlider::TicksBothSides</enum>
+                </property>
+                <property name="tickInterval">
+                 <number>1</number>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_2">
+              <item>
+               <widget class="QPushButton" name="MoveToGraph2Button">
+                <property name="maximumSize">
+                 <size>
+                  <width>150</width>
+                  <height>40</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Move Channel to Graph 2</string>
+                </property>
+                <property name="layoutDirection">
+                 <enum>Qt::RightToLeft</enum>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QPushButton {
     border-radius: 8px;
     padding: 10px;
 }
 QPushButton:hover {
     background-color: #142A4A;
 }</string>
-            </property>
-            <property name="text">
-             <string>Move</string>
-            </property>
-            <property name="icon">
-             <iconset resource="Images.qrc">
-              <normaloff>:/Images/downArrow.png</normaloff>:/Images/downArrow.png</iconset>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>20</width>
-              <height>20</height>
-             </size>
-            </property>
-           </widget>
+                </property>
+                <property name="text">
+                 <string>Move</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="Images.qrc">
+                  <normaloff>:/Images/downArrow.png</normaloff>:/Images/downArrow.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>20</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
           </item>
          </layout>
         </item>
-       </layout>
-      </item>
-     </layout>
-    </item>
-    <item row="2" column="0">
-     <layout class="QHBoxLayout" name="horizontalLayout_6">
-      <property name="spacing">
-       <number>15</number>
-      </property>
-      <item>
-       <widget class="QFrame" name="frame_3">
-        <property name="minimumSize">
-         <size>
-          <width>700</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color: #1E3E62;
-border-radius: 10px</string>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::StyledPanel</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Raised</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <layout class="QVBoxLayout" name="verticalLayout_3">
-        <property name="spacing">
-         <number>10</number>
-        </property>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_12">
+        <item row="3" column="0">
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
           <property name="spacing">
+           <number>15</number>
+          </property>
+          <property name="topMargin">
            <number>30</number>
           </property>
           <item>
-           <widget class="QPushButton" name="BrowseButtonGraph2">
+           <widget class="QFrame" name="frame_2">
             <property name="minimumSize">
              <size>
-              <width>40</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>70</width>
-              <height>16777215</height>
+              <width>700</width>
+              <height>240</height>
              </size>
             </property>
             <property name="styleSheet">
-             <string notr="true">QPushButton {
-    background-color: #0B192C;
-    border-radius: 8px;
-    padding: 10px;
-}
-QPushButton:hover {
-    background-color: #142A4A;
-}</string>
+             <string notr="true">background-color: #1E3E62;
+border-radius: 10px</string>
             </property>
-            <property name="text">
-             <string/>
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
             </property>
-            <property name="icon">
-             <iconset resource="Images.qrc">
-              <normaloff>:/Images/browse.png</normaloff>:/Images/browse.png</iconset>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>30</width>
-              <height>30</height>
-             </size>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="RealTimeButtonGraph2">
-            <property name="minimumSize">
-             <size>
-              <width>40</width>
-              <height>0</height>
-             </size>
+           <layout class="QVBoxLayout" name="verticalLayout_2">
+            <property name="spacing">
+             <number>10</number>
             </property>
-            <property name="maximumSize">
-             <size>
-              <width>70</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QPushButton {
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_7">
+              <property name="spacing">
+               <number>30</number>
+              </property>
+              <item>
+               <widget class="QPushButton" name="BrowseButtonGraph2">
+                <property name="minimumSize">
+                 <size>
+                  <width>40</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>70</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Upload Signal</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QPushButton {
     background-color: #0B192C;
     border-radius: 8px;
     padding: 10px;
@@ -636,38 +618,41 @@ QPushButton:hover {
 QPushButton:hover {
     background-color: #142A4A;
 }</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="Images.qrc">
-              <normaloff>:/Images/realTime.png</normaloff>:/Images/realTime.png</iconset>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>30</width>
-              <height>30</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="PlayPauseButtonGraph2">
-            <property name="minimumSize">
-             <size>
-              <width>40</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>70</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QPushButton {
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="Images.qrc">
+                  <normaloff>:/Images/browse.png</normaloff>:/Images/browse.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>30</width>
+                  <height>30</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="RealTimeButtonGraph2">
+                <property name="minimumSize">
+                 <size>
+                  <width>40</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>70</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Add Real-Time Signal</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QPushButton {
     background-color: #0B192C;
     border-radius: 8px;
     padding: 10px;
@@ -675,38 +660,41 @@ QPushButton:hover {
 QPushButton:hover {
     background-color: #142A4A;
 }</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="Images.qrc">
-              <normaloff>:/Images/pause.png</normaloff>:/Images/pause.png</iconset>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>30</width>
-              <height>30</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="ReplayButtonGraph2">
-            <property name="minimumSize">
-             <size>
-              <width>40</width>
-              <height>49</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>70</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QPushButton {
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="Images.qrc">
+                  <normaloff>:/Images/realTime.png</normaloff>:/Images/realTime.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>30</width>
+                  <height>30</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="PlayPauseButtonGraph2">
+                <property name="minimumSize">
+                 <size>
+                  <width>40</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>70</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Play/Pause</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QPushButton {
     background-color: #0B192C;
     border-radius: 8px;
     padding: 10px;
@@ -714,219 +702,622 @@ QPushButton:hover {
 QPushButton:hover {
     background-color: #142A4A;
 }</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="Images.qrc">
-              <normaloff>:/Images/replay.png</normaloff>:/Images/replay.png</iconset>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>30</width>
-              <height>30</height>
-             </size>
-            </property>
-           </widget>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="Images.qrc">
+                  <normaloff>:/Images/pause.png</normaloff>:/Images/pause.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>30</width>
+                  <height>30</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="ReplayButtonGraph2">
+                <property name="minimumSize">
+                 <size>
+                  <width>40</width>
+                  <height>49</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>70</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Replay</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QPushButton {
+    background-color: #0B192C;
+    border-radius: 8px;
+    padding: 10px;
+}
+QPushButton:hover {
+    background-color: #142A4A;
+}</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="Images.qrc">
+                  <normaloff>:/Images/replay.png</normaloff>:/Images/replay.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>30</width>
+                  <height>30</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_8">
+              <item>
+               <widget class="QLabel" name="label_3">
+                <property name="minimumSize">
+                 <size>
+                  <width>100</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>120</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
+                <property name="text">
+                 <string>Choose Signal: </string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="SignalsComboBoxGraph2">
+                <property name="minimumSize">
+                 <size>
+                  <width>100</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>400</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QComboBox {
+    background-color: #0B192C;
+    color: #FFFFFF;
+    border: 2px solid #29C7AC; /* Updated to new color */
+    border-radius: 5px;
+    padding: 5px;
+}
+
+QComboBox::drop-down {
+    border-left: 1px solid #29C7AC; /* Updated to new color */
+}
+
+QComboBox QAbstractItemView {
+    background-color: #0B192C;
+    color: #FFFFFF;
+    selection-background-color: #29C7AC; /* Updated highlight color */
+    selection-color: #FFFFFF;
+    border: 1px solid #29C7AC; /* Updated to new color */
+}
+</string>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>Signal 1</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="Images.qrc">
+                   <normaloff>:/Images/signal.png</normaloff>:/Images/signal.png</iconset>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Signal 2</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="Images.qrc">
+                   <normaloff>:/Images/signal.png</normaloff>:/Images/signal.png</iconset>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Signal 3</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="Images.qrc">
+                   <normaloff>:/Images/signal.png</normaloff>:/Images/signal.png</iconset>
+                 </property>
+                </item>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QLabel" name="ColorChangeGraph1_2">
+              <property name="minimumSize">
+               <size>
+                <width>100</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>400</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true"/>
+              </property>
+              <property name="text">
+               <string>Change Color</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="SignalTitleInputGraph2">
+              <property name="minimumSize">
+               <size>
+                <width>100</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>440</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLineEdit {
+    background-color: #0B192C;       /* Dark background */
+    color: #FFFFFF;                  /* White text */
+    border: 2px solid #29C7AC;       /* New greenish border */
+    border-radius: 8px;              /* Rounded corners */
+    padding: 8px;                    /* Padding for the text */
+    font-size: 14px;                 /* Adjust the font size */
+}
+
+QLineEdit:hover {
+    border: 2px solid #33DAC1;       /* Lighter greenish-blue on hover */
+}
+
+QLineEdit:focus {
+    border: 2px solid #29C7AC;       /* Stronger new color when focused */
+    background-color: #142A4A;       /* Slightly lighter background on focus */
+    color: #29C7AC;                  /* Text turns greenish-blue when focused */
+}
+
+QLineEdit::placeholder {
+    color: #33DAC1;                  /* Lighter new color for the placeholder */
+    font-style: italic;              /* Italicize placeholder text */
+}
+
+QLineEdit:disabled {
+    background-color: #1B2C3E;       /* Darker background when disabled */
+    color: #888888;                  /* Gray text when disabled */
+    border: 2px solid #666666;       /* Gray border when disabled */
+}
+</string>
+              </property>
+              <property name="placeholderText">
+               <string>Change Signal Title</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_9">
+              <property name="spacing">
+               <number>20</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="label_5">
+                <property name="maximumSize">
+                 <size>
+                  <width>100</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
+                <property name="text">
+                 <string>Speed: </string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSlider" name="SpeedSliderGraph2">
+                <property name="maximumSize">
+                 <size>
+                  <width>300</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QSlider::groove:horizontal {
+    border: 1px solid #29C7AC; /* New greenish-blue border */
+    height: 8px;
+    background: #0B192C; /* Deep blue background */
+    border-radius: 4px;
+}
+
+QSlider::handle:horizontal {
+    background: #29C7AC; /* New greenish-blue handle */
+    border: 1px solid #FFFFFF; /* White border around the handle */
+    width: 20px;
+    height: 20px;
+    border-radius: 10px; /* Rounded handle */
+    margin: -7px 0; /* Center the handle */
+}
+
+QSlider::sub-page:horizontal {
+    background: #29C7AC; /* Greenish-blue color for the left of the handle */
+    border: 1px solid #29C7AC; /* New border color */
+    height: 8px;
+    border-radius: 4px;
+}
+
+QSlider::add-page:horizontal {
+    background: #0B192C; /* Deep blue color for the right of the handle */
+    border: 1px solid #29C7AC; /* New greenish-blue border */
+    height: 8px;
+    border-radius: 4px;
+}
+</string>
+                </property>
+                <property name="minimum">
+                 <number>1</number>
+                </property>
+                <property name="maximum">
+                 <number>5</number>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="tickPosition">
+                 <enum>QSlider::TicksBothSides</enum>
+                </property>
+                <property name="tickInterval">
+                 <number>1</number>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_10">
+              <item>
+               <widget class="QPushButton" name="MoveToGraph1Button">
+                <property name="maximumSize">
+                 <size>
+                  <width>150</width>
+                  <height>40</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Move Channel to Graph 2</string>
+                </property>
+                <property name="layoutDirection">
+                 <enum>Qt::RightToLeft</enum>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QPushButton {
+    border-radius: 8px;
+    padding: 10px;
+}
+QPushButton:hover {
+    background-color: #142A4A;
+}</string>
+                </property>
+                <property name="text">
+                 <string>Move</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="Images.qrc">
+                  <normaloff>:/Images/upArrow.png</normaloff>:/Images/upArrow.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>20</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
           </item>
          </layout>
         </item>
-        <item>
+        <item row="0" column="0">
          <layout class="QHBoxLayout" name="horizontalLayout_13">
           <item>
-           <widget class="QLabel" name="label_8">
+           <widget class="QLabel" name="label">
             <property name="minimumSize">
              <size>
-              <width>100</width>
-              <height>0</height>
+              <width>0</width>
+              <height>70</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>120</width>
-              <height>16777215</height>
+              <width>16777215</width>
+              <height>100</height>
              </size>
             </property>
+            <property name="font">
+             <font>
+              <pointsize>-1</pointsize>
+             </font>
+            </property>
             <property name="styleSheet">
-             <string notr="true"/>
+             <string notr="true">font-size: 40px;
+
+</string>
             </property>
             <property name="text">
-             <string>Choose Signal: </string>
+             <string>Team 06</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="SignalsComboBoxGraph2">
-            <property name="minimumSize">
-             <size>
-              <width>100</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>300</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QComboBox {
+           <layout class="QHBoxLayout" name="horizontalLayout_14">
+            <item>
+             <widget class="QPushButton" name="NonRectangleSignalButton">
+              <property name="toolTip">
+               <string>Non-Rectangle Signal</string>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QPushButton {
     background-color: #0B192C;
-    color: #FFFFFF;
-    border: 2px solid #29C7AC; /* Updated to new color */
-    border-radius: 5px;
-    padding: 5px;
+    border-radius: 8px;
+    padding: 10px;
 }
-
-QComboBox::drop-down {
-    border-left: 1px solid #29C7AC; /* Updated to new color */
-}
-
-QComboBox QAbstractItemView {
+QPushButton:hover {
+    background-color: #142A4A;
+}</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="Images.qrc">
+                <normaloff>:/Images/nonRectangle.png</normaloff>:/Images/nonRectangle.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>50</width>
+                <height>50</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="GeneratePDFButton">
+              <property name="toolTip">
+               <string>Generate Report</string>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QPushButton {
     background-color: #0B192C;
-    color: #FFFFFF;
-    selection-background-color: #29C7AC; /* Updated highlight color */
-    selection-color: #FFFFFF;
-    border: 1px solid #29C7AC; /* Updated to new color */
+    border-radius: 8px;
+    padding: 10px;
 }
-</string>
-            </property>
-            <item>
-             <property name="text">
-              <string>Signal 1</string>
-             </property>
-             <property name="icon">
-              <iconset resource="Images.qrc">
-               <normaloff>:/Images/signal.png</normaloff>:/Images/signal.png</iconset>
-             </property>
+QPushButton:hover {
+    background-color: #142A4A;
+}</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="Images.qrc">
+                <normaloff>:/Images/pdf.png</normaloff>:/Images/pdf.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>50</width>
+                <height>50</height>
+               </size>
+              </property>
+             </widget>
             </item>
-            <item>
-             <property name="text">
-              <string>Signal 2</string>
-             </property>
-             <property name="icon">
-              <iconset resource="Images.qrc">
-               <normaloff>:/Images/signal.png</normaloff>:/Images/signal.png</iconset>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Signal 3</string>
-             </property>
-             <property name="icon">
-              <iconset resource="Images.qrc">
-               <normaloff>:/Images/signal.png</normaloff>:/Images/signal.png</iconset>
-             </property>
-            </item>
-           </widget>
+           </layout>
           </item>
          </layout>
         </item>
-        <item>
-         <widget class="QLabel" name="ColorChangeGraph2">
-          <property name="minimumSize">
-           <size>
-            <width>100</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>400</width>
-            <height>40</height>
-           </size>
-          </property>
-          <property name="styleSheet">
-           <string notr="true"/>
-          </property>
-          <property name="text">
-           <string>Change Color</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="SignalTitleInputGraph2">
-          <property name="minimumSize">
-           <size>
-            <width>100</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>440</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QLineEdit {
-    background-color: #0B192C;       /* Dark background */
-    color: #FFFFFF;                  /* White text */
-    border: 2px solid #29C7AC;       /* New greenish border */
-    border-radius: 8px;              /* Rounded corners */
-    padding: 8px;                    /* Padding for the text */
-    font-size: 14px;                 /* Adjust the font size */
-}
-
-QLineEdit:hover {
-    border: 2px solid #33DAC1;       /* Lighter greenish-blue on hover */
-}
-
-QLineEdit:focus {
-    border: 2px solid #29C7AC;       /* Stronger new color when focused */
-    background-color: #142A4A;       /* Slightly lighter background on focus */
-    color: #29C7AC;                  /* Text turns greenish-blue when focused */
-}
-
-QLineEdit::placeholder {
-    color: #33DAC1;                  /* Lighter new color for the placeholder */
-    font-style: italic;              /* Italicize placeholder text */
-}
-
-QLineEdit:disabled {
-    background-color: #1B2C3E;       /* Darker background when disabled */
-    color: #888888;                  /* Gray text when disabled */
-    border: 2px solid #666666;       /* Gray border when disabled */
-}
-</string>
-          </property>
-          <property name="placeholderText">
-           <string>Change Signal Title</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_14">
+       </layout>
+      </widget>
+      <widget class="QWidget" name="NonRectangleSignalPage">
+       <property name="styleSheet">
+        <string notr="true">margin: 0px 10px</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="4" column="0">
+         <layout class="QHBoxLayout" name="horizontalLayout_11">
           <property name="spacing">
-           <number>20</number>
+           <number>30</number>
           </property>
           <item>
-           <widget class="QLabel" name="label_10">
-            <property name="maximumSize">
-             <size>
-              <width>100</width>
-              <height>16777215</height>
-             </size>
+           <widget class="QPushButton" name="pushButton">
+            <property name="toolTip">
+             <string>Upload Signal</string>
             </property>
             <property name="styleSheet">
-             <string notr="true"/>
+             <string notr="true">QPushButton {
+    background-color: #0B192C;
+    border-radius: 8px;
+    padding: 10px;
+}
+QPushButton:hover {
+    background-color: #142A4A;
+}</string>
             </property>
             <property name="text">
-             <string>Speed: </string>
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="Images.qrc">
+              <normaloff>:/Images/browse.png</normaloff>:/Images/browse.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>30</width>
+              <height>30</height>
+             </size>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QSlider" name="SpeedSliderGraph2">
-            <property name="maximumSize">
+           <widget class="QPushButton" name="PlayPauseNonRectangleButton">
+            <property name="minimumSize">
              <size>
-              <width>300</width>
-              <height>16777215</height>
+              <width>50</width>
+              <height>0</height>
              </size>
             </property>
+            <property name="toolTip">
+             <string>Play/Pause</string>
+            </property>
             <property name="styleSheet">
-             <string notr="true">QSlider::groove:horizontal {
+             <string notr="true">QPushButton {
+    background-color: #0B192C;
+    border-radius: 8px;
+    padding: 10px;
+}
+QPushButton:hover {
+    background-color: #142A4A;
+}</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="Images.qrc">
+              <normaloff>:/Images/pause.png</normaloff>:/Images/pause.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>30</width>
+              <height>30</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="ReplayNonRectangleButton">
+            <property name="minimumSize">
+             <size>
+              <width>50</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>Replay</string>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QPushButton {
+    background-color: #0B192C;
+    border-radius: 8px;
+    padding: 10px;
+}
+QPushButton:hover {
+    background-color: #142A4A;
+}</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="Images.qrc">
+              <normaloff>:/Images/replay.png</normaloff>:/Images/replay.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>30</width>
+              <height>30</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_12">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetDefaultConstraint</enum>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_6">
+              <property name="minimumSize">
+               <size>
+                <width>70</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>70</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Speed:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSlider" name="SpeedSliderNonRectangleGraph">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>400</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>400</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QSlider::groove:horizontal {
     border: 1px solid #29C7AC; /* New greenish-blue border */
     height: 8px;
     background: #0B192C; /* Deep blue background */
@@ -956,38 +1347,67 @@ QSlider::add-page:horizontal {
     border-radius: 4px;
 }
 </string>
+              </property>
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>5</number>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+        <item row="2" column="0">
+         <layout class="QHBoxLayout" name="horizontalLayout_15">
+          <item>
+           <widget class="QFrame" name="NonRectangleGraph">
+            <property name="minimumSize">
+             <size>
+              <width>1100</width>
+              <height>300</height>
+             </size>
             </property>
-            <property name="minimum">
-             <number>1</number>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>300</height>
+             </size>
             </property>
-            <property name="maximum">
-             <number>5</number>
+            <property name="styleSheet">
+             <string notr="true">background-color: #1E3E62;
+border-radius: 10px</string>
             </property>
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
             </property>
-            <property name="tickPosition">
-             <enum>QSlider::TicksBothSides</enum>
-            </property>
-            <property name="tickInterval">
-             <number>1</number>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
             </property>
            </widget>
           </item>
          </layout>
         </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_15">
+        <item row="1" column="0">
+         <layout class="QHBoxLayout" name="horizontalLayout_17">
           <item>
-           <widget class="QPushButton" name="MoveToGraph1Button">
-            <property name="maximumSize">
+           <widget class="QPushButton" name="BackHomeButton">
+            <property name="minimumSize">
              <size>
-              <width>150</width>
-              <height>40</height>
+              <width>50</width>
+              <height>0</height>
              </size>
             </property>
-            <property name="layoutDirection">
-             <enum>Qt::RightToLeft</enum>
+            <property name="maximumSize">
+             <size>
+              <width>70</width>
+              <height>16777215</height>
+             </size>
             </property>
             <property name="styleSheet">
              <string notr="true">QPushButton {
@@ -1000,39 +1420,42 @@ QPushButton:hover {
 }</string>
             </property>
             <property name="text">
-             <string>Move</string>
+             <string/>
             </property>
             <property name="icon">
              <iconset resource="Images.qrc">
-              <normaloff>:/Images/upArrow.png</normaloff>:/Images/upArrow.png</iconset>
+              <normaloff>:/Images/home.png</normaloff>:/Images/home.png</iconset>
             </property>
             <property name="iconSize">
              <size>
-              <width>20</width>
-              <height>20</height>
+              <width>40</width>
+              <height>40</height>
              </size>
             </property>
            </widget>
           </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
          </layout>
         </item>
        </layout>
-      </item>
-     </layout>
+      </widget>
+     </widget>
     </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="statusBar">
-   <property name="font">
-    <font>
-     <family>Yu Gothic Light</family>
-     <pointsize>-1</pointsize>
-    </font>
-   </property>
-   <property name="sizeGripEnabled">
-    <bool>true</bool>
-   </property>
-  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources>
   <include location="Images.qrc"/>

@@ -9,5 +9,8 @@
     <file>Images/replay.png</file>
     <file>Images/upArrow.png</file>
     <file>Images/signal.png</file>
+    <file>Images/nonRectangle.png</file>
+    <file>Images/home.png</file>
+    <file>Images/pdf.png</file>
   </qresource>
 </RCC>
