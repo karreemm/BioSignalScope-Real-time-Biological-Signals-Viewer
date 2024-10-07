@@ -52,6 +52,7 @@ class Viewer(pg.PlotWidget):
             if max_channel_interval_value > max_interval_value:
                 max_interval_value = max_channel_interval_value
 
+        # self.setYRange(min_interval_value, max_interval_value)
         self.setYRange(min_interval_value, max_interval_value)
         self.x_range_tracker_min, self.x_range_tracker_max = self.viewRange()[0][0], self.viewRange()[0][1]
         self.y_range_tracker_min, self.y_range_tracker_max = self.viewRange()[1][0], self.viewRange()[1][1]
@@ -149,3 +150,11 @@ class Viewer(pg.PlotWidget):
             self.__zoom = new_zoom
         else:
             raise Exception("Value of zoom must be greater than zero")
+        
+    # @property
+    # def scrollbar_value(self):
+    #     return self.__scrollbar_value
+    
+    # @scrollbar_value.setter
+    # def scrollbar_value(self , new_scrollbar_value):
+    #     self.__scrollbar_value = new_scrollbar_value

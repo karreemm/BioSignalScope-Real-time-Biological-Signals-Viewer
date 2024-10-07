@@ -57,8 +57,8 @@ class TestWindow(QMainWindow):
         self.scrolling_y_axis_scrollbar.setMinimum(self.plot_widget.min_signals_value)
         self.scrolling_y_axis_scrollbar.setMaximum(self.plot_widget.max_signals_value)
         self.scrolling_y_axis_scrollbar.valueChanged.connect(lambda: self.plot_widget.scrolling_y_axis_scrollbar_effect(self.scrolling_y_axis_scrollbar.value()))
+        # Test
         # self.scrolling_y_axis_scrollbar.valueChanged.connect(lambda: self.plot_widget.scrolling_y_axis_scrollbar_effect(self.current_y_axis_start_value))
-
         self.viewBox.sigRangeChanged.connect(self.set_sliders_value)
     
     def set_sliders_value(self , view,ranges):
