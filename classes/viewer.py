@@ -11,12 +11,12 @@ class Viewer(pg.PlotWidget):
         super().__init__()
         self.__channels = []
         self.__rewind_state = False
-        self.__cine_speed = 10
+        self.__cine_speed = 1
         self.__zoom = 1
         
         self.x_axis = []
         
-        self.play_state = True
+        self.play_state = False
         
         self.counter = 0
         self.time_window = 1000
@@ -28,7 +28,6 @@ class Viewer(pg.PlotWidget):
         self.x_range_tracker_min, self.x_range_tracker_max = 0,1000
         self.y_range_tracker_min, self.y_range_tracker_max = 0,1000
         
-        
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_signal)
         # self.play()
@@ -36,8 +35,8 @@ class Viewer(pg.PlotWidget):
         
     def update_signal(self):
         if self.time_window + self.counter < len(self.x_axis):
-            self.counter += 10
-            print(f"{self.viewRange()} range in updating")
+            self.counter += 20
+            # print(f"{self.viewRange()} range in updating")
         else:
             self.counter = 0
         self.setXRange(min(self.x_axis[self.counter:self.counter + self.time_window]), max(self.x_axis[self.counter:self.counter + self.time_window])  )
@@ -54,17 +53,19 @@ class Viewer(pg.PlotWidget):
                 max_interval_value = max_channel_interval_value
 
         self.setYRange(min_interval_value, max_interval_value)
-        self.x_range_tracker_min, self.x_range_tracker_max = min(self.x_axis[self.counter:self.counter + self.time_window]), max(self.x_axis[self.counter:self.counter + self.time_window])
-        self.y_range_tracker_min, self.y_range_tracker_max = 0,1000
+        self.x_range_tracker_min, self.x_range_tracker_max = self.viewRange()[0][0], self.viewRange()[0][1]
+        self.y_range_tracker_min, self.y_range_tracker_max = self.viewRange()[1][0], self.viewRange()[1][1]
             
     def play(self):
-        self.play_state = True
-        self.timer.start(self.__cine_speed)
-        self.setXRange(self.viewRange()[0][0], self.viewRange()[0][1])
-        self.setYRange(self.viewRange()[1][0], self.viewRange()[1][1])
-        self.counter = int(max(0,self.viewRange()[0][0]))
-        print(f"{self.counter} this is counter from the play")
-        self.setLimits(xMin = 0, xMax = self.x_axis[-1], yMin = self.min_signals_value, yMax = self.max_signals_value)
+        if self.play_state == False:
+            self.play_state = True
+            self.timer.start(self.__cine_speed)
+            print(self.__cine_speed)
+            self.setXRange(self.viewRange()[0][0]+50, self.viewRange()[0][0]+1000)
+            self.setYRange(self.viewRange()[1][0], self.viewRange()[1][1])
+            self.counter = int(max(0,self.viewRange()[0][0]))
+            # print(f"{self.counter} this is counter from the play")
+            self.setLimits(xMin = 0, xMax = self.x_axis[-1], yMin = self.min_signals_value, yMax = self.max_signals_value)
         
         # print(f'{self.viewRange()} mm')
         
@@ -104,7 +105,7 @@ class Viewer(pg.PlotWidget):
     def cine_speed(self):
         return self.__cine_speed
     
-    @cine_speed.setter
+    # @cine_speed.setter
     def cine_speed(self , new_speed):
         """
         new_speed: the input must range between 10 and 50 
