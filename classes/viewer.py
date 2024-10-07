@@ -100,7 +100,12 @@ class Viewer(pg.PlotWidget):
     def remove_channel(self , to_be_removed_channel):
         self.__channels.remove(to_be_removed_channel)
     
-    
+    def scrolling_x_axis_scrollbar_effect(self , slidebar_current_value):
+            self.setXRange(slidebar_current_value, slidebar_current_value+1000)
+            
+    def scrolling_y_axis_scrollbar_effect(self , slidebar_current_value):
+            self.setYRange(slidebar_current_value, slidebar_current_value+200)
+        
     @property
     def cine_speed(self):
         return self.__cine_speed
