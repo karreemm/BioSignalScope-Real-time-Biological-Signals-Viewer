@@ -12,5 +12,13 @@
     <file>Images/nonRectangle.png</file>
     <file>Images/home.png</file>
     <file>Images/pdf.png</file>
+    <file>Images/plus.png</file>
+    <file>Images/minus.png</file>
+    <file>Images/next.png</file>
+    <file>Images/back.png</file>
+    <file>Images/show.png</file>
+    <file>Images/hide.png</file>
+    <file>Images/color.png</file>
+
   </qresource>
 </RCC>
