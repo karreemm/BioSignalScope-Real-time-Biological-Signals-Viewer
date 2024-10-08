@@ -18,11 +18,17 @@ class Viewer(pg.PlotWidget):
         
         self.play_state = False
         
+        self.viewBox = self.getViewBox()
+        
+        self.y_axis_scroll_bar_enabled = True 
+        
         self.counter = 0
         self.time_window = 1000
         
         self.max_signals_value = -inf
         self.min_signals_value = inf    
+        
+        self.scrolling_in_y_axis = False
         
         ## range trackers
         self.x_range_tracker_min, self.x_range_tracker_max = 0,1000
@@ -53,7 +59,16 @@ class Viewer(pg.PlotWidget):
                 max_interval_value = max_channel_interval_value
 
         # self.setYRange(min_interval_value, max_interval_value)
-        self.setYRange(min_interval_value, max_interval_value)
+        if self.y_axis_scroll_bar_enabled:
+            self.viewBox.setMouseEnabled(x = True, y =True)
+            self.viewBox.enableAutoRange(x=False, y=False)
+            self.viewBox.setAutoVisible(x=False, y=False)
+            pass
+        else:
+            self.viewBox.setMouseEnabled(x = True, y =False)
+            self.viewBox.enableAutoRange(x=False, y=True)
+            self.viewBox.setAutoVisible(x=False, y=True)
+        # self.setYRange(min_interval_value, max_interval_value)
         self.x_range_tracker_min, self.x_range_tracker_max = self.viewRange()[0][0], self.viewRange()[0][1]
         self.y_range_tracker_min, self.y_range_tracker_max = self.viewRange()[1][0], self.viewRange()[1][1]
             
@@ -62,11 +77,20 @@ class Viewer(pg.PlotWidget):
             self.play_state = True
             self.timer.start(self.__cine_speed)
             # print(self.__cine_speed)
-            self.setXRange(self.viewRange()[0][0]+50, self.viewRange()[0][0]+1000)
-            self.setYRange(self.viewRange()[1][0], self.viewRange()[1][1])
-            self.counter = int(max(0,self.viewRange()[0][0]))
+        if self.y_axis_scroll_bar_enabled:
+            self.viewBox.setMouseEnabled(x = True, y =True)
+            self.viewBox.enableAutoRange(x=False, y=False)
+            self.viewBox.setAutoVisible(x=False, y=False)
+        else:
+            self.viewBox.setMouseEnabled(x = True, y =False)
+            self.viewBox.enableAutoRange(x=False, y=True)
+            self.viewBox.setAutoVisible(x=False, y=True)
+            # self.setYRange(self.viewRange()[1][0], self.viewRange()[1][1])
+        self.setXRange(self.viewRange()[0][0]+50, self.viewRange()[0][0]+1000)
+        self.counter = int(max(0,self.viewRange()[0][0]))
             # print(f"{self.counter} this is counter from the play")
-            self.setLimits(xMin = 0, xMax = self.x_axis[-1], yMin = self.min_signals_value, yMax = self.max_signals_value)
+        self.setLimits(xMin = 0, xMax = self.x_axis[-1])
+            # , yMin = self.min_signals_value, yMax = self.max_signals_value
         
         # print(f'{self.viewRange()} mm')
         
@@ -107,9 +131,12 @@ class Viewer(pg.PlotWidget):
             self.blockSignals(False)
             
     def scrolling_y_axis_scrollbar_effect(self , slidebar_current_value):
-            self.blockSignals(True)
-            self.setYRange(slidebar_current_value, slidebar_current_value + self.max_signals_value - self.min_signals_value)
-            self.blockSignals(False)
+            # self.blockSignals(True)
+            self.scrolling_in_y_axis = True
+            print(slidebar_current_value)
+            self.setYRange(slidebar_current_value,  slidebar_current_value + self.max_signals_value - self.min_signals_value)
+            self.scrolling_in_y_axis = False
+            # self.blockSignals(False)
         
     @property
     def cine_speed(self):

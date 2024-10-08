@@ -16,14 +16,14 @@ class TestWindow(QMainWindow):
         self.play_button = QPushButton("play")
         self.stop_button = QPushButton("stop")
         self.current_x_axis_start_value = 0
-        self.current_y_axis_start_value = 0
+        # self.current_y_axis_start_value = 0
         ## slider feature
         self.cine_scrollbar = QSlider()
         self.cine_scrollbar.setMaximum(300)
         self.cine_scrollbar.setMinimum(1)
         
         self.plot_widget = Viewer()
-        self.viewBox = self.plot_widget.getViewBox()
+        # self.viewBox = self.plot_widget.getViewBox()
         self.layout.addWidget(self.plot_widget)
         self.layout.addWidget(self.play_button)
         self.layout.addWidget(self.stop_button)
@@ -59,7 +59,12 @@ class TestWindow(QMainWindow):
         self.scrolling_y_axis_scrollbar.valueChanged.connect(lambda: self.plot_widget.scrolling_y_axis_scrollbar_effect(self.scrolling_y_axis_scrollbar.value()))
         # Test
         # self.scrolling_y_axis_scrollbar.valueChanged.connect(lambda: self.plot_widget.scrolling_y_axis_scrollbar_effect(self.current_y_axis_start_value))
-        self.viewBox.sigRangeChanged.connect(self.set_sliders_value)
+        self.plot_widget.viewBox.sigRangeChanged.connect(self.set_sliders_value)
+        # self.plot_widget.viewBox.setMouseEnabled(x = True, y =False)
+        # self.plot_widget.viewBox.enableAutoRange(x=False, y=True)
+        # self.plot_widget.viewBox.setAutoVisible(x=False, y=True)
+        
+        
     
     def set_sliders_value(self , view,ranges):
         x_axis_slider_value = ranges[0][0]
@@ -67,9 +72,33 @@ class TestWindow(QMainWindow):
         self.scrolling_x_axis_scrollbar.blockSignals(True)
         self.scrolling_x_axis_scrollbar.setValue(int(x_axis_slider_value))
         self.scrolling_x_axis_scrollbar.blockSignals(False)
-        self.scrolling_y_axis_scrollbar.blockSignals(True)
-        self.scrolling_y_axis_scrollbar.setValue(int(y_axis_slider_value))
-        self.scrolling_y_axis_scrollbar.blockSignals(False)
+        
+        if self.plot_widget.y_axis_scroll_bar_enabled :
+            if not self.plot_widget.scrolling_in_y_axis:
+                self.scrolling_x_axis_scrollbar.blockSignals(True)
+                self.scrolling_y_axis_scrollbar.setEnabled(True)
+                self.plot_widget.viewBox.setMouseEnabled(x = True, y =True)
+                self.plot_widget.viewBox.enableAutoRange(x=False, y=False)
+                self.plot_widget.viewBox.setAutoVisible(x=False, y=False)
+                self.scrolling_y_axis_scrollbar.setValue(int(y_axis_slider_value))
+                self.scrolling_x_axis_scrollbar.blockSignals(False)
+        else:
+            self.scrolling_y_axis_scrollbar.setDisabled(True)
+            self.plot_widget.viewBox.setMouseEnabled(x = True, y =False)
+            self.plot_widget.viewBox.enableAutoRange(x=False, y=True)
+            self.plot_widget.viewBox.setAutoVisible(x=False, y=True)
+        
+        # if self.plot_widget.y_axis_state:
+        #     self.plot_widget.viewBox.setMouseEnabled(x = True, y =False)
+        #     self.plot_widget.viewBox.enableAutoRange(x=False, y=True)
+        #     self.plot_widget.viewBox.setAutoVisible(x=False, y=True)
+        #     self.scrolling_y_axis_scrollbar.setDisabled(True)
+        # else:
+        #     self.scrolling_y_axis_scrollbar.setEnabled(True)
+        #     self.scrolling_y_axis_scrollbar.blockSignals(True)
+        #     self.scrolling_y_axis_scrollbar.setValue(int(y_axis_slider_value))
+        #     self.scrolling_y_axis_scrollbar.blockSignals(False)
+            
         # self.current_x_axis_start_value = int(x_axis_slider_value)
         # print(x_axis_slider_value)
         # return
