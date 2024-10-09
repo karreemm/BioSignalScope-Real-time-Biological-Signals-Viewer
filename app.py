@@ -42,7 +42,7 @@ class TestWindow(QMainWindow):
         
         self.play_button.clicked.connect(self.plot_widget.play)
         self.stop_button.clicked.connect(self.plot_widget.pause)
-        
+        self.signal = signals[0]
         if signals:
             for signal in signals:
                 self.plot_widget.add_channel(signal)
@@ -68,8 +68,26 @@ class TestWindow(QMainWindow):
         # self.plot_widget.viewBox.enableAutoRange(x=False, y=True)
         # self.plot_widget.viewBox.setAutoVisible(x=False, y=True)
         
+        ############################################################
+        # Gluing
+        show_glue_rectangle = QPushButton("Show Rectangle of Gluing")
+        self.layout.addWidget(show_glue_rectangle)
+        to_glue_button = QPushButton("Add to Glue")
+        self.layout.addWidget(to_glue_button)
+        show_glue_rectangle.clicked.connect(self.show_glue_rectangle_func)
+        to_glue_button.clicked.connect(self.show_glued_region_coord)
+        #
+        ############################################################
         
-    
+    def show_glue_rectangle_func(self):
+            self.gluing_selected_region_1 = pg.LinearRegionItem()
+            self.plot_widget.addItem(self.gluing_selected_region_1)
+    def show_glued_region_coord(self):
+        data_tuples = [(i, self.signal.signal[i]) for i in range(len(self.signal))]
+        print(data_tuples)
+        selected_region = self.gluing_selected_region_1.getArraySlice(self.signal.signal ,data_tuples, returnSlice= True )   
+        print(selected_region)  
+        
     def set_sliders_value(self , view,ranges):
         x_axis_slider_value = ranges[0][0]
         y_axis_slider_value = ranges[1][0]
@@ -110,7 +128,7 @@ class TestWindow(QMainWindow):
         # print(x_axis_slider_value)
         # return
         # self.current_y_axis_start_value = int(y_axis_slider_value)
-        
+    
 
 def main():
     app = QApplication(sys.argv)
