@@ -16,6 +16,8 @@ class Viewer(pg.PlotWidget):
         
         self.x_axis = []
         
+        self.drag_active = False  
+        
         self.play_state = False
         
         self.viewBox = self.getViewBox()
@@ -79,6 +81,7 @@ class Viewer(pg.PlotWidget):
             # print(self.__cine_speed)
         if self.y_axis_scroll_bar_enabled:
             self.viewBox.setMouseEnabled(x = True, y =True)
+            
             self.viewBox.enableAutoRange(x=False, y=False)
             self.viewBox.setAutoVisible(x=False, y=False)
         else:
@@ -89,7 +92,7 @@ class Viewer(pg.PlotWidget):
         self.setXRange(self.viewRange()[0][0]+50, self.viewRange()[0][0]+1000)
         self.counter = int(max(0,self.viewRange()[0][0]))
             # print(f"{self.counter} this is counter from the play")
-        self.setLimits(xMin = 0, xMax = self.x_axis[-1])
+        self.setLimits(xMin = 0, xMax = self.x_axis[-1],  yMin = self.min_signals_value, yMax = self.max_signals_value)
             # , yMin = self.min_signals_value, yMax = self.max_signals_value
         
         # print(f'{self.viewRange()} mm')
@@ -133,9 +136,10 @@ class Viewer(pg.PlotWidget):
     def scrolling_y_axis_scrollbar_effect(self , slidebar_current_value):
             # self.blockSignals(True)
             self.scrolling_in_y_axis = True
-            print(slidebar_current_value)
-            self.setYRange(slidebar_current_value,  slidebar_current_value + self.max_signals_value - self.min_signals_value)
+            self.viewBox.blockSignals(True)  # Block signals to avoid auto-ranging
+            self.setYRange(max = slidebar_current_value + self.viewRange()[1][1] -  self.viewRange()[1][0], min =slidebar_current_value)
             self.scrolling_in_y_axis = False
+            self.viewBox.blockSignals(False)  # Unblock after setting the range
             # self.blockSignals(False)
         
     @property
@@ -177,6 +181,15 @@ class Viewer(pg.PlotWidget):
             self.__zoom = new_zoom
         else:
             raise Exception("Value of zoom must be greater than zero")
+        
+    def drag_and_move(self):
+        self.drag_active = True
+        print("draging")
+        # super().dragMoveEvent(event)  # Call the base class implementation if needed
+    
+    def reset_drag_flag(self):
+        """Reset drag flag to False after the event."""
+        self.drag_active = False
         
     # @property
     # def scrollbar_value(self):
