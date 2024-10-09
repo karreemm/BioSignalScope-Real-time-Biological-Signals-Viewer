@@ -19,6 +19,9 @@
     <file>Images/show.png</file>
     <file>Images/hide.png</file>
     <file>Images/color.png</file>
+    <file>Images/link.png</file>
+    <file>Images/addToReport.png</file>
+    <file>Images/update.png</file>
 
   </qresource>
 </RCC>

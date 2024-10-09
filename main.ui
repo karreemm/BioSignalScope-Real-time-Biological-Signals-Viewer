@@ -10,6 +10,12 @@
     <height>823</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
@@ -90,7 +96,6 @@ QScrollBar::add-line:horizontal:hover {
     background-color: #29C7AC; /* Arrow hover background */
 }
 
-/* Remove the arrow symbol and keep the clickable area */
 QScrollBar::sub-line:vertical:pressed,
 QScrollBar::add-line:vertical:pressed,
 QScrollBar::sub-line:horizontal:pressed,
@@ -98,7 +103,6 @@ QScrollBar::add-line:horizontal:pressed {
     background-color: #1F8A76;
 }
 
-/* Remove the arrow buttons altogether if not needed */
 QScrollBar::sub-line:vertical,
 QScrollBar::add-line:vertical,
 QScrollBar::sub-line:horizontal,
@@ -127,7 +131,7 @@ QScrollBar::add-line:horizontal {
        </size>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="MainPage">
        <layout class="QGridLayout" name="gridLayout_2">
@@ -597,7 +601,7 @@ QComboBox QAbstractItemView {
               </property>
               <property name="maximumSize">
                <size>
-                <width>400</width>
+                <width>1000</width>
                 <height>50</height>
                </size>
               </property>
@@ -1353,7 +1357,7 @@ QComboBox QAbstractItemView {
               </property>
               <property name="maximumSize">
                <size>
-                <width>400</width>
+                <width>1000</width>
                 <height>50</height>
                </size>
               </property>
@@ -1641,6 +1645,36 @@ QPushButton:hover {
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_14">
             <item>
+             <widget class="QPushButton" name="LinkGraphsButton">
+              <property name="toolTip">
+               <string>Link 2 Graphs</string>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QPushButton {
+    background-color: #0B192C;
+    border-radius: 8px;
+    padding: 10px;
+}
+QPushButton:hover {
+    background-color: #142A4A;
+}</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="Images.qrc">
+                <normaloff>:/Images/link.png</normaloff>:/Images/link.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>50</width>
+                <height>50</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QPushButton" name="NonRectangleSignalButton">
               <property name="toolTip">
                <string>Non-Rectangle Signal</string>
@@ -1717,7 +1751,7 @@ QPushButton:hover {
            <number>30</number>
           </property>
           <item>
-           <widget class="QPushButton" name="pushButton">
+           <widget class="QPushButton" name="UploadSignalNonRectangle">
             <property name="toolTip">
              <string>Upload Signal</string>
             </property>
@@ -1947,7 +1981,7 @@ border-radius: 10px</string>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_27">
             <item>
-             <widget class="QPushButton" name="BackHomeButton">
+             <widget class="QPushButton" name="BackHomeButton1">
               <property name="minimumSize">
                <size>
                 <width>50</width>
@@ -2050,7 +2084,511 @@ QPushButton:hover {
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="SignalGluing"/>
+      <widget class="QWidget" name="SignalGluing">
+       <layout class="QGridLayout" name="gridLayout_6">
+        <item row="1" column="0">
+         <layout class="QHBoxLayout" name="horizontalLayout_18">
+          <item>
+           <widget class="QFrame" name="GluingFrame">
+            <property name="minimumSize">
+             <size>
+              <width>1100</width>
+              <height>300</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>300</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: #1E3E62;
+border-radius: 10px</string>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="4" column="0">
+         <widget class="QTableWidget" name="tableWidget">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>1100</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>100</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QTableWidget {
+    background-color: #0B192C;
+    color: #29C7AC;
+    gridline-color: #29C7AC;
+    selection-background-color: #1A2A3C;
+    selection-color: #29C7AC;
+  border-left: 1px solid #29C7AC; 
+}
+
+QHeaderView::section {
+    background-color: #0B192C;
+    color: #29C7AC;
+    font-weight: bold;
+    border: 1px solid #29C7AC;
+}
+
+QTableCornerButton::section {
+    background-color: #0B192C;
+    border: 1px solid #29C7AC;
+}
+
+QWidget{
+border:none
+}
+
+QTableWidget::item:first {
+    border-left: 2px solid #29C7AC;
+            }</string>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="lineWidth">
+           <number>1</number>
+          </property>
+          <property name="verticalScrollMode">
+           <enum>QAbstractItemView::ScrollPerItem</enum>
+          </property>
+          <property name="showGrid">
+           <bool>true</bool>
+          </property>
+          <property name="cornerButtonEnabled">
+           <bool>true</bool>
+          </property>
+          <property name="rowCount">
+           <number>1</number>
+          </property>
+          <property name="columnCount">
+           <number>5</number>
+          </property>
+          <attribute name="horizontalHeaderVisible">
+           <bool>true</bool>
+          </attribute>
+          <attribute name="horizontalHeaderCascadingSectionResizes">
+           <bool>false</bool>
+          </attribute>
+          <attribute name="horizontalHeaderDefaultSectionSize">
+           <number>113</number>
+          </attribute>
+          <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+           <bool>false</bool>
+          </attribute>
+          <row/>
+          <column>
+           <property name="text">
+            <string>Mean</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Std</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Duration (s)</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Min</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Max</string>
+           </property>
+          </column>
+          <item row="0" column="0">
+           <property name="text">
+            <string/>
+           </property>
+          </item>
+          <item row="0" column="1">
+           <property name="text">
+            <string/>
+           </property>
+          </item>
+          <item row="0" column="2">
+           <property name="text">
+            <string/>
+           </property>
+          </item>
+          <item row="0" column="3">
+           <property name="text">
+            <string/>
+           </property>
+          </item>
+          <item row="0" column="4">
+           <property name="text">
+            <string/>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <layout class="QHBoxLayout" name="horizontalLayout_34">
+          <item>
+           <widget class="QPushButton" name="pushButton">
+            <property name="maximumSize">
+             <size>
+              <width>500</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="layoutDirection">
+             <enum>Qt::RightToLeft</enum>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QPushButton {
+    background-color: #0B192C;
+    border-radius: 8px;
+    padding: 10px;
+}
+QPushButton:hover {
+    background-color: #142A4A;
+}</string>
+            </property>
+            <property name="text">
+             <string>Add To Report  </string>
+            </property>
+            <property name="icon">
+             <iconset resource="Images.qrc">
+              <normaloff>:/Images/addToReport.png</normaloff>:/Images/addToReport.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>25</width>
+              <height>25</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="0" column="0">
+         <layout class="QHBoxLayout" name="horizontalLayout_16">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_20">
+            <item>
+             <widget class="QPushButton" name="BackHomeButton2">
+              <property name="minimumSize">
+               <size>
+                <width>50</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>70</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Back To Home</string>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QPushButton {
+    background-color: #0B192C;
+    border-radius: 8px;
+    padding: 10px;
+}
+QPushButton:hover {
+    background-color: #142A4A;
+}</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="Images.qrc">
+                <normaloff>:/Images/home.png</normaloff>:/Images/home.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>40</width>
+                <height>40</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_19">
+            <item>
+             <widget class="QLabel" name="label_8">
+              <property name="minimumSize">
+               <size>
+                <width>300</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>100</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">font-size: 40px
+
+</string>
+              </property>
+              <property name="text">
+               <string>Gluing Result</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_4">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+        <item row="2" column="0">
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <property name="spacing">
+           <number>20</number>
+          </property>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_23">
+            <property name="spacing">
+             <number>50</number>
+            </property>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_32">
+              <item>
+               <widget class="QLabel" name="label_9">
+                <property name="maximumSize">
+                 <size>
+                  <width>170</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Signal Relationship:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="comboBox">
+                <property name="maximumSize">
+                 <size>
+                  <width>500</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QComboBox {
+    background-color: #0B192C;
+    color: #FFFFFF;
+    border: 2px solid #29C7AC; /* Updated to new color */
+    border-radius: 5px;
+    padding: 5px;
+}
+
+QComboBox::drop-down {
+    border-left: 1px solid #29C7AC; /* Updated to new color */
+}
+
+QComboBox QAbstractItemView {
+    background-color: #0B192C;
+    color: #FFFFFF;
+    selection-background-color: #29C7AC; /* Updated highlight color */
+    selection-color: #FFFFFF;
+    border: 1px solid #29C7AC; /* Updated to new color */
+}
+</string>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>Gap (Positive Distance)</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Overlap (Negative Distance)</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_30">
+              <item>
+               <widget class="QLabel" name="label_10">
+                <property name="maximumSize">
+                 <size>
+                  <width>170</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Interpolation Order:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="comboBox_2">
+                <property name="maximumSize">
+                 <size>
+                  <width>500</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QComboBox {
+    background-color: #0B192C;
+    color: #FFFFFF;
+    border: 2px solid #29C7AC; /* Updated to new color */
+    border-radius: 5px;
+    padding: 5px;
+}
+
+QComboBox::drop-down {
+    border-left: 1px solid #29C7AC; /* Updated to new color */
+}
+
+QComboBox QAbstractItemView {
+    background-color: #0B192C;
+    color: #FFFFFF;
+    selection-background-color: #29C7AC; /* Updated highlight color */
+    selection-color: #FFFFFF;
+    border: 1px solid #29C7AC; /* Updated to new color */
+}
+</string>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>Order 1</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Order 2</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Order 3</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Order 4</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_35">
+            <item>
+             <widget class="QPushButton" name="pushButton_2">
+              <property name="maximumSize">
+               <size>
+                <width>500</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="layoutDirection">
+               <enum>Qt::RightToLeft</enum>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QPushButton {
+    background-color: #0B192C;
+    border-radius: 8px;
+    padding: 10px;
+}
+QPushButton:hover {
+    background-color: #142A4A;
+}</string>
+              </property>
+              <property name="text">
+               <string>Update Gluing  </string>
+              </property>
+              <property name="icon">
+               <iconset resource="Images.qrc">
+                <normaloff>:/Images/update.png</normaloff>:/Images/update.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>25</width>
+                <height>25</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>

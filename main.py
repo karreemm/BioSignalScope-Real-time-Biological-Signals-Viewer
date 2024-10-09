@@ -1,5 +1,6 @@
 import subprocess
 import sys
+from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QApplication, QMainWindow, QStackedWidget, QPushButton, QWidget, QColorDialog
 from PyQt5.uic import loadUi
 from PyQt5.QtGui import QIcon
@@ -47,8 +48,11 @@ class Main(QMainWindow):
         self.NonRectangleSignalButton = self.findChild(QPushButton, 'NonRectangleSignalButton')
         self.NonRectangleSignalButton.clicked.connect(self.go_to_non_rectangle_signal_page)
 
-        self.BackHomeButton = self.findChild(QPushButton, 'BackHomeButton')
-        self.BackHomeButton.clicked.connect(self.go_to_home_page)
+        self.BackHomeButton1 = self.findChild(QPushButton, 'BackHomeButton1')
+        self.BackHomeButton1.clicked.connect(self.go_to_home_page)
+
+        self.BackHomeButton2 = self.findChild(QPushButton, 'BackHomeButton2')
+        self.BackHomeButton2.clicked.connect(self.go_to_home_page)
 
         self.PlayPauseButtonGraph1 = self.findChild(QPushButton, 'PlayPauseButtonGraph1')
         self.PlayPauseButtonGraph1.clicked.connect(self.play_pause_graph1)
@@ -70,7 +74,19 @@ class Main(QMainWindow):
         self.ColorButtonGraph1.clicked.connect(self.change_color_graph1)  
 
         self.ColorButtonGraph2 = self.findChild(QPushButton, 'ColorButtonGraph2')
-        self.ColorButtonGraph2.clicked.connect(self.change_color_graph2)  
+        self.ColorButtonGraph2.clicked.connect(self.change_color_graph2) 
+
+        data = ["25.4", "3.2", "120", "5.1", "30.9"]
+
+        for column, value in enumerate(data):
+            item = QtWidgets.QTableWidgetItem(value)
+            item.setFlags(item.flags() & ~QtCore.Qt.ItemIsEditable) 
+            item.setTextAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)  
+            self.tableWidget.setItem(0, column, item)
+
+        header = self.tableWidget.horizontalHeader()
+        header.setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tableWidget.verticalHeader().setVisible(False) 
 
 
     def go_to_non_rectangle_signal_page(self):
