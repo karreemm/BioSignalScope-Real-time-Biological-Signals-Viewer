@@ -60,10 +60,10 @@ class TestWindow(QMainWindow):
         # print(f"{int(self.plot_widget.viewBox.viewRange()[1][1] - self.plot_widget.viewBox.viewRange()[1][0])} page step")
         self.scrolling_y_axis_scrollbar.setMaximum(self.plot_widget.max_signals_value + int(self.plot_widget.viewBox.viewRange()[1][1] - self.plot_widget.viewBox.viewRange()[1][0]))
         # print(f"{self.plot_widget.max_signals_value + int(self.plot_widget.viewBox.viewRange()[1][1] - self.plot_widget.viewBox.viewRange()[1][0])} maximum")
-        self.scrolling_y_axis_scrollbar.valueChanged.connect(lambda: self.plot_widget.scrolling_y_axis_scrollbar_effect(self.plot_widget.viewRange()[1][0]))
+        self.scrolling_y_axis_scrollbar.valueChanged.connect(lambda: self.plot_widget.scrolling_y_axis_scrollbar_effect(self.scrolling_y_axis_scrollbar.value()))
         # Test
         # self.scrolling_y_axis_scrollbar.valueChanged.connect(lambda: self.plot_widget.scrolling_y_axis_scrollbar_effect(self.current_y_axis_start_value))
-        self.plot_widget.viewBox.sigYRangeChanged.connect(self.set_sliders_value)
+        self.plot_widget.viewBox.sigRangeChanged.connect(self.set_sliders_value)
         # self.plot_widget.viewBox.setMouseEnabled(x = True, y =False)
         # self.plot_widget.viewBox.enableAutoRange(x=False, y=True)
         # self.plot_widget.viewBox.setAutoVisible(x=False, y=True)
@@ -71,20 +71,20 @@ class TestWindow(QMainWindow):
         
     
     def set_sliders_value(self , view,ranges):
-        # x_axis_slider_value = ranges[0][0]
-        y_axis_slider_value = ranges[1]
-        print(ranges)
-        # self.scrolling_x_axis_scrollbar.blockSignals(True)
-        # self.scrolling_x_axis_scrollbar.setValue(int(x_axis_slider_value))
-        # self.scrolling_x_axis_scrollbar.blockSignals(False)
+        x_axis_slider_value = ranges[0][0]
+        y_axis_slider_value = ranges[1][0]
+        # print(ranges)
+        self.scrolling_x_axis_scrollbar.blockSignals(True)
+        self.scrolling_x_axis_scrollbar.setValue(int(x_axis_slider_value))
+        self.scrolling_x_axis_scrollbar.blockSignals(False)
         
         if self.plot_widget.y_axis_scroll_bar_enabled :
             if not self.plot_widget.scrolling_in_y_axis:
-                self.scrolling_y_axis_scrollbar.blockSignals(True)
                 self.scrolling_y_axis_scrollbar.setEnabled(True)
                 self.plot_widget.viewBox.setMouseEnabled(x = True, y =True)
                 self.plot_widget.viewBox.enableAutoRange(x=False, y=False)
                 self.plot_widget.viewBox.setAutoVisible(x=False, y=False)
+                self.scrolling_y_axis_scrollbar.blockSignals(True)
                 self.scrolling_y_axis_scrollbar.setValue(int(y_axis_slider_value))
                 # self.scrolling_y_axis_scrollbar.setPageStep(int(self.plot_widget.viewBox.viewRange()[1][1] - self.plot_widget.viewBox.viewRange()[1][0]))
                 # self.scrolling_y_axis_scrollbar.

@@ -135,10 +135,17 @@ class Viewer(pg.PlotWidget):
             
     def scrolling_y_axis_scrollbar_effect(self , slidebar_current_value):
             # self.blockSignals(True)
-            self.scrolling_in_y_axis = True
             self.viewBox.blockSignals(True)  # Block signals to avoid auto-ranging
-            self.setYRange(max = slidebar_current_value + self.viewRange()[1][1] -  self.viewRange()[1][0], min =slidebar_current_value)
+            self.viewBox.setMouseEnabled(x = False, y =False)
+            self.viewBox.enableAutoRange(x=False, y=True)
+            self.viewBox.setAutoVisible(x=False, y=True)
+            self.scrolling_in_y_axis = True
+            self.setYRange(slidebar_current_value - 100, slidebar_current_value + 100)
+            # self.setYRange(max = slidebar_current_value + self.viewRange()[1][1] -  self.viewRange()[1][0], min =slidebar_current_value)
             self.scrolling_in_y_axis = False
+            self.viewBox.setMouseEnabled(x = True, y =True)
+            self.viewBox.enableAutoRange(x=False, y=False)
+            self.viewBox.setAutoVisible(x=False, y=False)
             self.viewBox.blockSignals(False)  # Unblock after setting the range
             # self.blockSignals(False)
         
