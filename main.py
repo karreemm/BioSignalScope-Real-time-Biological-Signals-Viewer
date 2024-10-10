@@ -32,10 +32,10 @@ class Main(QMainWindow):
         self.setMinimumHeight(min_height)
         self.setMinimumWidth(min_width)
 
-        self.PlayImage = QIcon(':/Images/play.png')
-        self.PauseImage = QIcon(':/Images/pause.png')
-        self.HideImage = QIcon(':/Images/hide.png')
-        self.ShowImage = QIcon(':/Images/show.png')
+        self.PlayImage = QIcon(':/Images/playW.png')
+        self.PauseImage = QIcon(':/Images/pauseW.png')
+        self.HideImage = QIcon(':/Images/hideW.png')
+        self.ShowImage = QIcon(':/Images/showW.png')
 
         self.is_playing_graph1 = False  
         self.is_playing_graph2 = False  
