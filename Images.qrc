@@ -2,26 +2,94 @@
 <RCC version="1.0">
   <qresource>
     <file>Images/browse.png</file>
+    <file>Images/browseW.png</file>
+    <file>Images/browseB.png</file>
+
     <file>Images/downArrow.png</file>
+    <file>Images/downArrowW.png</file>
+    <file>Images/downArrowB.png</file>
+
     <file>Images/pause.png</file>
+    <file>Images/pauseW.png</file>
+    <file>Images/pauseB.png</file>
+
     <file>Images/play.png</file>
+    <file>Images/playW.png</file>
+    <file>Images/playB.png</file>
+
     <file>Images/realTime.png</file>
+    <file>Images/realTimeW.png</file>
+    <file>Images/realTimeB.png</file>
+
     <file>Images/replay.png</file>
+    <file>Images/replayW.png</file>
+    <file>Images/replayB.png</file>
+
     <file>Images/upArrow.png</file>
+    <file>Images/upArrowW.png</file>
+    <file>Images/upArrowB.png</file>
+
     <file>Images/signal.png</file>
+    <file>Images/signalW.png</file>
+    <file>Images/signalB.png</file>
+
     <file>Images/nonRectangle.png</file>
+    <file>Images/nonRectangleW.png</file>
+    <file>Images/nonRectangleB.png</file>
+
     <file>Images/home.png</file>
+    <file>Images/homeW.png</file>
+    <file>Images/homeB.png</file>
+
     <file>Images/pdf.png</file>
+    <file>Images/pdfW.png</file>
+    <file>Images/pdfB.png</file>
+
     <file>Images/plus.png</file>
+    <file>Images/plusW.png</file>
+    <file>Images/plusB.png</file>
+
     <file>Images/minus.png</file>
+    <file>Images/minusW.png</file>
+    <file>Images/minusB.png</file>
+
     <file>Images/next.png</file>
+    <file>Images/nextW.png</file>
+    <file>Images/nextB.png</file>
+
     <file>Images/back.png</file>
+    <file>Images/backW.png</file>
+    <file>Images/backB.png</file>
+
     <file>Images/show.png</file>
+    <file>Images/showW.png</file>
+    <file>Images/showB.png</file>
+
     <file>Images/hide.png</file>
+    <file>Images/hideW.png</file>
+    <file>Images/hideB.png</file>
+
     <file>Images/color.png</file>
+    <file>Images/colorW.png</file>
+    <file>Images/colorB.png</file>
+
     <file>Images/link.png</file>
+    <file>Images/linkW.png</file>
+    <file>Images/linkB.png</file>
+
     <file>Images/addToReport.png</file>
+    <file>Images/addToReportW.png</file>
+    <file>Images/addToReportB.png</file>
+
     <file>Images/update.png</file>
+    <file>Images/updateW.png</file>
+    <file>Images/updateB.png</file>
+
+    <file>Images/gluingB.png</file>
+    <file>Images/gluingW.png</file>
+
+    <file>Images/start.png</file>
+
 
   </qresource>
 </RCC>
