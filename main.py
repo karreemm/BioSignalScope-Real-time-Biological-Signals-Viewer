@@ -76,6 +76,12 @@ class Main(QMainWindow):
         self.ColorButtonGraph2 = self.findChild(QPushButton, 'ColorButtonGraph2')
         self.ColorButtonGraph2.clicked.connect(self.change_color_graph2) 
 
+        self.StartGluingButton = self.findChild(QPushButton, 'StartGluingButton')
+        self.StartGluingButton.setEnabled(False) 
+
+        self.GluingModeButton = self.findChild(QPushButton, 'GluingModeButton')
+        self.GluingModeButton.clicked.connect(self.gluing_mode)
+
         data = ["25.4", "3.2", "120", "5.1", "30.9"]
 
         for column, value in enumerate(data):
@@ -87,7 +93,6 @@ class Main(QMainWindow):
         header = self.tableWidget.horizontalHeader()
         header.setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
         self.tableWidget.verticalHeader().setVisible(False) 
-
 
     def go_to_non_rectangle_signal_page(self):
         page_index = self.Pages.indexOf(self.findChild(QWidget, 'NonRectangleSignalPage'))
@@ -136,6 +141,9 @@ class Main(QMainWindow):
         color = QColorDialog.getColor()
         if color.isValid():
             print(color.name())
+
+    def gluing_mode(self):
+        self.StartGluingButton.setEnabled(True)
 
     
 if __name__ == '__main__':

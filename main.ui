@@ -236,7 +236,7 @@ QTableWidget::item:first {
        </size>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="MainPage">
        <layout class="QGridLayout" name="gridLayout_2">
@@ -443,107 +443,38 @@ border-radius: 10px
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_25">
               <item>
-               <widget class="QPushButton" name="BackButtonGraph1">
-                <property name="minimumSize">
-                 <size>
-                  <width>40</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>70</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="toolTip">
-                 <string>Move Back</string>
-                </property>
+               <widget class="QComboBox" name="ModeComboBoxGraph1">
                 <property name="styleSheet">
-                 <string notr="true"/>
+                 <string notr="true">QComboBox {
+    background-color: #0f1729;
+    color: white;              /* Updated blue text */
+    border: 2px solid #ffffff;   /* Updated white border */
+    border-radius: 5px;
+    padding: 5px;
+}
+
+QComboBox::drop-down {
+    border-left: 1px solid #ffffff; /* White border for the dropdown */
+}
+
+QComboBox QAbstractItemView {
+    background-color: #0f1729;
+    color: white;              /* Updated blue text */
+    selection-background-color: #ffffff; /* White highlight color */
+    selection-color: #0f1729;    /* Dark background for selected text */
+    border: 1px solid #ffffff;   /* White border for item view */
+}</string>
                 </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="icon">
-                 <iconset resource="Images.qrc">
-                  <normaloff>:/Images/backW.png</normaloff>:/Images/backW.png</iconset>
-                </property>
-                <property name="iconSize">
-                 <size>
-                  <width>30</width>
-                  <height>30</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="NextButtonGraph1">
-                <property name="toolTip">
-                 <string>Move Forward</string>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true"/>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="icon">
-                 <iconset resource="Images.qrc">
-                  <normaloff>:/Images/nextW.png</normaloff>:/Images/nextW.png</iconset>
-                </property>
-                <property name="iconSize">
-                 <size>
-                  <width>30</width>
-                  <height>30</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="ZoomInButtonGraph1">
-                <property name="toolTip">
-                 <string>Zoom In</string>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true"/>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="icon">
-                 <iconset resource="Images.qrc">
-                  <normaloff>:/Images/plusW.png</normaloff>:/Images/plusW.png</iconset>
-                </property>
-                <property name="iconSize">
-                 <size>
-                  <width>30</width>
-                  <height>30</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="ZoomOutButtonGraph1">
-                <property name="toolTip">
-                 <string>Zoom Out</string>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true"/>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="icon">
-                 <iconset resource="Images.qrc">
-                  <normaloff>:/Images/minusW.png</normaloff>:/Images/minusW.png</iconset>
-                </property>
-                <property name="iconSize">
-                 <size>
-                  <width>30</width>
-                  <height>30</height>
-                 </size>
-                </property>
+                <item>
+                 <property name="text">
+                  <string>Scrollable Mode</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>AutoFit Mode</string>
+                 </property>
+                </item>
                </widget>
               </item>
              </layout>
@@ -1055,143 +986,38 @@ border-radius: 10px
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_26">
               <item>
-               <widget class="QPushButton" name="BackButtonGraph2">
-                <property name="minimumSize">
-                 <size>
-                  <width>40</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>70</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="toolTip">
-                 <string>Move Back</string>
-                </property>
+               <widget class="QComboBox" name="ModeComboBoxGraph2">
                 <property name="styleSheet">
-                 <string notr="true"/>
+                 <string notr="true">QComboBox {
+    background-color: #0f1729;
+    color: white;              /* Updated blue text */
+    border: 2px solid #ffffff;   /* Updated white border */
+    border-radius: 5px;
+    padding: 5px;
+}
+
+QComboBox::drop-down {
+    border-left: 1px solid #ffffff; /* White border for the dropdown */
+}
+
+QComboBox QAbstractItemView {
+    background-color: #0f1729;
+    color: white;              /* Updated blue text */
+    selection-background-color: #ffffff; /* White highlight color */
+    selection-color: #0f1729;    /* Dark background for selected text */
+    border: 1px solid #ffffff;   /* White border for item view */
+}</string>
                 </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="icon">
-                 <iconset resource="Images.qrc">
-                  <normaloff>:/Images/backW.png</normaloff>:/Images/backW.png</iconset>
-                </property>
-                <property name="iconSize">
-                 <size>
-                  <width>30</width>
-                  <height>30</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="NextButtonGraph2">
-                <property name="minimumSize">
-                 <size>
-                  <width>40</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>70</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="toolTip">
-                 <string>Move Forward</string>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true"/>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="icon">
-                 <iconset resource="Images.qrc">
-                  <normaloff>:/Images/nextW.png</normaloff>:/Images/nextW.png</iconset>
-                </property>
-                <property name="iconSize">
-                 <size>
-                  <width>30</width>
-                  <height>30</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="ZoomInButtonGraph2">
-                <property name="minimumSize">
-                 <size>
-                  <width>40</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>70</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="toolTip">
-                 <string>Zoom In</string>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true"/>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="icon">
-                 <iconset resource="Images.qrc">
-                  <normaloff>:/Images/plusW.png</normaloff>:/Images/plusW.png</iconset>
-                </property>
-                <property name="iconSize">
-                 <size>
-                  <width>30</width>
-                  <height>30</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="ZoomOutButtonGraph2">
-                <property name="minimumSize">
-                 <size>
-                  <width>40</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>70</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="toolTip">
-                 <string>Zoom Out</string>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true"/>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="icon">
-                 <iconset resource="Images.qrc">
-                  <normaloff>:/Images/minusW.png</normaloff>:/Images/minusW.png</iconset>
-                </property>
-                <property name="iconSize">
-                 <size>
-                  <width>30</width>
-                  <height>30</height>
-                 </size>
-                </property>
+                <item>
+                 <property name="text">
+                  <string>Scrollable Mode</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>AutoFit Mode</string>
+                 </property>
+                </item>
                </widget>
               </item>
              </layout>
@@ -1560,7 +1386,7 @@ QLineEdit:disabled {
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="pushButton_3">
+             <widget class="QPushButton" name="GluingModeButton">
               <property name="toolTip">
                <string>Glue Two Signals</string>
               </property>
@@ -1570,6 +1396,26 @@ QLineEdit:disabled {
               <property name="icon">
                <iconset resource="Images.qrc">
                 <normaloff>:/Images/gluingB.png</normaloff>:/Images/gluingB.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>50</width>
+                <height>50</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="StartGluingButton">
+              <property name="toolTip">
+               <string>Start Gluing</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="Images.qrc">
+                <normaloff>:/Images/start.png</normaloff>:/Images/start.png</iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -1929,7 +1775,7 @@ border-radius: 10px
         <item row="5" column="0">
          <layout class="QHBoxLayout" name="horizontalLayout_34">
           <item>
-           <widget class="QPushButton" name="pushButton">
+           <widget class="QPushButton" name="AddToReportButton">
             <property name="maximumSize">
              <size>
               <width>500</width>
@@ -2045,7 +1891,7 @@ QComboBox QAbstractItemView {
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_35">
             <item>
-             <widget class="QPushButton" name="pushButton_2">
+             <widget class="QPushButton" name="UpdateGluingButton">
               <property name="maximumSize">
                <size>
                 <width>500</width>
@@ -2267,7 +2113,7 @@ border-radius: 10px
            <number>5</number>
           </property>
           <attribute name="horizontalHeaderVisible">
-           <bool>true</bool>
+           <bool>false</bool>
           </attribute>
           <attribute name="horizontalHeaderCascadingSectionResizes">
            <bool>false</bool>

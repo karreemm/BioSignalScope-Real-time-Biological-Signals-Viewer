@@ -88,6 +88,8 @@
     <file>Images/gluingB.png</file>
     <file>Images/gluingW.png</file>
 
+    <file>Images/start.png</file>
+
 
   </qresource>
 </RCC>
