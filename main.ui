@@ -207,10 +207,10 @@ QSlider::add-page:horizontal {
        </size>
       </property>
       <property name="styleSheet">
-       <string notr="true">margin-top: 10px</string>
+       <string notr="true"/>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="MainPage">
        <layout class="QGridLayout" name="gridLayout_2">
