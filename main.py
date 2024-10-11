@@ -96,6 +96,7 @@ class Main(QMainWindow):
         header = self.tableWidget.horizontalHeader()
         header.setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
         self.tableWidget.verticalHeader().setVisible(False) 
+        self.tableWidget.horizontalHeader().setVisible(True)
         
         # initializing the main viewers 
         self.viewer_frame1 = self.findChild(QFrame, 'Graph1Frame')

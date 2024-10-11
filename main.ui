@@ -194,35 +194,6 @@ QSlider::add-page:horizontal {
     border-radius: 4px;
 }
 
-/* Table styling */
-QTableWidget {
-    background-color: #0f1729;
-    color: #ffffff;                   /* Updated text color to white */
-    gridline-color: #ffffff;           /* Updated gridline color to white */
-    selection-background-color: #1A2A3C;
-    selection-color: #ffffff;          /* Updated selection text color to white */
-    border-left: 1px solid #ffffff;    /* Updated border color to white */
-}
-
-QHeaderView::section {
-    background-color: #0f1729;
-    color: #ffffff;                    /* Updated header text color to white */
-    font-weight: bold;
-    border: 1px solid #ffffff;         /* Updated header border color to white */
-}
-
-QTableCornerButton::section {
-    background-color: #0f1729;
-    border: 1px solid #ffffff;         /* Updated corner button border color to white */
-}
-
-QWidget {
-    border: none;
-}
-
-QTableWidget::item:first {
-    border-left: 2px solid #ffffff;    /* Updated first item border color to white */
-}
 </string>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -2008,7 +1979,7 @@ border-radius: 10px
             <item>
              <widget class="QPushButton" name="pushButton_2">
               <property name="layoutDirection">
-               <enum>Qt::RightToLeft</enum>
+               <enum>Qt::LeftToRight</enum>
               </property>
               <property name="styleSheet">
                <string notr="true">color: white;
@@ -2016,7 +1987,7 @@ border-radius: 10px
 </string>
               </property>
               <property name="text">
-               <string>Move Left  </string>
+               <string>  Move Left</string>
               </property>
               <property name="icon">
                <iconset resource="Images.qrc">
@@ -2183,7 +2154,33 @@ border-radius: 10px
            </size>
           </property>
           <property name="styleSheet">
-           <string notr="true">margin-top: 30px</string>
+           <string notr="true">/* Table styling */
+QTableWidget {
+    background-color: #0f1729;
+    color: #ffffff;                   /* Updated text color to white */
+    gridline-color: #ffffff;           /* Updated gridline color to white */
+    selection-background-color: #1A2A3C;
+    selection-color: #ffffff;          /* Updated selection text color to white */
+    border-left: 1px solid #ffffff;    /* Updated border color to white */
+}
+
+QHeaderView::section {
+    background-color: #0f1729;
+    color: #ffffff;                    /* Updated header text color to white */
+    font-weight: bold;
+    border: 1px solid #ffffff;         /* Updated header border color to white */
+}
+
+QTableCornerButton::section {
+    background-color: #0f1729;
+    border: 1px solid #ffffff;         /* Updated corner button border color to white */
+}
+
+QWidget {
+    border: none;
+}
+
+</string>
           </property>
           <property name="frameShape">
            <enum>QFrame::StyledPanel</enum>
@@ -2234,7 +2231,7 @@ border-radius: 10px
           </column>
           <column>
            <property name="text">
-            <string>Duration (s)</string>
+            <string>Range</string>
            </property>
           </column>
           <column>
@@ -2247,31 +2244,6 @@ border-radius: 10px
             <string>Max</string>
            </property>
           </column>
-          <item row="0" column="0">
-           <property name="text">
-            <string/>
-           </property>
-          </item>
-          <item row="0" column="1">
-           <property name="text">
-            <string/>
-           </property>
-          </item>
-          <item row="0" column="2">
-           <property name="text">
-            <string/>
-           </property>
-          </item>
-          <item row="0" column="3">
-           <property name="text">
-            <string/>
-           </property>
-          </item>
-          <item row="0" column="4">
-           <property name="text">
-            <string/>
-           </property>
-          </item>
          </widget>
         </item>
        </layout>
