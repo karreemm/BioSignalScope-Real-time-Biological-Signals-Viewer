@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout
 from PyQt5.QtCore import QTimer
 import pyqtgraph as pg
 import pandas as pd
+import numpy as np
 from math import inf
 
 class Viewer(pg.PlotWidget):
@@ -40,6 +41,17 @@ class Viewer(pg.PlotWidget):
         self.timer.timeout.connect(self.update_signal)
         # self.play()
         
+        
+        
+    def show_glue_rectangle_func(self):
+            self.gluing_selected_region = pg.LinearRegionItem(values=[self.viewRange()[0][0]+50,self.viewRange()[0][0]+150])
+            self.addItem(self.gluing_selected_region)
+    def process_region_coord(self , selected_channel_index):
+        selected_region = self.gluing_selected_region.getRegion()   
+        # print(selected_region)  
+        data_y = self.channels[selected_channel_index].signal[int(selected_region[0]): int(selected_region[1])]
+        data_x = np.linspace(int(selected_region[0]) , int(selected_region[1]) , num= int(selected_region[1]) - int(selected_region[0]))
+        return [data_x , data_y]
         
     def update_signal(self):
         if self.time_window + self.counter < len(self.x_axis):
@@ -125,6 +137,14 @@ class Viewer(pg.PlotWidget):
                     self.min_signals_value = min(channel.signal)
                 if max(channel.signal) > self.max_signals_value:
                     self.max_signals_value = max(channel.signal)
+        else:
+            raise Exception("The new channel must be of class CustomSignal")
+        
+    def add_glued_moving_channel(self , new_channel , channel_x_values):
+        if isinstance(new_channel , CustomSignal):
+            self.__channels.append(new_channel)
+            # self.x_axis = list(range(max([len(signal) for signal in self.__channels]))) ## max len in the signals imported
+            self.plot( channel_x_values ,new_channel.signal)## pass the x_axis from the length of the signal
         else:
             raise Exception("The new channel must be of class CustomSignal")
     

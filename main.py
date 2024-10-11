@@ -1,12 +1,14 @@
 import subprocess
 import sys
 from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtWidgets import QApplication, QMainWindow, QStackedWidget, QPushButton,QComboBox,  QMessageBox, QWidget, QColorDialog, QFrame, QVBoxLayout, QFileDialog
+from PyQt5.QtWidgets import QApplication, QMainWindow, QStackedWidget, QPushButton,QComboBox,  QMessageBox, QWidget, QColorDialog, QFrame, QVBoxLayout, QFileDialog ,QScrollBar
 from PyQt5.uic import loadUi
 from PyQt5.QtGui import QIcon
 from classes.viewer import Viewer
 from classes.channel_ import CustomSignal
+from classes.gluer import Gluer
 import pandas as pd 
+import numpy as np
 
 def compile_qrc():
     qrc_file = 'Images.qrc'
@@ -81,10 +83,28 @@ class Main(QMainWindow):
 
         self.StartGluingButton = self.findChild(QPushButton, 'StartGluingButton')
         self.StartGluingButton.setEnabled(False) 
+        self.StartGluingButton.clicked.connect(self.start_gluing)
 
         self.GluingModeButton = self.findChild(QPushButton, 'GluingModeButton')
         self.GluingModeButton.clicked.connect(self.gluing_mode)
 
+        self.UpdateGluingButton = self.findChild(QPushButton , "UpdateGluingButton")
+        self.UpdateGluingButton.clicked.connect(self.update_gluing_interpolate)
+        
+        self.MoveSignalLeftButton = self.findChild(QPushButton , "pushButton_2")
+        self.MoveSignalLeftButton.clicked.connect(self.move_signal_left)
+        
+        # Adding functionality of going to glue window button
+        self.StartGluingButton.clicked.connect(self.start_gluing)
+        self.signal_gluing_page = self.findChild(QWidget, 'SignalGluing')
+        self.page_index = self.Pages.indexOf(self.signal_gluing_page)
+        self.glued_viewer_frame = self.signal_gluing_page.findChild(QFrame, 'GluingFrame')
+        self.glued_frame_layout = QVBoxLayout()
+        self.glued_viewer = Viewer()
+        self.glued_frame_layout.addWidget(self.glued_viewer)
+        self.glued_viewer_frame.setLayout(self.glued_frame_layout)
+        self.y_interpolated = None
+        
         data = ["25.4", "3.2", "120", "5.1", "30.9"]
 
         for column, value in enumerate(data):
@@ -149,7 +169,29 @@ class Main(QMainWindow):
         page_index = self.Pages.indexOf(self.findChild(QWidget, 'MainPage'))
         if page_index != -1:
             self.Pages.setCurrentIndex(page_index)
+            
+    def go_to_gluing_page(self , data_x_viewer_1 , data_y_viewer_1 , data_x_viewer_2 , data_y_viewer_2):
+        self.glued_viewer.clear()
+        self.to_be_glued_signal_1 = CustomSignal(data_y_viewer_1)
+        self.to_be_glued_signal_2 = CustomSignal(data_y_viewer_2)
+        self.init_gluing_page(data_x_viewer_1 , data_x_viewer_2)
+        if self.page_index != -1:
+            self.Pages.setCurrentIndex(self.page_index)
 
+    def init_gluing_page(self  ,data_x_viewer_1 , data_x_viewer_2):
+        self.glued_viewer.add_glued_moving_channel(self.to_be_glued_signal_1, data_x_viewer_1)
+        self.glued_viewer.add_glued_moving_channel(self.to_be_glued_signal_2, data_x_viewer_2)
+        self.glued_signal_1_x_values = data_x_viewer_1
+        self.glued_signal_2_x_values = data_x_viewer_2
+        
+                
+    def set_gluing_scroll_bar_func(self):
+        self.glued_viewer.clear()
+        self.glued_viewer.remove_channel(self.to_be_glued_signal_2)
+        self.glued_signal_2_x_values = [x + 100 for x in self.glued_signal_2_x_values]
+        # self.glued_viewer.plot()
+        
+        
     def play_pause_graph1(self):
         if self.is_playing_graph1:
             self.PlayPauseButtonGraph1.setIcon(self.PauseImage)
@@ -198,7 +240,49 @@ class Main(QMainWindow):
 
     def gluing_mode(self):
         self.StartGluingButton.setEnabled(True)
+        self.viewer1.show_glue_rectangle_func()
+        self.viewer2.show_glue_rectangle_func()
+    
+    def start_gluing(self):
+        selected_channel_index_viewer_1 = self.signals_dropdown_1.currentIndex()
+        selected_channel_index_viewer_2 = self.signals_dropdown_2.currentIndex()
+        [data_x_viewer_1 , data_y_viewer_1] = self.viewer1.process_region_coord(selected_channel_index_viewer_1)
+        [data_x_viewer_2 , data_y_viewer_2] = self.viewer2.process_region_coord(selected_channel_index_viewer_2)
+        self.go_to_gluing_page(data_x_viewer_1 , data_y_viewer_1 , data_x_viewer_2 , data_y_viewer_2)
         
+    def update_gluing_interpolate(self):
+        self.glued_viewer.clear()
+        self.interpolation_order_combo_box = self.findChild(QComboBox , "comboBox_2")
+        interpolation_order = self.interpolation_order_combo_box.currentIndex()
+        self.gluer_interpolate = Gluer(self.to_be_glued_signal_1 , self.to_be_glued_signal_2 ,self.glued_signal_1_x_values , self.glued_signal_2_x_values )
+        self.y_interpolated= self.gluer_interpolate.interpolate( interpolation_order)
+        print(self.gluer_interpolate.signal_1_x_values[-1])
+        print(self.gluer_interpolate.signal_2_x_values[0])
+        if(self.gluer_interpolate.signal_1_x_values[0] < self.gluer_interpolate.signal_2_x_values[0] ):
+            overlap_start = max(min(self.gluer_interpolate.signal_2_x_values) ,min(self.gluer_interpolate.signal_1_x_values))
+            overlap_end = min(max(self.gluer_interpolate.signal_2_x_values) ,max(self.gluer_interpolate.signal_1_x_values))
+            
+            x_overlapped = np.linspace(overlap_start , overlap_end , num = 1000)
+            
+            signal_1_x_values_before_interpolated_part = self.gluer_interpolate.signal_1_x_values[:x_overlapped[0]]
+            signal_2_x_values_before_interpolated_part = self.gluer_interpolate.signal_2_x_values[x_overlapped[-1]:]
+            
+            signal_1_y_values_before_interpolated_part = self.gluer_interpolate.signal_1_y_values[:self.y_interpolated[0]]
+            signal_2_x_values_before_interpolated_part = self.gluer_interpolate.signal_2_x_values[x_overlapped[-1]:]
+            
+            glued_interpolated_overlapped_signal_x_values = np.concatenate([signal_1_x_values_before_interpolated_part , x_overlapped ,signal_2_x_values_before_interpolated_part])
+            glued_interpolated_overlapped_signal_y_values = np.concatenate([self.to_be_glued_signal_1.signal , self.y_interpolated , self.to_be_glued_signal_2.signal])
+            
+            
+        else:
+            x_gap = np.linspace(self.gluer_interpolate.signal_1_x_values[-1] , self.gluer_interpolate.signal_2_x_values[0], num = 1000)
+            glued_interpolated_gapped_signal_x_values = np.concatenate([self.glued_signal_1_x_values , x_gap ,self.glued_signal_2_x_values])
+            glued_interpolated_gapped_signal_y_values = np.concatenate([self.to_be_glued_signal_1.signal , self.y_interpolated , self.to_be_glued_signal_2.signal])
+            
+            self.glued_viewer.plot(glued_interpolated_gapped_signal_x_values , glued_interpolated_gapped_signal_y_values)
+    
+    def move_signal_left(self):
+        pass
     def load_signal(self,viewer_number:str):
         '''
         viewer_number: 1 or 2

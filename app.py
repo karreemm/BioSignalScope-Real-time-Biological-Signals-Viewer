@@ -23,8 +23,10 @@ class TestWindow(QMainWindow):
         self.cine_scrollbar.setMinimum(1)
         
         self.plot_widget = Viewer()
+        # self.plot_widget2 = Viewer()
         # self.viewBox = self.plot_widget.getViewBox()
         self.layout.addWidget(self.plot_widget)
+        # self.layout.addWidget(self.plot_widget2)
         self.layout.addWidget(self.play_button)
         self.layout.addWidget(self.stop_button)
         # cine slider feature 
@@ -46,6 +48,7 @@ class TestWindow(QMainWindow):
         if signals:
             for signal in signals:
                 self.plot_widget.add_channel(signal)
+                # self.plot_widget2.add_channel(signal)
             self.plot_widget.play()
         
         self.scrolling_x_axis_scrollbar.setMaximum(self.plot_widget.x_axis[-1])
@@ -74,19 +77,10 @@ class TestWindow(QMainWindow):
         self.layout.addWidget(show_glue_rectangle)
         to_glue_button = QPushButton("Add to Glue")
         self.layout.addWidget(to_glue_button)
-        show_glue_rectangle.clicked.connect(self.show_glue_rectangle_func)
-        to_glue_button.clicked.connect(self.show_glued_region_coord)
+        show_glue_rectangle.clicked.connect(self.plot_widget.show_glue_rectangle_func)
+        to_glue_button.clicked.connect(self.plot_widget.process_region_coord)
         #
         ############################################################
-        
-    def show_glue_rectangle_func(self):
-            self.gluing_selected_region_1 = pg.LinearRegionItem()
-            self.plot_widget.addItem(self.gluing_selected_region_1)
-    def show_glued_region_coord(self):
-        data_tuples = [(i, self.signal.signal[i]) for i in range(len(self.signal))]
-        print(data_tuples)
-        selected_region = self.gluing_selected_region_1.getArraySlice(self.signal.signal ,data_tuples, returnSlice= True )   
-        print(selected_region)  
         
     def set_sliders_value(self , view,ranges):
         x_axis_slider_value = ranges[0][0]
