@@ -22,7 +22,7 @@ class Viewer(pg.PlotWidget):
         
         self.viewBox = self.getViewBox()
         
-        self.y_axis_scroll_bar_enabled = True 
+        self.y_axis_scroll_bar_enabled = False 
         
         self.counter = 0
         self.time_window = 1000
@@ -53,6 +53,8 @@ class Viewer(pg.PlotWidget):
         min_interval_value = inf
         max_interval_value = -inf
         for channel in self.__channels:
+            if self.counter + self.time_window > len(channel):
+                continue
             min_channel_interval_value = min(channel.signal[self.counter:self.counter + self.time_window])
             if min_channel_interval_value < min_interval_value:
                 min_interval_value = min_channel_interval_value
@@ -117,7 +119,8 @@ class Viewer(pg.PlotWidget):
             self.__channels.append(new_channel)
             self.x_axis = list(range(max([len(signal) for signal in self.__channels]))) ## max len in the signals imported
             for channel in self.__channels:
-                self.plot(self.x_axis,channel.signal)
+                self.plot( [i for i in  range(len(channel.signal))] ,channel.signal)## pass the x_axis from the length of the signal
+                print(channel.color)
                 if min(channel.signal) < self.min_signals_value:
                     self.min_signals_value = min(channel.signal)
                 if max(channel.signal) > self.max_signals_value:

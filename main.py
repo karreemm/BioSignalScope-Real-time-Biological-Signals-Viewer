@@ -1,9 +1,12 @@
 import subprocess
 import sys
 from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtWidgets import QApplication, QMainWindow, QStackedWidget, QPushButton, QWidget, QColorDialog
+from PyQt5.QtWidgets import QApplication, QMainWindow, QStackedWidget, QPushButton,QComboBox,  QMessageBox, QWidget, QColorDialog, QFrame, QVBoxLayout, QFileDialog
 from PyQt5.uic import loadUi
 from PyQt5.QtGui import QIcon
+from classes.viewer import Viewer
+from classes.channel_ import CustomSignal
+import pandas as pd 
 
 def compile_qrc():
     qrc_file = 'Images.qrc'
@@ -93,6 +96,48 @@ class Main(QMainWindow):
         header = self.tableWidget.horizontalHeader()
         header.setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
         self.tableWidget.verticalHeader().setVisible(False) 
+        
+        # initializing the main viewers 
+        self.viewer_frame1 = self.findChild(QFrame, 'Graph1Frame')
+        self.frame1_layout = QVBoxLayout()
+        self.viewer1 = Viewer()
+        self.frame1_layout.addWidget(self.viewer1)
+        self.viewer_frame1.setLayout(self.frame1_layout)
+        self.play_pause_graph1()
+        
+        self.viewer_frame2 = self.findChild(QFrame, 'Graph2Frame')
+        self.frame2_layout = QVBoxLayout()
+        self.viewer2 = Viewer()
+        self.frame2_layout.addWidget(self.viewer2)
+        self.viewer_frame2.setLayout(self.frame2_layout)
+        self.play_pause_graph2()
+        
+        # initializing the buttons
+        self.number_of_viewer_1_signals = 0
+        self.number_of_viewer_2_signals = 0
+        ## upload buttons
+        self.upload_button_1 = self.findChild(QPushButton ,'BrowseButtonGraph1')
+        self.upload_button_1.clicked.connect(lambda : self.load_signal('1'))
+        self.upload_button_2 = self.findChild(QPushButton ,'BrowseButtonGraph2')
+        self.upload_button_2.clicked.connect(lambda : self.load_signal('2'))
+        
+        # Auto fit mode 
+        self.view_modes_dropdown_1 = self.findChild(QComboBox, 'ModeComboBoxGraph1')
+        self.view_modes_dropdown_1.currentIndexChanged.connect(lambda index : self.change_view_mode(index, '1'))
+        self.change_view_mode(0, 1)
+        self.view_modes_dropdown_2 = self.findChild(QComboBox, 'ModeComboBoxGraph2')
+        self.view_modes_dropdown_2.currentIndexChanged.connect(lambda index : self.change_view_mode(index, '2'))
+        self.change_view_mode(0, 2)
+        
+        # initializing the signals dropdown 
+        self.signals_dropdown_1 = self.findChild(QComboBox, 'SignalsComboBoxGraph1')
+        for i in range(3):
+            self.signals_dropdown_1.removeItem(0)
+        self.signals_dropdown_2 = self.findChild(QComboBox, 'SignalsComboBoxGraph2')
+        for i in range(3):
+            self.signals_dropdown_2.removeItem(0)
+        
+
 
     def go_to_non_rectangle_signal_page(self):
         page_index = self.Pages.indexOf(self.findChild(QWidget, 'NonRectangleSignalPage'))
@@ -107,15 +152,23 @@ class Main(QMainWindow):
     def play_pause_graph1(self):
         if self.is_playing_graph1:
             self.PlayPauseButtonGraph1.setIcon(self.PauseImage)
+            if len(self.viewer1.channels):
+                self.viewer1.play()
         else:
             self.PlayPauseButtonGraph1.setIcon(self.PlayImage)
+            if len(self.viewer1.channels):
+                self.viewer1.pause()
         self.is_playing_graph1 = not self.is_playing_graph1
 
     def play_pause_graph2(self):
         if self.is_playing_graph2:
             self.PlayPauseButtonGraph2.setIcon(self.PauseImage)
+            if len(self.viewer2.channels):
+                self.viewer2.play()
         else:
             self.PlayPauseButtonGraph2.setIcon(self.PlayImage)
+            if len(self.viewer2.channels):
+                self.viewer2.pause()
         self.is_playing_graph2 = not self.is_playing_graph2
 
     def show_hide_graph1(self):
@@ -144,6 +197,64 @@ class Main(QMainWindow):
 
     def gluing_mode(self):
         self.StartGluingButton.setEnabled(True)
+        
+    def load_signal(self,viewer_number:str):
+        '''
+        viewer_number: 1 or 2
+        '''
+        file_path, _ = QFileDialog.getOpenFileName(self,'Open CSV File', '', 'CSV Files (*.csv);;All Files (*)' )
+        if file_path:
+            if file_path.endswith('.csv'):
+                    df = pd.read_csv(file_path)
+                    for i, col in enumerate(df.columns):
+                        if viewer_number == '1':
+                            signal = CustomSignal(label=f"{col}_signal_{self.number_of_viewer_1_signals}", signal=df[col].values )
+                            self.signals_dropdown_1.addItem(signal.label)
+                        else:
+                            signal = CustomSignal(label=f"{i}_signal_{self.number_of_viewer_2_signals}", signal=df[col].values )
+                            self.signals_dropdown_2.addItem(signal.label)
+                    ## testing ##
+                        print(f"Column Name: {col}")
+                        print(df[col].values)
+                        print(type(df[col].values))
+                    ## testing ##
+                        if viewer_number == "1":
+                            self.viewer1.add_channel(signal)
+                        else:
+                            self.viewer2.add_channel(signal)
+                            
+                    if viewer_number == "1":
+                            self.number_of_viewer_1_signals+=1
+                    else:
+                            self.number_of_viewer_2_signals+=1
+                    print(len(self.viewer1.channels))
+            else:
+                self.show_error("the file extention must be a csv file")
+        else:
+            # self.show_error("no file is uploaded")
+            pass
+    
+    def change_view_mode(self, index, viewer_number):
+        if viewer_number == '1':
+            if index == 0:
+                self.viewer1.y_axis_scroll_bar_enabled = True
+            else:
+                self.viewer1.y_axis_scroll_bar_enabled = False
+        else:
+            if index == 0:
+                self.viewer2.y_axis_scroll_bar_enabled = True
+            else:
+                self.viewer2.y_axis_scroll_bar_enabled = False
+        
+        
+                
+    def show_error(self, message:str):
+        msg_box = QMessageBox()
+        msg_box.setIcon(QMessageBox.Icon.Critical)
+        msg_box.setWindowTitle("ERROR")
+        msg_box.setText(message)
+        msg_box.setStandardButtons(QMessageBox.StandardButton.Ok)
+        msg_box.exec_()
 
     
 if __name__ == '__main__':
