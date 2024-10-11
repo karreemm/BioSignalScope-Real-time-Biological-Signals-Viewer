@@ -11,7 +11,7 @@ class Viewer(pg.PlotWidget):
         super().__init__()
         self.__channels = []
         self.__rewind_state = False
-        self.__cine_speed = 1
+        self.__cine_speed = 30
         self.__zoom = 1
         
         self.x_axis = []
