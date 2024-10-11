@@ -90,6 +90,10 @@
 
     <file>Images/start.png</file>
 
+    <file>Images/rightArrowW.png</file>
+    <file>Images/leftArrowW.png</file>
+
+
 
   </qresource>
 </RCC>
