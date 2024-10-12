@@ -192,8 +192,8 @@ class Viewer(pg.PlotWidget):
         """
         if(new_speed > 0):
             self.__cine_speed = new_speed
-            self.pause()
-            self.play()
+            # self.pause()
+            # self.play()
         else: 
             raise Exception("Speed of cine must be greater than zero")
         pass
