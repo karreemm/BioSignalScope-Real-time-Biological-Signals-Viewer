@@ -42,6 +42,11 @@ class Main(QMainWindow):
         self.PauseImage = QIcon(':/Images/pauseW.png')
         self.HideImage = QIcon(':/Images/hideW.png')
         self.ShowImage = QIcon(':/Images/showW.png')
+        self.RewindImage = QIcon(':/Images/rewind.png')
+        self.NoRewindImage = QIcon(':/Images/noRewind.png')
+
+        self.is_rewinding_graph1 = False
+        self.is_rewinding_graph2 = False
 
         self.is_playing_graph1 = False  
         self.is_playing_graph2 = False  
@@ -94,6 +99,14 @@ class Main(QMainWindow):
         
         self.MoveSignalLeftButton = self.findChild(QPushButton , "pushButton_2")
         self.MoveSignalLeftButton.clicked.connect(self.move_signal_left)
+
+        self.RewindButtonGraph1 = self.findChild(QPushButton, 'RewindButtonGraph1')
+        self.RewindButtonGraph1.setIcon(self.NoRewindImage)
+        self.RewindButtonGraph1.clicked.connect(self.rewind_graph1)
+
+        self.RewindButtonGraph2 = self.findChild(QPushButton, 'RewindButtonGraph2')
+        self.RewindButtonGraph2.setIcon(self.NoRewindImage)
+        self.RewindButtonGraph2.clicked.connect(self.rewind_graph2)
         
         # Adding functionality of going to glue window button
         self.StartGluingButton.clicked.connect(self.start_gluing)
@@ -480,9 +493,21 @@ class Main(QMainWindow):
                     plot_item.setPen(pg.mkPen(color=color))
                     self.viewer1.channels[dropdown_index].color = color
                     
-        
-        
-                
+    def rewind_graph1(self):
+        if self.is_rewinding_graph1:
+            self.RewindButtonGraph1.setIcon(self.NoRewindImage)
+
+        else:
+            self.RewindButtonGraph1.setIcon(self.RewindImage)
+        self.is_rewinding_graph1 = not self.is_rewinding_graph1
+
+    def rewind_graph2(self):
+        if self.is_rewinding_graph2:
+            self.RewindButtonGraph2.setIcon(self.NoRewindImage)
+        else:
+            self.RewindButtonGraph2.setIcon(self.RewindImage)
+        self.is_rewinding_graph2 = not self.is_rewinding_graph2
+    
     def show_error(self, message:str):
         msg_box = QMessageBox()
         msg_box.setIcon(QMessageBox.Icon.Critical)

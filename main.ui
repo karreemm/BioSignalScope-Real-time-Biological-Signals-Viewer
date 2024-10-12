@@ -19,6 +19,9 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="toolTip">
+   <string>Rewind/NoRewind</string>
+  </property>
   <property name="styleSheet">
    <string notr="true">* {
     background-color: #0f1729;   /* Updated background */
@@ -403,6 +406,38 @@ border-radius: 10px
                 <property name="icon">
                  <iconset resource="Images.qrc">
                   <normaloff>:/Images/replayW.png</normaloff>:/Images/replayW.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>30</width>
+                  <height>30</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="RewindButtonGraph1">
+                <property name="minimumSize">
+                 <size>
+                  <width>40</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>70</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Rewind/NoRewind </string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="Images.qrc">
+                  <normaloff>:/Images/noRewind.png</normaloff>:/Images/noRewind.png</iconset>
                 </property>
                 <property name="iconSize">
                  <size>
@@ -950,6 +985,38 @@ border-radius: 10px
                 <property name="icon">
                  <iconset resource="Images.qrc">
                   <normaloff>:/Images/replayW.png</normaloff>:/Images/replayW.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>30</width>
+                  <height>30</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="RewindButtonGraph2">
+                <property name="minimumSize">
+                 <size>
+                  <width>40</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>70</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Rewind/NoRewind</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="Images.qrc">
+                  <normaloff>:/Images/noRewind.png</normaloff>:/Images/noRewind.png</iconset>
                 </property>
                 <property name="iconSize">
                  <size>

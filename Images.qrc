@@ -93,6 +93,10 @@
     <file>Images/rightArrowW.png</file>
     <file>Images/leftArrowW.png</file>
 
+    <file>Images/rewind.png</file>
+    <file>Images/noRewind.png</file>
+
+
 
 
   </qresource>
