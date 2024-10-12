@@ -12,7 +12,7 @@ class Viewer(pg.PlotWidget):
         super().__init__()
         self.__channels = []
         self.__rewind_state = False
-        self.__cine_speed = 30
+        self.__cine_speed = 60
         self.__zoom = 1
         
         self.x_axis = []
@@ -27,6 +27,7 @@ class Viewer(pg.PlotWidget):
         
         self.counter = 0
         self.time_window = 1000
+        
         
         self.max_signals_value = -inf
         self.min_signals_value = inf    
@@ -58,7 +59,10 @@ class Viewer(pg.PlotWidget):
             self.counter += 20
             # print(f"{self.viewRange()} range in updating")
         else:
-            self.counter = 0
+            if self.__rewind_state:
+                self.counter = 0
+            # else:
+            #     self.pause()
         self.setXRange(min(self.x_axis[self.counter:self.counter + self.time_window]), max(self.x_axis[self.counter:self.counter + self.time_window])  )
         # self.setXRange(self.viewRange()[0][0]+self.counter, self.viewRange()[0][1]+self.counter)
             
@@ -111,6 +115,11 @@ class Viewer(pg.PlotWidget):
         
         # print(f'{self.viewRange()} mm')
         
+    def replay(self):
+        if len(self.__channels):
+            self.play()
+            self.counter = 0
+        
     def pause(self):
         self.play_state = False
         self.timer.stop()
@@ -125,6 +134,9 @@ class Viewer(pg.PlotWidget):
     
     def zoom_out(self):
         pass
+    
+    def update_x_axis(self):
+        self.x_axis = list(range(max([len(signal) for signal in self.__channels])))
     
     def add_channel(self , new_channel):
         if isinstance(new_channel , CustomSignal):
@@ -202,9 +214,9 @@ class Viewer(pg.PlotWidget):
     def rewind_state(self):
         return self.__rewind_state
     
-    # @rewind_state.setter
-    # def rewind_state(self, new_rewind_state):
-    #     self.__rewind_state = new_rewind_state
+    @rewind_state.setter
+    def rewind_state(self, new_rewind_state):
+        self.__rewind_state = new_rewind_state
     
     @property
     def channels(self):

@@ -160,6 +160,7 @@ class Main(QMainWindow):
         self.frame1_layout.addWidget(self.viewer1)
         self.viewer_frame1.setLayout(self.frame1_layout)
         self.play_pause_graph1()
+        self.viewer1.sigRangeChanged.connect(lambda:self.change_graph_play_pause_icon_for_rewinding('1'))
         
         self.viewer_frame2 = self.findChild(QFrame, 'Graph2Frame')
         self.frame2_layout = QVBoxLayout()
@@ -167,6 +168,7 @@ class Main(QMainWindow):
         self.frame2_layout.addWidget(self.viewer2)
         self.viewer_frame2.setLayout(self.frame2_layout)
         self.play_pause_graph2()
+        self.viewer2.sigRangeChanged.connect(lambda:self.change_graph_play_pause_icon_for_rewinding('2'))
         
         # initializing the buttons
         self.number_of_viewer_1_signals = 0
@@ -221,8 +223,31 @@ class Main(QMainWindow):
         self.signal_speed_slider_2 = self.findChild(QSlider, 'SpeedSliderGraph2')
         self.signal_speed_slider_2.setRange(0,4)
         self.signal_speed_slider_2.setTickInterval(1)
-        self.signal_speed_slider_1.valueChanged.connect(lambda value: self.on_slider_value_changed(value, '2'))
-
+        self.signal_speed_slider_2.valueChanged.connect(lambda value: self.on_slider_value_changed(value, '2'))
+        
+        # replay button
+        self.replay_button_1 = self.findChild(QPushButton, 'ReplayButtonGraph1')
+        self.replay_button_1.clicked.connect(lambda:self.replay_signal('1'))
+        self.replay_button_2 = self.findChild(QPushButton, 'ReplayButtonGraph2')
+        self.replay_button_2.clicked.connect(lambda:self.replay_signal('2'))
+        
+    def replay_signal(self, viewer:str):
+        if viewer == '1':
+            if not self.is_playing_graph1:
+                self.viewer1.replay()
+                self.is_playing_graph1 = True 
+            else:
+                print("condition 2")
+                self.play_pause_graph1()
+                self.viewer1.replay()
+        else:
+            if not self.is_playing_graph2:
+                self.is_playing_graph2 = True 
+                self.viewer2.replay()
+            else:
+                print("condition 2")
+                self.play_pause_graph2()
+                self.viewer2.replay()
         
     def on_slider_value_changed(self,value, viewer:str):
         speeds = [70,60,50,40,30]
@@ -295,6 +320,9 @@ class Main(QMainWindow):
                         
                     # self.viewer2.play()
                     # self.viewer2.pause()
+                    self.viewer1.update_x_axis()
+                    if self.viewer1.x_axis[-1] < self.viewer1.viewRange()[0][1]:
+                        self.replay_signal('1')
                     break
         else:
             dropdown_index = self.signals_dropdown_2.currentIndex()
@@ -314,6 +342,9 @@ class Main(QMainWindow):
                     if len(self.viewer2.channels) == 0:
                         self.viewer2.pause()
                         self.PlayPauseButtonGraph2.setIcon(self.PlayImage)
+                    self.viewer2.update_x_axis()
+                    if self.viewer2.x_axis[-1] < self.viewer2.viewRange()[0][1]:
+                        self.replay_signal('2')
                     break
 
 
@@ -660,22 +691,34 @@ class Main(QMainWindow):
                 # print(signal_y_data, plot_item.getData()[1])
                 if np.array_equal(signal_y_data, plot_item.getData()[1]):
                     plot_item.setPen(pg.mkPen(color=color))
-                    self.viewer1.channels[dropdown_index].color = color
+                    self.viewer2.channels[dropdown_index].color = color
                     
     def rewind_graph1(self):
         if self.is_rewinding_graph1:
             self.RewindButtonGraph1.setIcon(self.NoRewindImage)
-
+            self.viewer1.rewind_state = False
         else:
             self.RewindButtonGraph1.setIcon(self.RewindImage)
+            self.viewer1.rewind_state = True
         self.is_rewinding_graph1 = not self.is_rewinding_graph1
 
     def rewind_graph2(self):
         if self.is_rewinding_graph2:
             self.RewindButtonGraph2.setIcon(self.NoRewindImage)
+            self.viewer2.rewind_state = False
         else:
             self.RewindButtonGraph2.setIcon(self.RewindImage)
+            self.viewer2.rewind_state = True
         self.is_rewinding_graph2 = not self.is_rewinding_graph2
+        
+    def change_graph_play_pause_icon_for_rewinding(self, viewer:str):
+        if viewer == '1':
+            if not self.is_rewinding_graph1 and self.viewer1.viewRange()[0][1] == self.viewer1.x_axis[-1]:
+                self.play_pause_graph1()
+        else:
+            if not self.is_rewinding_graph2 and (self.viewer2.viewRange()[0][1] == self.viewer2.x_axis[-1]):
+                self.play_pause_graph2()
+            pass
 
     def open_real_time_window_graph1(self):
         self.real_time_window = realTimeWindow()
