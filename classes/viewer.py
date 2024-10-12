@@ -131,7 +131,7 @@ class Viewer(pg.PlotWidget):
             self.__channels.append(new_channel)
             self.x_axis = list(range(max([len(signal) for signal in self.__channels]))) ## max len in the signals imported
             for channel in self.__channels:
-                self.plot( [i for i in  range(len(channel.signal))] ,channel.signal)## pass the x_axis from the length of the signal
+                self.plot( [i for i in  range(len(channel.signal))] ,channel.signal, pen = pg.mkPen(color = channel.color))## pass the x_axis from the length of the signal
                 print(channel.color)
                 if min(channel.signal) < self.min_signals_value:
                     self.min_signals_value = min(channel.signal)
@@ -139,6 +139,15 @@ class Viewer(pg.PlotWidget):
                     self.max_signals_value = max(channel.signal)
         else:
             raise Exception("The new channel must be of class CustomSignal")
+        
+    def plot_internal_signals(self):
+        for channel in self.__channels:
+                self.plot( [i for i in  range(len(channel.signal))] ,channel.signal, pen = pg.mkPen(color = channel.color))## pass the x_axis from the length of the signal
+                print(channel.color)
+                if min(channel.signal) < self.min_signals_value:
+                    self.min_signals_value = min(channel.signal)
+                if max(channel.signal) > self.max_signals_value:
+                    self.max_signals_value = max(channel.signal)
         
     def add_glued_moving_channel(self , new_channel , channel_x_values):
         if isinstance(new_channel , CustomSignal):

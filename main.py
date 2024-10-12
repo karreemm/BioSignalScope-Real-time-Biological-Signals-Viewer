@@ -9,6 +9,7 @@ from classes.channel_ import CustomSignal
 from classes.gluer import Gluer
 import pandas as pd 
 import numpy as np
+import pyqtgraph as pg
 
 def compile_qrc():
     qrc_file = 'Images.qrc'
@@ -145,10 +146,10 @@ class Main(QMainWindow):
         # Auto fit mode 
         self.view_modes_dropdown_1 = self.findChild(QComboBox, 'ModeComboBoxGraph1')
         self.view_modes_dropdown_1.currentIndexChanged.connect(lambda index : self.change_view_mode(index, '1'))
-        self.change_view_mode(0, 1)
+        self.change_view_mode(0, '1')
         self.view_modes_dropdown_2 = self.findChild(QComboBox, 'ModeComboBoxGraph2')
         self.view_modes_dropdown_2.currentIndexChanged.connect(lambda index : self.change_view_mode(index, '2'))
-        self.change_view_mode(0, 2)
+        self.change_view_mode(0, '2')
         
         # initializing the signals dropdown 
         self.signals_dropdown_1 = self.findChild(QComboBox, 'SignalsComboBoxGraph1')
@@ -157,7 +158,47 @@ class Main(QMainWindow):
         self.signals_dropdown_2 = self.findChild(QComboBox, 'SignalsComboBoxGraph2')
         for i in range(3):
             self.signals_dropdown_2.removeItem(0)
+            
+        # move button
+        self.move_signal_button_1 = self.findChild(QPushButton, 'MoveToGraph2Button')
+        self.move_signal_button_1.clicked.connect(lambda:self.move_signal('1'))
+        self.move_signal_button_2 = self.findChild(QPushButton, 'MoveToGraph1Button')
+        self.move_signal_button_2.clicked.connect(lambda:self.move_signal('2'))
         
+        
+    def move_signal(self, from_viewer:str):
+        if from_viewer == '1':
+            dropdown_index = self.signals_dropdown_1.currentIndex()
+            signal_y_data = self.viewer1.channels[dropdown_index].signal
+            for i, plot_item in enumerate(self.viewer1.listDataItems()):
+                if np.array_equal(signal_y_data, plot_item.getData()[1]):
+                    signal_to_be_removed = self.viewer1.channels[dropdown_index]
+                    self.viewer1.remove_channel(signal_to_be_removed)
+                    self.viewer1.removeItem(plot_item)
+                    self.signals_dropdown_1.removeItem(dropdown_index)
+                    self.viewer1.clear()
+                    self.viewer1.plot_internal_signals()
+                    self.viewer2.add_channel(signal_to_be_removed)
+                    self.signals_dropdown_2.addItem(signal_to_be_removed.label)
+                    self.viewer2.play()
+                    self.viewer2.pause()
+                    break
+        else:
+            dropdown_index = self.signals_dropdown_2.currentIndex()
+            signal_y_data = self.viewer2.channels[dropdown_index].signal
+            for i, plot_item in enumerate(self.viewer2.listDataItems()):
+                if np.array_equal(signal_y_data, plot_item.getData()[1]):
+                    signal_to_be_removed = self.viewer2.channels[dropdown_index]
+                    self.viewer2.remove_channel(signal_to_be_removed)
+                    self.viewer2.removeItem(plot_item)
+                    self.signals_dropdown_2.removeItem(dropdown_index)
+                    self.viewer2.clear()
+                    self.viewer2.plot_internal_signals()
+                    self.viewer1.add_channel(signal_to_be_removed)
+                    self.signals_dropdown_1.addItem(signal_to_be_removed.label)
+                    self.viewer1.play()
+                    self.viewer1.pause()
+                    break
 
 
     def go_to_non_rectangle_signal_page(self):
@@ -217,26 +258,56 @@ class Main(QMainWindow):
     def show_hide_graph1(self):
         if self.is_graph1_visible:
             self.ShowHideButtonGraph1.setIcon(self.ShowImage)
+            
+            dropdown_index = self.signals_dropdown_1.currentIndex()
+            signal_y_data = self.viewer1.channels[dropdown_index].signal
+            for i, plot_item in enumerate(self.viewer1.listDataItems()):
+                # print(signal_y_data, plot_item.getData()[1])
+                if np.array_equal(signal_y_data, plot_item.getData()[1]):
+                    plot_item.setPen(pg.mkPen(color='#000000'))
+                    self.viewer1.channels[dropdown_index].visability = False
         else:
             self.ShowHideButtonGraph1.setIcon(self.HideImage)
+            dropdown_index = self.signals_dropdown_1.currentIndex()
+            signal_y_data = self.viewer1.channels[dropdown_index].signal
+            for i, plot_item in enumerate(self.viewer1.listDataItems()):
+                # print(signal_y_data, plot_item.getData()[1])
+                if np.array_equal(signal_y_data, plot_item.getData()[1]):
+                    plot_item.setPen(pg.mkPen(color=self.viewer1.channels[dropdown_index].color))
+                    self.viewer1.channels[dropdown_index].visability = True
         self.is_graph1_visible = not self.is_graph1_visible
     
     def show_hide_graph2(self):
         if self.is_graph2_visible:
             self.ShowHideButtonGraph2.setIcon(self.ShowImage)
+            dropdown_index = self.signals_dropdown_2.currentIndex()
+            signal_y_data = self.viewer2.channels[dropdown_index].signal
+            for i, plot_item in enumerate(self.viewer2.listDataItems()):
+                if np.array_equal(signal_y_data, plot_item.getData()[1]):
+                    plot_item.setPen(pg.mkPen(color='#000000'))
+                    self.viewer2.channels[dropdown_index].visability = False
         else:
             self.ShowHideButtonGraph2.setIcon(self.HideImage)
+            dropdown_index = self.signals_dropdown_2.currentIndex()
+            signal_y_data = self.viewer2.channels[dropdown_index].signal
+            for i, plot_item in enumerate(self.viewer2.listDataItems()):
+                # print(signal_y_data, plot_item.getData()[1])
+                if np.array_equal(signal_y_data, plot_item.getData()[1]):
+                    plot_item.setPen(pg.mkPen(color=self.viewer2.channels[dropdown_index].color))
+                    self.viewer2.channels[dropdown_index].visability = True
         self.is_graph2_visible = not self.is_graph2_visible
 
     def change_color_graph1(self):
         color = QColorDialog.getColor()
         if color.isValid():
-            print(color.name())
+            self.change_plot_color('1', color.name())
+            # print(color.name())
     
     def change_color_graph2(self):
         color = QColorDialog.getColor()
         if color.isValid():
-            print(color.name())
+            self.change_plot_color('2', color.name())
+            # print(color.name())
 
     def gluing_mode(self):
         self.StartGluingButton.setEnabled(True)
@@ -293,26 +364,32 @@ class Main(QMainWindow):
                     df = pd.read_csv(file_path)
                     for i, col in enumerate(df.columns):
                         if viewer_number == '1':
-                            signal = CustomSignal(label=f"{col}_signal_{self.number_of_viewer_1_signals}", signal=df[col].values )
+                            signal = CustomSignal(label=f"{col}_signal_{self.number_of_viewer_1_signals}_1", signal=df[col].values )
                             self.signals_dropdown_1.addItem(signal.label)
                         else:
-                            signal = CustomSignal(label=f"{i}_signal_{self.number_of_viewer_2_signals}", signal=df[col].values )
+                            signal = CustomSignal(label=f"{col}_signal_{self.number_of_viewer_2_signals}_2", signal=df[col].values )
                             self.signals_dropdown_2.addItem(signal.label)
                     ## testing ##
-                        print(f"Column Name: {col}")
-                        print(df[col].values)
-                        print(type(df[col].values))
+                        # print(f"Column Name: {col}")
+                        # print(df[col].values)
+                        # print(type(df[col].values))
                     ## testing ##
                         if viewer_number == "1":
+                            self.viewer1.clear()
                             self.viewer1.add_channel(signal)
                         else:
+                            self.viewer2.clear()
                             self.viewer2.add_channel(signal)
                             
                     if viewer_number == "1":
                             self.number_of_viewer_1_signals+=1
+                            self.viewer1.play()
+                            self.viewer1.pause()
                     else:
                             self.number_of_viewer_2_signals+=1
-                    print(len(self.viewer1.channels))
+                            self.viewer2.play()
+                            self.viewer2.pause()
+                    # print(len(self.viewer1.channels))
             else:
                 self.show_error("the file extention must be a csv file")
         else:
@@ -330,6 +407,26 @@ class Main(QMainWindow):
                 self.viewer2.y_axis_scroll_bar_enabled = True
             else:
                 self.viewer2.y_axis_scroll_bar_enabled = False
+                
+    def change_plot_color(self, viewer:str, color:str):
+        if viewer == '1':
+            dropdown_index = self.signals_dropdown_1.currentIndex()
+            signal_y_data = self.viewer1.channels[dropdown_index].signal
+            for i, plot_item in enumerate(self.viewer1.listDataItems()):
+                # print(signal_y_data, plot_item.getData()[1])
+                if np.array_equal(signal_y_data, plot_item.getData()[1]):
+                    plot_item.setPen(pg.mkPen(color=color))
+                    self.viewer1.channels[dropdown_index].color = color
+                    # print("color changed")
+        else:
+            dropdown_index = self.signals_dropdown_2.currentIndex()
+            signal_y_data = self.viewer2.channels[dropdown_index].signal
+            for i, plot_item in enumerate(self.viewer2.listDataItems()):
+                # print(signal_y_data, plot_item.getData()[1])
+                if np.array_equal(signal_y_data, plot_item.getData()[1]):
+                    plot_item.setPen(pg.mkPen(color=color))
+                    self.viewer1.channels[dropdown_index].color = color
+                    
         
         
                 
