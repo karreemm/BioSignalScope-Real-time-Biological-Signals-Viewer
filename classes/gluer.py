@@ -10,6 +10,11 @@ class Gluer():
         # self.__window_start_2 = window_start_2
         # self.__gap_overlap = gap_overlap
         self.__interpolation_order = interpolation_order
+        self.__mean = "null"
+        self.__std = "null"
+        self.__duration = "null"
+        self.__min = "null"
+        self.__max = "null"
     
     @property
     def signal_1(self):
@@ -43,8 +48,38 @@ class Gluer():
     def interpolation_order(self):
         return self.__interpolation_order
     
+    @property
+    def mean(self):
+        return self.__mean
+    @property
+    def std(self):
+        return self.__std
+    @property
+    def duration(self):
+        return self.__duration
+    @property
+    def min(self):
+        return self.__min
+    @property
+    def max(self):
+        return self.__max
+    
     # @interpolation_order.setter
     # def interpolation_order(self, value)
+    
+    def get_statistics(self , glued_interpoalted_signal_x_values , glued_interpoalted_signal_y_values):
+        statistics = {
+                "mean": np.mean(glued_interpoalted_signal_y_values),
+                "std": np.std(glued_interpoalted_signal_y_values),
+                "min": np.min(glued_interpoalted_signal_y_values),
+                "max": np.max(glued_interpoalted_signal_y_values),
+                "duration": len(glued_interpoalted_signal_x_values)
+}
+        self.__max = str(statistics["max"])
+        self.__min = str(statistics["min"])
+        self.__mean = str(statistics["mean"])
+        self.__std = str(statistics["std"])
+        self.__duration = str(statistics["duration"])
     
     def interpolate(self , interpolation_order):
         if(interpolation_order == 0):
@@ -53,6 +88,48 @@ class Gluer():
             interpolation_order = "quadratic"
         if(interpolation_order == 2):
             interpolation_order = "cubic"
+            
+        if(self.signal_2_x_values[0] < self.signal_1_x_values[0]):  ## Signal 2 is the first signal in timeline
+            if(self.signal_1_x_values[0] < self.signal_2_x_values[-1]):    
+                overlap_start = max(min(self.signal_2_x_values) ,min(self.signal_1_x_values))
+                overlap_end = min(max(self.signal_2_x_values) ,max(self.signal_1_x_values))
+                
+                interpolation_function_signal_1 = interp1d(self.signal_1_x_values , self.signal_1.signal ,kind=interpolation_order)
+                interpolation_function_signal_2 = interp1d(self.signal_2_x_values , self.signal_2.signal ,kind=interpolation_order)
+                x_overlapped = np.linspace(overlap_start , overlap_end , num= int(overlap_end) - int(overlap_start))
+            
+                signal_1_interpolated = interpolation_function_signal_1(x_overlapped)
+                signal_2_interpolated = interpolation_function_signal_2(x_overlapped)
+            
+                y_interpolated = (signal_1_interpolated + signal_2_interpolated) / 2
+            else:
+                x_gap = np.linspace(self.signal_2_x_values[-1] , self.signal_1_x_values[0], num = np.int16(self.signal_1_x_values[0]) - np.int16(self.signal_2_x_values[-1]))
+                data_x = np.concatenate([self.signal_2_x_values, self.signal_1_x_values])
+                data_y = np.concatenate([self.signal_2.signal, self.signal_1.signal])
+                interpolation_function_data_1 = interp1d(data_x , data_y ,kind=interpolation_order ,fill_value="extrapolate")
+                y_interpolated = interpolation_function_data_1(x_gap)
+        else:  #Signal 1 is the first signal in the timeline
+            if(self.signal_1_x_values[-1] > self.signal_2_x_values[0]):
+                overlap_start = max(min(self.signal_2_x_values) ,min(self.signal_1_x_values))
+                overlap_end = min(max(self.signal_2_x_values) ,max(self.signal_1_x_values))
+                
+                interpolation_function_signal_1 = interp1d(self.signal_1_x_values , self.signal_1.signal ,kind=interpolation_order)
+                interpolation_function_signal_2 = interp1d(self.signal_2_x_values , self.signal_2.signal ,kind=interpolation_order)
+                x_overlapped = np.linspace(overlap_start , overlap_end , num= int(overlap_end) - int(overlap_start))
+            
+                signal_1_interpolated = interpolation_function_signal_1(x_overlapped)
+                signal_2_interpolated = interpolation_function_signal_2(x_overlapped)
+            
+                y_interpolated = (signal_1_interpolated + signal_2_interpolated) / 2
+            else:
+                
+                x_gap = np.linspace(self.signal_1_x_values[-1] , self.signal_2_x_values[0], num = np.int16(self.signal_2_x_values[0]) - np.int16(self.signal_1_x_values[-1]) )
+                data_x = np.concatenate([self.signal_1_x_values, self.signal_2_x_values])
+                data_y = np.concatenate([self.signal_1.signal, self.signal_2.signal])
+                interpolation_function_data_1 = interp1d(data_x , data_y ,kind=interpolation_order ,fill_value="extrapolate")
+                y_interpolated = interpolation_function_data_1(x_gap)
+                
+        return y_interpolated
         if (self.signal_1_x_values[-1] > self.signal_2_x_values[0] ):
             overlap_start = max(min(self.signal_2_x_values) ,min(self.signal_1_x_values))
             overlap_end = min(max(self.signal_2_x_values) ,max(self.signal_1_x_values))

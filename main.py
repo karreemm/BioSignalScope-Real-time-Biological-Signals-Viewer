@@ -11,6 +11,12 @@ import pandas as pd
 import numpy as np
 import pyqtgraph as pg
 from realTimeWindow import realTimeWindow
+import pyqtgraph.exporters
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Image , Spacer
+import copy
 
 def compile_qrc():
     qrc_file = 'Images.qrc'
@@ -111,6 +117,18 @@ class Main(QMainWindow):
         self.RewindButtonGraph2.setIcon(self.NoRewindImage)
         self.RewindButtonGraph2.clicked.connect(self.rewind_graph2)
         
+        self.MoveSignalRightButton = self.findChild(QPushButton , "pushButton")
+        self.MoveSignalRightButton.clicked.connect(self.move_signal_right)
+        
+        self.AddToPDFReport = self.findChild(QPushButton ,"AddToReportButton")
+        self.AddToPDFReport.clicked.connect(self.add_to_pdf_report)
+        self.captured_report_images_counter = 1
+        self.captured_report_images_filenames = []
+        self.captured_report_images_statistics = []
+        
+        self.GeneratePDFReport = self.findChild(QPushButton , "GeneratePDFButton")
+        self.GeneratePDFReport.clicked.connect(self.generate_pdf_report)
+        
         # Adding functionality of going to glue window button
         self.StartGluingButton.clicked.connect(self.start_gluing)
         self.signal_gluing_page = self.findChild(QWidget, 'SignalGluing')
@@ -122,9 +140,9 @@ class Main(QMainWindow):
         self.glued_viewer_frame.setLayout(self.glued_frame_layout)
         self.y_interpolated = None
         
-        data = ["25.4", "3.2", "120", "5.1", "30.9"]
+        self.stats_data = ["null", "null", "null", "null", "null"]
 
-        for column, value in enumerate(data):
+        for column, value in enumerate(self.stats_data):
             item = QtWidgets.QTableWidgetItem(value)
             item.setFlags(item.flags() & ~QtCore.Qt.ItemIsEditable) 
             item.setTextAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)  
@@ -425,33 +443,152 @@ class Main(QMainWindow):
         interpolation_order = self.interpolation_order_combo_box.currentIndex()
         self.gluer_interpolate = Gluer(self.to_be_glued_signal_1 , self.to_be_glued_signal_2 ,self.glued_signal_1_x_values , self.glued_signal_2_x_values )
         self.y_interpolated= self.gluer_interpolate.interpolate( interpolation_order)
-        print(self.gluer_interpolate.signal_1_x_values[-1])
-        print(self.gluer_interpolate.signal_2_x_values[0])
-        if(self.gluer_interpolate.signal_1_x_values[0] < self.gluer_interpolate.signal_2_x_values[0] ):
-            overlap_start = max(min(self.gluer_interpolate.signal_2_x_values) ,min(self.gluer_interpolate.signal_1_x_values))
-            overlap_end = min(max(self.gluer_interpolate.signal_2_x_values) ,max(self.gluer_interpolate.signal_1_x_values))
-            
-            x_overlapped = np.linspace(overlap_start , overlap_end , num = 1000)
-            
-            signal_1_x_values_before_interpolated_part = self.gluer_interpolate.signal_1_x_values[:x_overlapped[0]]
-            signal_2_x_values_before_interpolated_part = self.gluer_interpolate.signal_2_x_values[x_overlapped[-1]:]
-            
-            signal_1_y_values_before_interpolated_part = self.gluer_interpolate.signal_1_y_values[:self.y_interpolated[0]]
-            signal_2_x_values_before_interpolated_part = self.gluer_interpolate.signal_2_x_values[x_overlapped[-1]:]
-            
-            glued_interpolated_overlapped_signal_x_values = np.concatenate([signal_1_x_values_before_interpolated_part , x_overlapped ,signal_2_x_values_before_interpolated_part])
-            glued_interpolated_overlapped_signal_y_values = np.concatenate([self.to_be_glued_signal_1.signal , self.y_interpolated , self.to_be_glued_signal_2.signal])
-            
-            
-        else:
-            x_gap = np.linspace(self.gluer_interpolate.signal_1_x_values[-1] , self.gluer_interpolate.signal_2_x_values[0], num = 1000)
-            glued_interpolated_gapped_signal_x_values = np.concatenate([self.glued_signal_1_x_values , x_gap ,self.glued_signal_2_x_values])
-            glued_interpolated_gapped_signal_y_values = np.concatenate([self.to_be_glued_signal_1.signal , self.y_interpolated , self.to_be_glued_signal_2.signal])
-            
-            self.glued_viewer.plot(glued_interpolated_gapped_signal_x_values , glued_interpolated_gapped_signal_y_values)
+        if(self.gluer_interpolate.signal_2_x_values[0] < self.gluer_interpolate.signal_1_x_values[0]):  ## Signal 2 is the first signal in timeline
+            if(self.gluer_interpolate.signal_1_x_values[0] < self.gluer_interpolate.signal_2_x_values[-1]):
+                overlap_start = max(min(self.gluer_interpolate.signal_2_x_values) ,min(self.gluer_interpolate.signal_1_x_values))
+                overlap_end = min(max(self.gluer_interpolate.signal_2_x_values) ,max(self.gluer_interpolate.signal_1_x_values))
+                
+                x_overlapped = np.linspace(int(overlap_start) , int(overlap_end) , num= np.int16(overlap_end) - np.int16(overlap_start))
+                x_overlapped = [int(x) for x in x_overlapped]
+                signal_1_x_values_as_int = [int(x) for x in self.gluer_interpolate.signal_1_x_values]
+                signal_2_x_values_as_int = [int(x) for x in self.gluer_interpolate.signal_2_x_values]
+                
+                x_overlapped_first_value_index_in_signal_2 = signal_2_x_values_as_int.index(int(x_overlapped[0]))
+                x_overlapped_last_value_index_in_signal_1 = signal_1_x_values_as_int.index(int(x_overlapped[-1]))
+                
+                signal_2_x_values_before_interpolated_part = self.gluer_interpolate.signal_2_x_values[:x_overlapped_first_value_index_in_signal_2]
+                signal_1_x_values_after_interpolated_part = self.gluer_interpolate.signal_1_x_values[x_overlapped_last_value_index_in_signal_1:]
+                
+                # signal_2_x_values_before_interpolated_part_as_int = [int(x) for x in signal_2_x_values_before_interpolated_part]
+                # signal_1_x_values_after_interpolated_part_as_int = [int(x) for x in signal_1_x_values_after_interpolated_part]
+                
+                signal_2_y_values_before_interpolated_part = self.gluer_interpolate.signal_2.signal[:x_overlapped_first_value_index_in_signal_2]
+                signal_1_y_values_after_interpolated_part = self.gluer_interpolate.signal_1.signal[x_overlapped_last_value_index_in_signal_1:]
+                
+                self.glued_interpolated_overlapped_signal_x_values = np.concatenate([signal_2_x_values_before_interpolated_part , x_overlapped ,signal_1_x_values_after_interpolated_part])
+                self.glued_interpolated_overlapped_signal_y_values = np.concatenate([signal_2_y_values_before_interpolated_part , self.y_interpolated , signal_1_y_values_after_interpolated_part])
+                
+                self.glued_viewer.plot(self.glued_interpolated_overlapped_signal_x_values , self.glued_interpolated_overlapped_signal_y_values)
+                self.gluer_interpolate.get_statistics(self.glued_interpolated_overlapped_signal_x_values ,self.glued_interpolated_overlapped_signal_y_values )
+                self.update_statistics()
+                
+            else:
+                x_gap = np.linspace(self.gluer_interpolate.signal_2_x_values[-1] , self.gluer_interpolate.signal_1_x_values[0], num = np.int16(self.gluer_interpolate.signal_1_x_values[0]) - np.int16(self.gluer_interpolate.signal_2_x_values[-1]))
+                self.glued_interpolated_gapped_signal_x_values = np.concatenate([self.glued_signal_2_x_values , x_gap ,self.glued_signal_1_x_values])
+                self.glued_interpolated_gapped_signal_y_values = np.concatenate([self.to_be_glued_signal_2.signal , self.y_interpolated , self.to_be_glued_signal_1.signal])
+                
+                self.glued_viewer.plot(self.glued_interpolated_gapped_signal_x_values , self.glued_interpolated_gapped_signal_y_values)
+                self.gluer_interpolate.get_statistics(self.glued_interpolated_gapped_signal_x_values ,self.glued_interpolated_gapped_signal_y_values )
+                self.update_statistics()
+                
+        else:  #Signal 1 is the first signal in the timeline
+            if(self.gluer_interpolate.signal_1_x_values[-1] > self.gluer_interpolate.signal_2_x_values[0]):
+                overlap_start = max(min(self.gluer_interpolate.signal_2_x_values) ,min(self.gluer_interpolate.signal_1_x_values))
+                overlap_end = min(max(self.gluer_interpolate.signal_2_x_values) ,max(self.gluer_interpolate.signal_1_x_values))
+                
+                x_overlapped = np.linspace(int(overlap_start) , int(overlap_end) , num= np.int16(overlap_end) - np.int16(overlap_start))
+                x_overlapped = [int(x) for x in x_overlapped]
+                signal_1_x_values_as_int = [int(x) for x in self.gluer_interpolate.signal_1_x_values]
+                signal_2_x_values_as_int = [int(x) for x in self.gluer_interpolate.signal_2_x_values]
+                x_overlapped_first_value_index_in_signal_1 = signal_1_x_values_as_int.index(int(x_overlapped[0]))
+                x_overlapped_last_value_index_in_signal_2 = signal_2_x_values_as_int.index(int(x_overlapped[-1]))
+                # print(f"x_overlapped: {x_overlapped}")
+                # print(f"signal_2_x_values: {signal_2_x_values_as_int} , length: {len(signal_2_x_values_as_int)}")
+                signal_1_x_values_before_interpolated_part = self.gluer_interpolate.signal_1_x_values[:x_overlapped_first_value_index_in_signal_1]
+                signal_2_x_values_after_interpolated_part = signal_2_x_values_as_int[x_overlapped_last_value_index_in_signal_2:]
+                # print(f'signal_2_x_values_after_interpoaltion: {signal_2_x_values_after_interpolated_part}')
+                
+                # signal_1_x_values_before_interpolated_part_as_int = [int(x) for x in signal_1_x_values_before_interpolated_part]
+                # signal_2_x_values_after_interpolated_part_as_int = [int(x) for x in signal_2_x_values_after_interpolated_part]
+                
+                # print(f"signal_2_y_values = {self.gluer_interpolate.signal_2.signal} , length: {len(self.gluer_interpolate.signal_2.signal)}")
+                # print(f"signal_2_x_values = {signal_2_x_values_after_interpolated_part_as_int} , length: {len(signal_2_x_values_after_interpolated_part_as_int)}")
+                
+                signal_1_y_values_before_interpolated_part = self.gluer_interpolate.signal_1.signal[:x_overlapped_first_value_index_in_signal_1]
+                signal_2_y_values_after_interpolated_part = self.gluer_interpolate.signal_2.signal[x_overlapped_last_value_index_in_signal_2 : ]
+                
+                self.glued_interpolated_overlapped_signal_x_values = np.concatenate([signal_1_x_values_before_interpolated_part , x_overlapped ,signal_2_x_values_after_interpolated_part])
+                self.glued_interpolated_overlapped_signal_y_values = np.concatenate([signal_1_y_values_before_interpolated_part , self.y_interpolated , signal_2_y_values_after_interpolated_part])
+                # print(f'glued_interpolated_overlapped_signal_y_values: {glued_interpolated_overlapped_signal_y_values} , length = {len(glued_interpolated_overlapped_signal_y_values)}')
+                self.glued_viewer.plot(self.glued_interpolated_overlapped_signal_x_values , self.glued_interpolated_overlapped_signal_y_values)
+                self.gluer_interpolate.get_statistics(self.glued_interpolated_overlapped_signal_x_values ,self.glued_interpolated_overlapped_signal_y_values )
+                self.update_statistics()
+
+            else:
+                x_gap = np.linspace(self.gluer_interpolate.signal_1_x_values[-1] , self.gluer_interpolate.signal_2_x_values[0], num = np.int16(self.gluer_interpolate.signal_2_x_values[0]) - np.int16(self.gluer_interpolate.signal_1_x_values[-1]))
+                self.glued_interpolated_gapped_signal_x_values = np.concatenate([self.glued_signal_1_x_values , x_gap ,self.glued_signal_2_x_values])
+                self.glued_interpolated_gapped_signal_y_values = np.concatenate([self.to_be_glued_signal_1.signal , self.y_interpolated , self.to_be_glued_signal_2.signal])
+                
+                self.glued_viewer.plot(self.glued_interpolated_gapped_signal_x_values , self.glued_interpolated_gapped_signal_y_values)
+                self.gluer_interpolate.get_statistics(self.glued_interpolated_gapped_signal_x_values ,self.glued_interpolated_gapped_signal_y_values )
+                self.update_statistics()
+                
+    def update_statistics(self ):
+        self.stats_data[0] = self.gluer_interpolate.mean
+        self.stats_data[1] = self.gluer_interpolate.std
+        self.stats_data[2] = self.gluer_interpolate.duration
+        self.stats_data[3] = self.gluer_interpolate.min
+        self.stats_data[4] = self.gluer_interpolate.max
+        for column, value in enumerate(self.stats_data):
+            item = QtWidgets.QTableWidgetItem(value)
+            item.setFlags(item.flags() & ~QtCore.Qt.ItemIsEditable) 
+            item.setTextAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)  
+            self.tableWidget.setItem(0, column, item)
     
+    def add_to_pdf_report(self):
+        captured_data_region_exported_image = pyqtgraph.exporters.ImageExporter(self.glued_viewer.getPlotItem())
+        captured_data_region_exported_image.parameters()['width'] = 2000  # Set the export width
+        captured_data_region_exported_image.parameters()['height'] = 1000  # Set the export height
+        captured_data_region_exported_image.export(f"./captured_report_signals/captured_region{self.captured_report_images_counter}.png")
+        self.captured_report_images_filenames.append(f"./captured_report_signals/captured_region{self.captured_report_images_counter}.png")
+        self.captured_report_images_counter += 1
+        print(self.stats_data)
+        current_stats_data = copy.copy(self.stats_data)
+        self.captured_report_images_statistics.append(current_stats_data)  
+        print(self.captured_report_images_statistics)  
+        
+    def generate_pdf_report(self):
+        doc = SimpleDocTemplate("report.pdf", pagesize=letter)
+        elements = []
+        width, height = letter
+        
+        for i, (image_filename, stats) in enumerate(zip(self.captured_report_images_filenames, self.captured_report_images_statistics)):  
+            img = Image(image_filename, width=600, height=300)
+            elements.append(img)
+            elements.append(Spacer(1, 20))
+            data = [
+                ['Mean', 'Std Dev', 'Duration', 'Min', 'Max'],  
+                [f"{float(stats[0]):.2f}", f"{float(stats[1]):.2f}", f"{float(stats[2]):.2f}", f"{float(stats[3]):.2f}", f"{float(stats[4]):.2f}"]
+            ]
+
+            # Create and style the table
+            table = Table(data, colWidths=[80, 80, 80, 80, 80])  
+            table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),  
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke), 
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'), 
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),  
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),  
+            ]))
+
+            elements.append(table)
+
+        doc.build(elements)
+        self.captured_report_images_filenames.clear()
+        self.captured_report_images_statistics.clear()
+        
     def move_signal_left(self):
-        pass
+        self.glued_viewer.clear()
+        self.glued_signal_2_x_values = [x - 50 for x in self.glued_signal_2_x_values ]
+        self.init_gluing_page(self.glued_signal_1_x_values, self.glued_signal_2_x_values)
+    
+    def move_signal_right(self):
+        self.glued_viewer.clear()
+        self.glued_signal_2_x_values = [x + 50 for x in self.glued_signal_2_x_values ]
+        self.init_gluing_page(self.glued_signal_1_x_values, self.glued_signal_2_x_values)
+    
     def load_signal(self,viewer_number:str):
         '''
         viewer_number: 1 or 2
