@@ -1,7 +1,7 @@
 import subprocess
 import sys
 from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtWidgets import QApplication, QMainWindow,QLineEdit,  QStackedWidget, QPushButton,QComboBox,  QMessageBox, QWidget, QColorDialog, QFrame, QVBoxLayout, QFileDialog ,QScrollBar
+from PyQt5.QtWidgets import QApplication,QSlider,  QMainWindow,QLineEdit,  QStackedWidget, QPushButton,QComboBox,  QMessageBox, QWidget, QColorDialog, QFrame, QVBoxLayout, QFileDialog ,QScrollBar
 from PyQt5.uic import loadUi
 from PyQt5.QtGui import QIcon
 from classes.viewer import Viewer
@@ -194,6 +194,29 @@ class Main(QMainWindow):
 
         self.RealTimeButtonGraph2 = self.findChild(QPushButton, 'RealTimeButtonGraph2')
         self.RealTimeButtonGraph2.clicked.connect(self.open_real_time_window_graph2)
+        
+        # speed assignment 
+        self.signal_speed_slider_1 = self.findChild(QSlider, 'SpeedSliderGraph1')
+        self.signal_speed_slider_1.setRange(0,4)
+        self.signal_speed_slider_1.setTickInterval(1)
+        self.signal_speed_slider_1.valueChanged.connect(lambda value: self.on_slider_value_changed(value, '1'))
+        self.signal_speed_slider_2 = self.findChild(QSlider, 'SpeedSliderGraph2')
+        self.signal_speed_slider_2.setRange(0,4)
+        self.signal_speed_slider_2.setTickInterval(1)
+        self.signal_speed_slider_1.valueChanged.connect(lambda value: self.on_slider_value_changed(value, '2'))
+
+        
+    def on_slider_value_changed(self,value, viewer:str):
+        speeds = [70,60,50,40,30]
+        new_speed = speeds[value]
+        if viewer == '1':
+            self.play_pause_graph1()
+            self.viewer1.cine_speed(new_speed)
+            self.play_pause_graph1()
+        else:
+            self.play_pause_graph2()
+            self.viewer2.cine_speed(new_speed)
+            self.play_pause_graph2()
         
     def fill_signal_label_textbox(self, viewer:str):
         if viewer == '1':
