@@ -1,7 +1,7 @@
 import subprocess
 import sys
 from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtWidgets import QApplication, QMainWindow, QStackedWidget, QPushButton,QComboBox,  QMessageBox, QWidget, QColorDialog, QFrame, QVBoxLayout, QFileDialog ,QScrollBar
+from PyQt5.QtWidgets import QApplication, QMainWindow,QLineEdit,  QStackedWidget, QPushButton,QComboBox,  QMessageBox, QWidget, QColorDialog, QFrame, QVBoxLayout, QFileDialog ,QScrollBar
 from PyQt5.uic import loadUi
 from PyQt5.QtGui import QIcon
 from classes.viewer import Viewer
@@ -155,9 +155,11 @@ class Main(QMainWindow):
         self.signals_dropdown_1 = self.findChild(QComboBox, 'SignalsComboBoxGraph1')
         for i in range(3):
             self.signals_dropdown_1.removeItem(0)
+        # self.signals_dropdown_1.currentIndexChanged.connect(lambda:self.fill_signal_label_textbox('1'))
         self.signals_dropdown_2 = self.findChild(QComboBox, 'SignalsComboBoxGraph2')
         for i in range(3):
             self.signals_dropdown_2.removeItem(0)
+        # self.signals_dropdown_2.currentIndexChanged.connect(lambda:self.fill_signal_label_textbox('2'))
             
         # move button
         self.move_signal_button_1 = self.findChild(QPushButton, 'MoveToGraph2Button')
@@ -165,6 +167,48 @@ class Main(QMainWindow):
         self.move_signal_button_2 = self.findChild(QPushButton, 'MoveToGraph1Button')
         self.move_signal_button_2.clicked.connect(lambda:self.move_signal('2'))
         
+        #signals renameing
+        self.signals_naming_textbox_1 = self.findChild(QLineEdit, 'SignalTitleInputGraph1')
+        self.signals_naming_textbox_1.textChanged.connect(lambda: self.change_signal_label('1'))
+        self.signals_naming_textbox_2 = self.findChild(QLineEdit, 'SignalTitleInputGraph2')
+        self.signals_naming_textbox_2.textChanged.connect(lambda: self.change_signal_label('2'))
+        
+    def fill_signal_label_textbox(self, viewer:str):
+        if viewer == '1':
+            if len(self.viewer1.channels):
+                dropdown_index = self.signals_dropdown_1.currentIndex()
+                current_label = self.viewer1.channels[dropdown_index].label
+                self.signals_naming_textbox_1.setText(current_label)
+        else:
+            if len(self.viewer2.channels):
+                dropdown_index = self.signals_dropdown_2.currentIndex()
+                current_label = self.viewer2.channels[dropdown_index].label
+                self.signals_naming_textbox_2.setText(current_label)
+        
+    def change_signal_label(self, viewer:str):
+        if viewer == '1':
+            if len(self.viewer1.channels):
+                dropdown_index = self.signals_dropdown_1.currentIndex()
+                new_label = self.signals_naming_textbox_1.text()
+                self.viewer1.channels[dropdown_index].label = new_label
+                self.refill_signals_dropdown('1')
+        else:
+            if len(self.viewer2.channels):
+                new_label = self.signals_naming_textbox_2.text()
+                dropdown_index = self.signals_dropdown_2.currentIndex()
+                self.viewer2.channels[dropdown_index].label = new_label
+                self.refill_signals_dropdown('2')
+    
+    def refill_signals_dropdown(self, viewer:str):
+        if viewer == '1':
+            self.signals_dropdown_1.clear()
+            for signal in self.viewer1.channels:
+                self.signals_dropdown_1.addItem(signal.label)
+        else:
+            self.signals_dropdown_2.clear()
+            for signal in self.viewer2.channels:
+                self.signals_dropdown_2.addItem(signal.label)
+            
         
     def move_signal(self, from_viewer:str):
         if from_viewer == '1':
@@ -182,6 +226,12 @@ class Main(QMainWindow):
                     self.signals_dropdown_2.addItem(signal_to_be_removed.label)
                     self.viewer2.play()
                     self.viewer2.pause()
+                    if len(self.viewer1.channels) == 0:
+                        self.viewer1.pause()
+                        self.PlayPauseButtonGraph1.setIcon(self.PlayImage)
+                        
+                    # self.viewer2.play()
+                    # self.viewer2.pause()
                     break
         else:
             dropdown_index = self.signals_dropdown_2.currentIndex()
@@ -198,6 +248,9 @@ class Main(QMainWindow):
                     self.signals_dropdown_1.addItem(signal_to_be_removed.label)
                     self.viewer1.play()
                     self.viewer1.pause()
+                    if len(self.viewer2.channels) == 0:
+                        self.viewer2.pause()
+                        self.PlayPauseButtonGraph2.setIcon(self.PlayImage)
                     break
 
 
@@ -240,8 +293,8 @@ class Main(QMainWindow):
                 self.viewer1.play()
         else:
             self.PlayPauseButtonGraph1.setIcon(self.PlayImage)
-            if len(self.viewer1.channels):
-                self.viewer1.pause()
+            # if len(self.viewer1.channels):
+            self.viewer1.pause()
         self.is_playing_graph1 = not self.is_playing_graph1
 
     def play_pause_graph2(self):
@@ -251,8 +304,8 @@ class Main(QMainWindow):
                 self.viewer2.play()
         else:
             self.PlayPauseButtonGraph2.setIcon(self.PlayImage)
-            if len(self.viewer2.channels):
-                self.viewer2.pause()
+            # if len(self.viewer2.channels):
+            self.viewer2.pause()
         self.is_playing_graph2 = not self.is_playing_graph2
 
     def show_hide_graph1(self):
@@ -383,12 +436,12 @@ class Main(QMainWindow):
                             
                     if viewer_number == "1":
                             self.number_of_viewer_1_signals+=1
-                            self.viewer1.play()
-                            self.viewer1.pause()
+                            self.play_pause_graph1()
+                            # self.viewer1.pause()
                     else:
                             self.number_of_viewer_2_signals+=1
-                            self.viewer2.play()
-                            self.viewer2.pause()
+                            self.play_pause_graph2()
+                            # self.viewer2.pause()
                     # print(len(self.viewer1.channels))
             else:
                 self.show_error("the file extention must be a csv file")
