@@ -10,6 +10,7 @@ from classes.gluer import Gluer
 import pandas as pd 
 import numpy as np
 import pyqtgraph as pg
+from realTimeWindow import realTimeWindow
 
 def compile_qrc():
     qrc_file = 'Images.qrc'
@@ -44,6 +45,8 @@ class Main(QMainWindow):
         self.ShowImage = QIcon(':/Images/showW.png')
         self.RewindImage = QIcon(':/Images/rewind.png')
         self.NoRewindImage = QIcon(':/Images/noRewind.png')
+
+        self.real_time_window = None
 
         self.is_rewinding_graph1 = False
         self.is_rewinding_graph2 = False
@@ -185,6 +188,12 @@ class Main(QMainWindow):
         self.signals_naming_textbox_1.textChanged.connect(lambda: self.change_signal_label('1'))
         self.signals_naming_textbox_2 = self.findChild(QLineEdit, 'SignalTitleInputGraph2')
         self.signals_naming_textbox_2.textChanged.connect(lambda: self.change_signal_label('2'))
+
+        self.RealTimeButtonGraph1 = self.findChild(QPushButton, 'RealTimeButtonGraph1')
+        self.RealTimeButtonGraph1.clicked.connect(self.open_real_time_window_graph1)
+
+        self.RealTimeButtonGraph2 = self.findChild(QPushButton, 'RealTimeButtonGraph2')
+        self.RealTimeButtonGraph2.clicked.connect(self.open_real_time_window_graph2)
         
         # speed assignment 
         self.signal_speed_slider_1 = self.findChild(QSlider, 'SpeedSliderGraph1')
@@ -530,6 +539,14 @@ class Main(QMainWindow):
         else:
             self.RewindButtonGraph2.setIcon(self.RewindImage)
         self.is_rewinding_graph2 = not self.is_rewinding_graph2
+
+    def open_real_time_window_graph1(self):
+        self.real_time_window = realTimeWindow()
+        self.real_time_window.show()
+
+    def open_real_time_window_graph2(self):
+        self.real_time_window = realTimeWindow()
+        self.real_time_window.show()
     
     def show_error(self, message:str):
         msg_box = QMessageBox()
