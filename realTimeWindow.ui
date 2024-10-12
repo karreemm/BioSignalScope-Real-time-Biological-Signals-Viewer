@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">* {
+    background-color: #0f1729;   /* Updated background */
+    color: #39bef7;              /* Updated text color */
+    font-size: 18px;
+}
+
+QPushButton {
+    background-color: #0f1729;
+    border-radius: 8px;
+    padding: 10px;
+	 border: 2px solid #ffffff;   /* Updated white border */
+}
+
+QPushButton:hover {
+    background-color: #142A4A;
+}</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QLineEdit" name="lineEdit">
+      <property name="styleSheet">
+       <string notr="true">QLineEdit {
+    background-color: #0f1729;   /* Updated dark background */
+    color: #e1e8f0;              /* Updated white text */
+    border: 2px solid #ffffff;   /* Updated blue border */
+    border-radius: 8px;
+    padding: 8px;
+    font-size: 14px;
+}
+
+QLineEdit:hover {
+    border: 2px solid #ffffff;   /* Updated lighter blue on hover */
+}
+
+QLineEdit:focus {
+    border: 2px solid #39bef7;   /* Stronger blue when focused */
+    background-color: #142A4A;   /* Slightly lighter background on focus */
+    color: #39bef7;              /* Text turns blue when focused */
+}
+
+QLineEdit::placeholder {
+    color: #39bef7;              /* Lighter blue for the placeholder */
+    font-style: italic;
+}
+
+QLineEdit:disabled {
+    background-color: #1B2C3E;   /* Darker background when disabled */
+    color: #888888;              /* Gray text when disabled */
+    border: 2px solid #666666;   /* Gray border when disabled */
+}</string>
+      </property>
+      <property name="placeholderText">
+       <string>Enter the SIgnal API Link</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QPushButton" name="pushButton">
+      <property name="styleSheet">
+       <string notr="true">color: white
+</string>
+      </property>
+      <property name="text">
+       <string>View Signal</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
