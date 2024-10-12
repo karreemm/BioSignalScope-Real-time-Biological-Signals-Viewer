@@ -37,7 +37,7 @@ QPushButton:hover {
    </property>
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <widget class="QLineEdit" name="lineEdit">
+     <widget class="QLineEdit" name="RealTimeInput">
       <property name="styleSheet">
        <string notr="true">QLineEdit {
     background-color: #0f1729;   /* Updated dark background */
@@ -75,7 +75,7 @@ QLineEdit:disabled {
      </widget>
     </item>
     <item row="1" column="0">
-     <widget class="QPushButton" name="pushButton">
+     <widget class="QPushButton" name="RealTimeViewButton">
       <property name="styleSheet">
        <string notr="true">color: white
 </string>
