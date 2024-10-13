@@ -128,7 +128,7 @@ class Main(QMainWindow):
 
         self.LinkGraphsButton = self.findChild(QPushButton, 'LinkGraphsButton')
         self.LinkGraphsButton.clicked.connect(self.link_graphs)
-        self.LinkGraphsButton.setIcon(self.LinkImage)
+        # self.LinkGraphsButton.setIcon(self.LinkImage)
         
         self.AddToPDFReport = self.findChild(QPushButton ,"AddToReportButton")
         self.AddToPDFReport.clicked.connect(self.add_to_pdf_report)
@@ -238,6 +238,8 @@ class Main(QMainWindow):
         self.replay_button_2 = self.findChild(QPushButton, 'ReplayButtonGraph2')
         self.replay_button_2.clicked.connect(lambda:self.replay_signal('2'))
         
+        # linking button 
+          
     def replay_signal(self, viewer:str):
         if viewer == '1':
             if not self.is_playing_graph1:
@@ -734,9 +736,14 @@ class Main(QMainWindow):
 
     def link_graphs(self):
         if self.is_linked:
-            self.LinkGraphsButton.setIcon(self.UnlinkImage)
-        else:
             self.LinkGraphsButton.setIcon(self.LinkImage)
+            if len(self.viewer1.channels) and len(self.viewer2.channels):
+                self.viewer1.setXLink(self.viewer2)
+                self.viewer1.setYLink(self.viewer2)
+        else:
+            self.LinkGraphsButton.setIcon(self.UnlinkImage)
+            self.viewer1.setXLink(None)
+            self.viewer1.setYLink(None)
         self.is_linked = not self.is_linked
     
     def show_error(self, message:str):
