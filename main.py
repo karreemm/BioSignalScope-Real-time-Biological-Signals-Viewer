@@ -10,7 +10,6 @@ from classes.gluer import Gluer
 import pandas as pd 
 import numpy as np
 import pyqtgraph as pg
-from realTimeWindow import realTimeWindow
 import pyqtgraph.exporters
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
@@ -51,6 +50,8 @@ class Main(QMainWindow):
         self.ShowImage = QIcon(':/Images/showW.png')
         self.RewindImage = QIcon(':/Images/rewind.png')
         self.NoRewindImage = QIcon(':/Images/noRewind.png')
+        self.LinkImage = QIcon(':/Images/linkB.png')
+        self.UnlinkImage = QIcon(':/Images/unlink.png')
 
         self.real_time_window = None
 
@@ -63,6 +64,8 @@ class Main(QMainWindow):
         self.is_graph1_visible = True
         self.is_graph2_visible = True
 
+        self.is_linked = True
+
         self.Pages = self.findChild(QStackedWidget, 'stackedWidget') 
 
         self.NonRectangleSignalButton = self.findChild(QPushButton, 'NonRectangleSignalButton')
@@ -73,6 +76,9 @@ class Main(QMainWindow):
 
         self.BackHomeButton2 = self.findChild(QPushButton, 'BackHomeButton2')
         self.BackHomeButton2.clicked.connect(self.go_to_home_page)
+
+        self.BackHomeButton3 = self.findChild(QPushButton, 'BackHomeButton3')
+        self.BackHomeButton3.clicked.connect(self.go_to_home_page)
 
         self.PlayPauseButtonGraph1 = self.findChild(QPushButton, 'PlayPauseButtonGraph1')
         self.PlayPauseButtonGraph1.clicked.connect(self.play_pause_graph1)
@@ -119,6 +125,10 @@ class Main(QMainWindow):
         
         self.MoveSignalRightButton = self.findChild(QPushButton , "pushButton")
         self.MoveSignalRightButton.clicked.connect(self.move_signal_right)
+
+        self.LinkGraphsButton = self.findChild(QPushButton, 'LinkGraphsButton')
+        self.LinkGraphsButton.clicked.connect(self.link_graphs)
+        self.LinkGraphsButton.setIcon(self.LinkImage)
         
         self.AddToPDFReport = self.findChild(QPushButton ,"AddToReportButton")
         self.AddToPDFReport.clicked.connect(self.add_to_pdf_report)
@@ -128,6 +138,9 @@ class Main(QMainWindow):
         
         self.GeneratePDFReport = self.findChild(QPushButton , "GeneratePDFButton")
         self.GeneratePDFReport.clicked.connect(self.generate_pdf_report)
+
+        self.RealTimeSignalButton = self.findChild(QPushButton, 'RealTimeSignalButton')
+        self.RealTimeSignalButton.clicked.connect(self.go_to_real_time_page)
         
         # Adding functionality of going to glue window button
         self.StartGluingButton.clicked.connect(self.start_gluing)
@@ -208,12 +221,6 @@ class Main(QMainWindow):
         self.signals_naming_textbox_1.textChanged.connect(lambda: self.change_signal_label('1'))
         self.signals_naming_textbox_2 = self.findChild(QLineEdit, 'SignalTitleInputGraph2')
         self.signals_naming_textbox_2.textChanged.connect(lambda: self.change_signal_label('2'))
-
-        self.RealTimeButtonGraph1 = self.findChild(QPushButton, 'RealTimeButtonGraph1')
-        self.RealTimeButtonGraph1.clicked.connect(self.open_real_time_window_graph1)
-
-        self.RealTimeButtonGraph2 = self.findChild(QPushButton, 'RealTimeButtonGraph2')
-        self.RealTimeButtonGraph2.clicked.connect(self.open_real_time_window_graph2)
         
         # speed assignment 
         self.signal_speed_slider_1 = self.findChild(QSlider, 'SpeedSliderGraph1')
@@ -720,13 +727,17 @@ class Main(QMainWindow):
                 self.play_pause_graph2()
             pass
 
-    def open_real_time_window_graph1(self):
-        self.real_time_window = realTimeWindow()
-        self.real_time_window.show()
+    def go_to_real_time_page(self):
+        page_index = self.Pages.indexOf(self.findChild(QWidget, 'RealTimePage'))
+        if page_index != -1:
+            self.Pages.setCurrentIndex(page_index)
 
-    def open_real_time_window_graph2(self):
-        self.real_time_window = realTimeWindow()
-        self.real_time_window.show()
+    def link_graphs(self):
+        if self.is_linked:
+            self.LinkGraphsButton.setIcon(self.UnlinkImage)
+        else:
+            self.LinkGraphsButton.setIcon(self.LinkImage)
+        self.is_linked = not self.is_linked
     
     def show_error(self, message:str):
         msg_box = QMessageBox()
