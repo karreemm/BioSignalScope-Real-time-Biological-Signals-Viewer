@@ -1,9 +1,14 @@
 import subprocess
 import sys
 from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtWidgets import QApplication,QSlider,  QMainWindow,QLineEdit,  QStackedWidget, QPushButton,QComboBox,  QMessageBox, QWidget, QColorDialog, QFrame, QVBoxLayout, QFileDialog ,QScrollBar
+from PyQt5.QtWidgets import QApplication, QHBoxLayout,QSlider,  QMainWindow,QLineEdit,  QStackedWidget, QPushButton,QComboBox,  QMessageBox, QWidget, QColorDialog, QFrame, QVBoxLayout, QFileDialog ,QScrollBar
 from PyQt5.uic import loadUi
+
 from PyQt5.QtGui import QIcon
+from classes.spiderPlot import SpiderPlot
+from classes.CSVLoader import CSVLoader
+from classes.resampled_data import wave
+from classes.spiderPlot import PlotControls
 from classes.viewer import Viewer
 from classes.channel_ import CustomSignal
 from classes.gluer import Gluer
@@ -11,22 +16,22 @@ import pandas as pd
 import numpy as np
 import pyqtgraph as pg
 import pyqtgraph.exporters
-from reportlab.lib.pagesizes import letter
-from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Image , Spacer
+# from reportlab.lib.pagesizes import letter
+# from reportlab.lib import colors
+# from reportlab.lib.styles import getSampleStyleSheet
+# from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Image , Spacer
 import copy
 
-def compile_qrc():
-    qrc_file = 'Images.qrc'
-    output_file = 'CompiledImages.py'
-    try:
-        subprocess.run(['pyrcc5', qrc_file, '-o', output_file], check=True)
-        print(f"Compiled {qrc_file} to {output_file}")
-    except subprocess.CalledProcessError as e:
-        print(f"Failed to compile {qrc_file}: {e}")
+# def compile_qrc():
+#     qrc_file = 'Images.qrc'
+#     output_file = 'CompiledImages.py'
+#     try:
+#         subprocess.run(['pyrcc5', qrc_file, '-o', output_file], check=True)
+#         print(f"Compiled {qrc_file} to {output_file}")
+#     except subprocess.CalledProcessError as e:
+#         print(f"Failed to compile {qrc_file}: {e}")
 
-compile_qrc()
+# compile_qrc()
 
 import CompiledImages  
 
@@ -68,6 +73,49 @@ class Main(QMainWindow):
 
         self.Pages = self.findChild(QStackedWidget, 'stackedWidget') 
 
+        
+        self.NonRectangleSignalButton = self.findChild(QPushButton, 'NonRectangleSignalButton')
+        self.NonRectangleSignalButton.clicked.connect(self.go_to_non_rectangle_signal_page)
+
+        self.BackHomeButton1 = self.findChild(QPushButton, 'BackHomeButton1')
+        self.BackHomeButton1.clicked.connect(self.go_to_home_page)
+
+        self.BackHomeButton2 = self.findChild(QPushButton, 'BackHomeButton2')
+        self.BackHomeButton2.clicked.connect(self.go_to_home_page)
+
+        self.BackHomeButton3 = self.findChild(QPushButton, 'BackHomeButton3')
+        self.BackHomeButton3.clicked.connect(self.go_to_home_page)
+        
+        self.NonRectangleGraph = self.findChild(QFrame, 'NonRectangleGraph')
+        
+        self.UploadSignalNonRectangle= self.findChild(QPushButton, 'UploadSignalNonRectangle')
+
+        target_sampling_rate = 10  # The desired sampling rate
+        interpolation_order = 'linear'  # Interpolation method, could be 'linear', 'quadratic', etc.
+        self.non_rectangle_multiple_csv_loader = CSVLoader(self.UploadSignalNonRectangle)
+
+        wave_instance = wave(self.non_rectangle_multiple_csv_loader.csv_files, target_sampling_rate, interpolation_order)
+        graph = SpiderPlot(wave_instance.data_samples)
+        self.horizontalLayout_15 = self.findChild(QHBoxLayout, 'horizontalLayout_15')
+        self.horizontalLayout_15.addWidget(graph)
+        
+        self.PlayPauseNonRectangleButton = self.findChild(QPushButton, 'PlayPauseNonRectangleButton')
+        
+        self.ReplayNonRectangleButton = self.findChild(QPushButton, 'ReplayNonRectangleButton')
+
+        self.SpeedSliderNonRectangleGraph = self.findChild(QSlider,'SpeedSliderNonRectangleGraph')
+        
+        self.BackButtonNonRectangle = self.findChild(QPushButton, 'BackButtonNonRectangle')
+        
+        self.NextButtonNonRectangle = self.findChild(QPushButton, 'NextButtonNonRectangle')
+        
+        self.ChangeColorButtonNonRectangle = self.findChild(QPushButton, 'ChangeColorButtonNonRectangle')
+        
+        
+        self.spider_viewer_control = PlotControls(graph, self.BackButtonNonRectangle, self.NextButtonNonRectangle, 
+                                                  self.SpeedSliderNonRectangleGraph, self.PlayPauseNonRectangleButton, self.ReplayNonRectangleButton, self.ChangeColorButtonNonRectangle)
+        
+        
         self.NonRectangleSignalButton = self.findChild(QPushButton, 'NonRectangleSignalButton')
         self.NonRectangleSignalButton.clicked.connect(self.go_to_non_rectangle_signal_page)
 
