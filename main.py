@@ -77,7 +77,7 @@ class Main(QMainWindow):
         self.BackHomeButton1.clicked.connect(self.navigation.go_to_home_page)
 
         self.BackHomeButton2 = self.findChild(QPushButton, 'BackHomeButton2')
-        self.BackHomeButton2.clicked.connect(self.navigation.go_to_home_page)
+        self.BackHomeButton2.clicked.connect(self.go_to_home_page_from_gluing)
 
         self.BackHomeButton3 = self.findChild(QPushButton, 'BackHomeButton3')
         self.BackHomeButton3.clicked.connect(self.navigation.go_to_home_page)
@@ -149,7 +149,7 @@ class Main(QMainWindow):
         
 
         self.RealTimeSignalButton = self.findChild(QPushButton, 'RealTimeSignalButton')
-        self.RealTimeSignalButton.clicked.connect(self.go_to_real_time_page)
+        self.RealTimeSignalButton.clicked.connect(self.navigation.go_to_real_time_page)
 
         self.RealTimeSignalInput = self.findChild(QLineEdit, 'RealTimeSignalInput')
         self.RealTimeSignalInput.textChanged.connect(self.real_time_signal.enable_view_button)
