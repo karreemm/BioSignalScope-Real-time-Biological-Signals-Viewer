@@ -81,7 +81,7 @@ class Main(QMainWindow):
         self.BackHomeButton1.clicked.connect(self.go_to_home_page)
 
         self.BackHomeButton2 = self.findChild(QPushButton, 'BackHomeButton2')
-        self.BackHomeButton2.clicked.connect(self.go_to_home_page)
+        self.BackHomeButton2.clicked.connect(self.go_to_home_page_from_gluing)
 
         self.BackHomeButton3 = self.findChild(QPushButton, 'BackHomeButton3')
         self.BackHomeButton3.clicked.connect(self.go_to_home_page)
@@ -144,6 +144,8 @@ class Main(QMainWindow):
         
         self.GeneratePDFReport = self.findChild(QPushButton , "GeneratePDFButton")
         self.GeneratePDFReport.clicked.connect(self.generate_pdf_report)
+
+        
 
         self.RealTimeSignalButton = self.findChild(QPushButton, 'RealTimeSignalButton')
         self.RealTimeSignalButton.clicked.connect(self.go_to_real_time_page)
@@ -236,6 +238,25 @@ class Main(QMainWindow):
         self.view_modes_dropdown_2.currentIndexChanged.connect(lambda index : self.change_view_mode(index, '2'))
         self.change_view_mode(0, '2')
         
+        # Viewer 1 Scroll bars Initialization
+        self.scrolling_x_axis_scrollbar_viewer1 = self.findChild(QScrollBar , "HorizontalScrollGraph1")
+        self.scrolling_x_axis_scrollbar_viewer1.valueChanged.connect(lambda: self.viewer1.scrolling_x_axis_scrollbar_effect(self.scrolling_x_axis_scrollbar_viewer1.value()))
+        
+        self.scrolling_y_axis_scrollbar_viewer1 = self.findChild(QScrollBar , "VerticalScrollGraph1")
+        self.viewer1.viewBox.sigRangeChanged.connect(self.set_viewer1_sliders_value)
+        self.scrolling_y_axis_scrollbar_viewer1.valueChanged.connect(lambda: self.viewer1.scrolling_y_axis_scrollbar_effect(self.scrolling_y_axis_scrollbar_viewer1.value()))
+        
+        
+        # Viewer 2 Scroll bars Initialization
+        self.scrolling_x_axis_scrollbar_viewer2 = self.findChild(QScrollBar , "HorizontalScrollGraph2")
+        self.scrolling_x_axis_scrollbar_viewer2.valueChanged.connect(lambda: self.viewer2.scrolling_x_axis_scrollbar_effect(self.scrolling_x_axis_scrollbar_viewer2.value()))
+        
+        self.scrolling_y_axis_scrollbar_viewer2 = self.findChild(QScrollBar , "VerticalScrollGraph2")
+        self.viewer2.viewBox.sigRangeChanged.connect(self.set_viewer2_sliders_value)
+        self.scrolling_y_axis_scrollbar_viewer2.valueChanged.connect(lambda: self.viewer2.scrolling_y_axis_scrollbar_effect(self.scrolling_y_axis_scrollbar_viewer2.value()))
+        
+        
+        
         # initializing the signals dropdown 
         self.signals_dropdown_1 = self.findChild(QComboBox, 'SignalsComboBoxGraph1')
         for i in range(3):
@@ -275,7 +296,7 @@ class Main(QMainWindow):
         self.replay_button_2.clicked.connect(lambda:self.replay_signal('2'))
         
         # linking button 
-          
+        
     def replay_signal(self, viewer:str):
         if viewer == '1':
             if not self.is_playing_graph1:
@@ -365,6 +386,12 @@ class Main(QMainWindow):
                         
                     # self.viewer2.play()
                     # self.viewer2.pause()
+                    scrolling_x_axis_scrollbar_viewer2_page_step = 1075
+                    self.scrolling_x_axis_scrollbar_viewer2.setMaximum(self.viewer2.x_axis[-1] - scrolling_x_axis_scrollbar_viewer2_page_step)
+                    self.scrolling_y_axis_scrollbar_viewer2.setMinimum(self.viewer2.min_signals_value)
+                    self.scrolling_y_axis_scrollbar_viewer2.setPageStep(int(self.viewer2.viewBox.viewRange()[1][1] - self.viewer2.viewBox.viewRange()[1][0]))
+                    scrolling_y_axis_scrollbar_viewer2_page_step = 325
+                    self.scrolling_y_axis_scrollbar_viewer2.setMaximum(self.viewer2.max_signals_value + int(self.viewer2.viewBox.viewRange()[1][1] - self.viewer2.viewBox.viewRange()[1][0]) - scrolling_y_axis_scrollbar_viewer2_page_step)
                     self.viewer1.update_x_axis()
                     if self.viewer1.x_axis[-1] < self.viewer1.viewRange()[0][1]:
                         self.replay_signal('1')
@@ -387,6 +414,12 @@ class Main(QMainWindow):
                     if len(self.viewer2.channels) == 0:
                         self.viewer2.pause()
                         self.PlayPauseButtonGraph2.setIcon(self.PlayImage)
+                    scrolling_x_axis_scrollbar_viewer1_page_step = 1075
+                    self.scrolling_x_axis_scrollbar_viewer1.setMaximum(self.viewer1.x_axis[-1] - scrolling_x_axis_scrollbar_viewer1_page_step)
+                    self.scrolling_y_axis_scrollbar_viewer1.setMinimum(self.viewer1.min_signals_value)
+                    self.scrolling_y_axis_scrollbar_viewer1.setPageStep(int(self.viewer1.viewBox.viewRange()[1][1] - self.viewer1.viewBox.viewRange()[1][0]))
+                    scrolling_y_axis_scrollbar_viewer1_page_step = 325
+                    self.scrolling_y_axis_scrollbar_viewer1.setMaximum(self.viewer1.max_signals_value + int(self.viewer1.viewBox.viewRange()[1][1] - self.viewer1.viewBox.viewRange()[1][0]) - scrolling_y_axis_scrollbar_viewer1_page_step)
                     self.viewer2.update_x_axis()
                     if self.viewer2.x_axis[-1] < self.viewer2.viewRange()[0][1]:
                         self.replay_signal('2')
@@ -403,6 +436,14 @@ class Main(QMainWindow):
         if page_index != -1:
             self.Pages.setCurrentIndex(page_index)
             
+    def go_to_home_page_from_gluing(self):
+        page_index = self.Pages.indexOf(self.findChild(QWidget, 'MainPage'))
+        self.viewer1.removeItem(self.viewer1.gluing_selected_region)
+        self.viewer2.removeItem(self.viewer2.gluing_selected_region)
+        self.StartGluingButton.setEnabled(False)
+        if page_index != -1:
+            self.Pages.setCurrentIndex(page_index)
+            
     def go_to_gluing_page(self , data_x_viewer_1 , data_y_viewer_1 , data_x_viewer_2 , data_y_viewer_2):
         self.glued_viewer.clear()
         self.to_be_glued_signal_1 = CustomSignal(data_y_viewer_1)
@@ -416,14 +457,6 @@ class Main(QMainWindow):
         self.glued_viewer.add_glued_moving_channel(self.to_be_glued_signal_2, data_x_viewer_2)
         self.glued_signal_1_x_values = data_x_viewer_1
         self.glued_signal_2_x_values = data_x_viewer_2
-        
-                
-    def set_gluing_scroll_bar_func(self):
-        self.glued_viewer.clear()
-        self.glued_viewer.remove_channel(self.to_be_glued_signal_2)
-        self.glued_signal_2_x_values = [x + 100 for x in self.glued_signal_2_x_values]
-        # self.glued_viewer.plot()
-        
         
     def play_pause_graph1(self):
         if self.is_playing_graph1:
@@ -688,9 +721,22 @@ class Main(QMainWindow):
                         if viewer_number == "1":
                             self.viewer1.clear()
                             self.viewer1.add_channel(signal)
+                            scrolling_x_axis_scrollbar_viewer1_page_step = 1075
+                            self.scrolling_x_axis_scrollbar_viewer1.setMaximum(self.viewer1.x_axis[-1] - scrolling_x_axis_scrollbar_viewer1_page_step)
+                            self.scrolling_y_axis_scrollbar_viewer1.setMinimum(self.viewer1.min_signals_value)
+                            self.scrolling_y_axis_scrollbar_viewer1.setPageStep(int(self.viewer1.viewBox.viewRange()[1][1] - self.viewer1.viewBox.viewRange()[1][0]))
+                            scrolling_y_axis_scrollbar_viewer1_page_step = 325
+                            self.scrolling_y_axis_scrollbar_viewer1.setMaximum(self.viewer1.max_signals_value + int(self.viewer1.viewBox.viewRange()[1][1] - self.viewer1.viewBox.viewRange()[1][0]) - scrolling_y_axis_scrollbar_viewer1_page_step)
+                            
                         else:
                             self.viewer2.clear()
                             self.viewer2.add_channel(signal)
+                            scrolling_x_axis_scrollbar_viewer2_page_step = 1075
+                            self.scrolling_x_axis_scrollbar_viewer2.setMaximum(self.viewer2.x_axis[-1] - scrolling_x_axis_scrollbar_viewer2_page_step)
+                            self.scrolling_y_axis_scrollbar_viewer2.setMinimum(self.viewer2.min_signals_value)
+                            self.scrolling_y_axis_scrollbar_viewer2.setPageStep(int(self.viewer2.viewBox.viewRange()[1][1] - self.viewer2.viewBox.viewRange()[1][0]))
+                            scrolling_y_axis_scrollbar_viewer2_page_step = 325
+                            self.scrolling_y_axis_scrollbar_viewer2.setMaximum(self.viewer2.max_signals_value + int(self.viewer2.viewBox.viewRange()[1][1] - self.viewer2.viewBox.viewRange()[1][0]) - scrolling_y_axis_scrollbar_viewer2_page_step)
                             
                     if viewer_number == "1":
                             self.number_of_viewer_1_signals+=1
@@ -718,7 +764,56 @@ class Main(QMainWindow):
                 self.viewer2.y_axis_scroll_bar_enabled = True
             else:
                 self.viewer2.y_axis_scroll_bar_enabled = False
-                
+    
+    def set_viewer1_sliders_value(self , view,ranges):
+        x_axis_slider_value = ranges[0][0]
+        y_axis_slider_value = ranges[1][0]
+        self.scrolling_x_axis_scrollbar_viewer1.blockSignals(True)
+        self.scrolling_x_axis_scrollbar_viewer1.setValue(int(x_axis_slider_value))
+        self.scrolling_x_axis_scrollbar_viewer1.blockSignals(False)
+        
+        if self.viewer1.y_axis_scroll_bar_enabled :
+            if not self.viewer1.scrolling_in_y_axis:
+                self.scrolling_y_axis_scrollbar_viewer1.setEnabled(True)
+                self.viewer1.viewBox.setMouseEnabled(x = True, y =True)
+                self.viewer1.viewBox.enableAutoRange(x=False, y=False)
+                self.viewer1.viewBox.setAutoVisible(x=False, y=False)
+                self.scrolling_y_axis_scrollbar_viewer1.blockSignals(True)
+                self.scrolling_y_axis_scrollbar_viewer1.setValue(int(y_axis_slider_value))
+                # self.scrolling_y_axis_scrollbar.setPageStep(int(self.viewer1.viewBox.viewRange()[1][1] - self.viewer1.viewBox.viewRange()[1][0]))
+                # self.scrolling_y_axis_scrollbar.
+                self.scrolling_y_axis_scrollbar_viewer1.blockSignals(False)
+        else:
+            self.scrolling_y_axis_scrollbar_viewer1.setDisabled(True)
+            self.viewer1.viewBox.setMouseEnabled(x = True, y =False)
+            self.viewer1.viewBox.enableAutoRange(x=False, y=True)
+            self.viewer1.viewBox.setAutoVisible(x=False, y=True)
+            
+    def set_viewer2_sliders_value(self , view,ranges):
+        x_axis_slider_value = ranges[0][0]
+        y_axis_slider_value = ranges[1][0]
+        # print(ranges)
+        self.scrolling_x_axis_scrollbar_viewer2.blockSignals(True)
+        self.scrolling_x_axis_scrollbar_viewer2.setValue(int(x_axis_slider_value))
+        self.scrolling_x_axis_scrollbar_viewer2.blockSignals(False)
+        
+        if self.viewer2.y_axis_scroll_bar_enabled :
+            if not self.viewer2.scrolling_in_y_axis:
+                self.scrolling_y_axis_scrollbar_viewer2.setEnabled(True)
+                self.viewer2.viewBox.setMouseEnabled(x = True, y =True)
+                self.viewer2.viewBox.enableAutoRange(x=False, y=False)
+                self.viewer2.viewBox.setAutoVisible(x=False, y=False)
+                self.scrolling_y_axis_scrollbar_viewer2.blockSignals(True)
+                self.scrolling_y_axis_scrollbar_viewer2.setValue(int(y_axis_slider_value))
+                # self.scrolling_y_axis_scrollbar.setPageStep(int(self.viewer2.viewBox.viewRange()[1][1] - self.viewer2.viewBox.viewRange()[1][0]))
+                # self.scrolling_y_axis_scrollbar.
+                self.scrolling_y_axis_scrollbar_viewer2.blockSignals(False)
+        else:
+            self.scrolling_y_axis_scrollbar_viewer2.setDisabled(True)
+            self.viewer2.viewBox.setMouseEnabled(x = True, y =False)
+            self.viewer2.viewBox.enableAutoRange(x=False, y=True)
+            self.viewer2.viewBox.setAutoVisible(x=False, y=True)
+    
     def change_plot_color(self, viewer:str, color:str):
         if viewer == '1':
             dropdown_index = self.signals_dropdown_1.currentIndex()
