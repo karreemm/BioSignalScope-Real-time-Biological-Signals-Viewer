@@ -1,4 +1,5 @@
 import subprocess
+import requests
 import sys
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QApplication,QSlider,  QMainWindow,QLineEdit,  QStackedWidget, QPushButton,QComboBox,  QMessageBox, QWidget, QColorDialog, QFrame, QVBoxLayout, QFileDialog ,QScrollBar
@@ -16,15 +17,10 @@ from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Image , Spacer
 import copy
-
-def compile_qrc():
-    qrc_file = 'Images.qrc'
-    output_file = 'CompiledImages.py'
-    try:
-        subprocess.run(['pyrcc5', qrc_file, '-o', output_file], check=True)
-        print(f"Compiled {qrc_file} to {output_file}")
-    except subprocess.CalledProcessError as e:
-        print(f"Failed to compile {qrc_file}: {e}")
+from PyQt5.QtCore import Qt
+from feature_classes.realTimeSignal import RealTimeSignal
+from feature_classes.navigations import Navigations
+from helper_functions.compile_qrc import compile_qrc
 
 compile_qrc()
 
@@ -43,6 +39,9 @@ class Main(QMainWindow):
 
         self.setMinimumHeight(min_height)
         self.setMinimumWidth(min_width)
+
+        self.real_time_signal = RealTimeSignal()
+        self.navigation = Navigations()
 
         self.PlayImage = QIcon(':/Images/playW.png')
         self.PauseImage = QIcon(':/Images/pauseW.png')
@@ -67,18 +66,26 @@ class Main(QMainWindow):
         self.is_linked = True
 
         self.Pages = self.findChild(QStackedWidget, 'stackedWidget') 
+        self.NonRectangleSignalPage =  self.Pages.indexOf(self.findChild(QWidget, 'NonRectangleSignalPage'))
+        self.MainPage =  self.Pages.indexOf(self.findChild(QWidget, 'MainPage'))
+        self.RealTimeSignalPage =  self.Pages.indexOf(self.findChild(QWidget, 'RealTimePage'))
 
         self.NonRectangleSignalButton = self.findChild(QPushButton, 'NonRectangleSignalButton')
-        self.NonRectangleSignalButton.clicked.connect(self.go_to_non_rectangle_signal_page)
+        self.NonRectangleSignalButton.clicked.connect(self.navigation.go_to_non_rectangle_signal_page)
 
         self.BackHomeButton1 = self.findChild(QPushButton, 'BackHomeButton1')
-        self.BackHomeButton1.clicked.connect(self.go_to_home_page)
+        self.BackHomeButton1.clicked.connect(self.navigation.go_to_home_page)
 
         self.BackHomeButton2 = self.findChild(QPushButton, 'BackHomeButton2')
-        self.BackHomeButton2.clicked.connect(self.go_to_home_page)
+        self.BackHomeButton2.clicked.connect(self.navigation.go_to_home_page)
 
         self.BackHomeButton3 = self.findChild(QPushButton, 'BackHomeButton3')
-        self.BackHomeButton3.clicked.connect(self.go_to_home_page)
+        self.BackHomeButton3.clicked.connect(self.navigation.go_to_home_page)
+
+        self.RealTimeSignalButton = self.findChild(QPushButton, 'RealTimeSignalButton')
+        self.RealTimeSignalButton.clicked.connect(self.navigation.go_to_real_time_page)
+
+        self.navigation.initialize(self.NonRectangleSignalButton, self.BackHomeButton1, self.BackHomeButton2, self.BackHomeButton3, self.RealTimeSignalButton, self.RealTimeSignalPage, self.MainPage, self.NonRectangleSignalPage, self.Pages)
 
         self.PlayPauseButtonGraph1 = self.findChild(QPushButton, 'PlayPauseButtonGraph1')
         self.PlayPauseButtonGraph1.clicked.connect(self.play_pause_graph1)
@@ -139,8 +146,27 @@ class Main(QMainWindow):
         self.GeneratePDFReport = self.findChild(QPushButton , "GeneratePDFButton")
         self.GeneratePDFReport.clicked.connect(self.generate_pdf_report)
 
-        self.RealTimeSignalButton = self.findChild(QPushButton, 'RealTimeSignalButton')
-        self.RealTimeSignalButton.clicked.connect(self.go_to_real_time_page)
+        self.RealTimeSignalInput = self.findChild(QLineEdit, 'RealTimeSignalInput')
+        self.RealTimeSignalInput.textChanged.connect(self.real_time_signal.enable_view_button)
+
+        self.RealTimeViewSignalButton = self.findChild(QPushButton, 'RealTimeViewSignalButton')
+        self.RealTimeViewSignalButton.clicked.connect(self.real_time_signal.show_real_time_graph)
+        self.RealTimeViewSignalButton.clicked.connect(self.real_time_signal.disable_view_button)
+
+        self.RealTimeSignalFrame = self.findChild(QFrame, 'RealTimeSignalFrame')
+
+        self.PlayPauseButtonRealTime = self.findChild(QPushButton, 'PlayPauseButtonRealTime')
+        self.PlayPauseButtonRealTime.clicked.connect(self.real_time_signal.toggle_play_pause_real_time)
+
+        self.RealTimeScroll = self.findChild(QScrollBar, 'RealTimeScroll')
+        self.RealTimeScroll.setOrientation(Qt.Horizontal)
+        self.RealTimeScroll.valueChanged.connect(self.real_time_signal.scroll_graph)
+
+        self.graphWidget = pg.PlotWidget()
+        self.layout = QtWidgets.QVBoxLayout(self.RealTimeSignalFrame)
+        self.layout.addWidget(self.graphWidget)
+
+        self.real_time_signal.initialize(self.RealTimeSignalInput, self.RealTimeViewSignalButton, self.PlayPauseButtonRealTime, self.RealTimeScroll, self.graphWidget)
         
         # Adding functionality of going to glue window button
         self.StartGluingButton.clicked.connect(self.start_gluing)
@@ -355,17 +381,6 @@ class Main(QMainWindow):
                     if self.viewer2.x_axis[-1] < self.viewer2.viewRange()[0][1]:
                         self.replay_signal('2')
                     break
-
-
-    def go_to_non_rectangle_signal_page(self):
-        page_index = self.Pages.indexOf(self.findChild(QWidget, 'NonRectangleSignalPage'))
-        if page_index != -1:
-            self.Pages.setCurrentIndex(page_index)
-
-    def go_to_home_page(self):
-        page_index = self.Pages.indexOf(self.findChild(QWidget, 'MainPage'))
-        if page_index != -1:
-            self.Pages.setCurrentIndex(page_index)
             
     def go_to_gluing_page(self , data_x_viewer_1 , data_y_viewer_1 , data_x_viewer_2 , data_y_viewer_2):
         self.glued_viewer.clear()
@@ -387,7 +402,6 @@ class Main(QMainWindow):
         self.glued_viewer.remove_channel(self.to_be_glued_signal_2)
         self.glued_signal_2_x_values = [x + 100 for x in self.glued_signal_2_x_values]
         # self.glued_viewer.plot()
-        
         
     def play_pause_graph1(self):
         if self.is_playing_graph1:
@@ -729,10 +743,10 @@ class Main(QMainWindow):
                 self.play_pause_graph2()
             pass
 
-    def go_to_real_time_page(self):
-        page_index = self.Pages.indexOf(self.findChild(QWidget, 'RealTimePage'))
-        if page_index != -1:
-            self.Pages.setCurrentIndex(page_index)
+    # def go_to_real_time_page(self):
+    #     page_index = self.Pages.indexOf(self.findChild(QWidget, 'RealTimePage'))
+    #     if page_index != -1:
+    #         self.Pages.setCurrentIndex(page_index)
 
     def link_graphs(self):
         if self.is_linked:
