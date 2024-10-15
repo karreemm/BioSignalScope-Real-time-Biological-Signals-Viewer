@@ -14,15 +14,18 @@ class SpiderPlot(QWidget):
         # Initial window setup
         self.data = data_samples
         
-        self.max_values = self.data.max(axis = 1)
+        self.max_values = self.get_max_values(self.data)
+        print(f'max values in the dataframes {self.max_values}')
         # Polygon properties
-        self.radius = 200  # Radius for the circle in which the polygon is inscribed
+        self.radius = 200  # Radius for the circle in which the polygon is inscribed4
+        print(f'shape of the data will be plotted{self.data.shape}')
         self.data_points, self.num_vertices = self.data.shape
+        self.num_vertices = self.num_vertices-1
         self.axis_labels = self.data.columns[1:]
         self.polygon_pen = QPen(Qt.black, 2)
         self.axis_pen =  QPen(Qt.gray, 2)
         self.spider_pen =  QPen(Qt.black, 2)
-        print(self.axis_labels)
+
         
   # Default number of vertices (triangle)
         self.current_row_idx = 0
@@ -34,7 +37,12 @@ class SpiderPlot(QWidget):
         self.timer.start(self.time_interval)
         
 
-
+    def get_max_values(self, data):
+        maximums = []
+        for col_name in data.columns[1:]:
+            maximums.append(data[col_name].max())
+        return maximums
+    
     def get_speed(self):
         return 100*(1/(self.time_interval))
     
@@ -123,10 +131,12 @@ class SpiderPlot(QWidget):
             x = int(center_x + self.radius * cos(angle))
             y = int(center_y - self.radius* sin(angle))  # Negative because of Qt's inverted y-axis
             vertices.append(QPoint(x, y))
+            # vertices.append(QPoint(-x, -y))
+
         # Draw lines between the vertices
         painter.drawPoint(center)
-        for i in range(self.num_vertices):
-            next_vertex = vertices[(i + 1) % self.num_vertices]  # Wrap around to the first vertex
+        for i in range( self.num_vertices):
+            next_vertex = vertices[(i+1) % self.num_vertices]  # Wrap around to the first vertex
             painter.drawLine(vertices[i], next_vertex)
             painter.setPen(self.axis_pen)
             painter.drawLine(center,vertices[i])    
@@ -134,15 +144,13 @@ class SpiderPlot(QWidget):
 
             
 
-    def draw_spider(self, painter, center_x, center_y, max= 20):
+    def draw_spider(self, painter, center_x, center_y):
         spider_pen = self.spider_pen
         painter.setPen(spider_pen)
         
         # Calculate the angle between each vertex
-        values = self.current_row
+        values = self.current_row[1:]  # Exclude the 'time' column
         angle_step = 2 * pi / self.num_vertices
-
-        step_size = max / 5  # Assuming 5 levels for the concentric circles
 
         # List to store vertices
         vertices = []
@@ -150,10 +158,19 @@ class SpiderPlot(QWidget):
         # Calculate the coordinates for each vertex
         for i in range(self.num_vertices):
             angle = i * angle_step
-        
-            x = int(center_x + self.radius*(1 - (values[i]/max)) * cos(angle))
-            y = int(center_y - self.radius*(1 - (values[i]/max)) * sin(angle))  # Negative because of Qt's inverted y-axis
+            # Normalize the value to be between 0 and 1
+            normalized_value = values[i] / self.max_values[i]
+            
+            # Ensure normalized_value is clamped between 0 and 1
+            normalized_value = max(0, min(1, normalized_value))
+            
+            # Scale the radius based on the normalized value
+            scaled_radius = self.radius * normalized_value
+            
+            x = int(center_x + scaled_radius * cos(angle))
+            y = int(center_y - scaled_radius * sin(angle))  # Negative because of Qt's inverted y-axis
             vertices.append(QPoint(x, y))
+            
         # Draw lines between the vertices
         for i in range(self.num_vertices):
             next_vertex = vertices[(i + 1) % self.num_vertices]  # Wrap around to the first vertex
@@ -169,7 +186,9 @@ class SpiderPlot(QWidget):
             angle = i * angle_step
             x = int(center_x + (self.radius + 20) * cos(angle))
             y = int(center_y - (self.radius + 20) * sin(angle))
-            painter.drawText(x - 20, y, 40, 20, Qt.AlignCenter, label)
+            formatted_value = f'{self.max_values[i]:.2f}'
+
+            painter.drawText(x - 20, y, 60, 20, Qt.AlignCenter, f'{label}, {formatted_value}')
 
 
 class PlotControls(QWidget):
@@ -259,7 +278,6 @@ class PlotControls(QWidget):
 
         # self.time_slider.setValue(self.spider_plot.current_row_idx)
     def replay_plotting(self):
-        if self.spider_plot.current_row_idx >= self.spider_plot.data_points - 1:
             self.spider_plot.current_row_idx = 0
             self.start_plotting()
     def slider_changed(self, value):
