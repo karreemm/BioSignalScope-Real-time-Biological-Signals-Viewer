@@ -2,9 +2,14 @@ import subprocess
 import requests
 import sys
 from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtWidgets import QApplication,QSlider,  QMainWindow,QLineEdit,  QStackedWidget, QPushButton,QComboBox,  QMessageBox, QWidget, QColorDialog, QFrame, QVBoxLayout, QFileDialog ,QScrollBar
+from PyQt5.QtWidgets import QApplication, QHBoxLayout,QSlider,  QMainWindow,QLineEdit,  QStackedWidget, QPushButton,QComboBox,  QMessageBox, QWidget, QColorDialog, QFrame, QVBoxLayout, QFileDialog ,QScrollBar
 from PyQt5.uic import loadUi
+
 from PyQt5.QtGui import QIcon
+from classes.spiderPlot import SpiderPlot
+from classes.CSVLoader import CSVLoader
+from classes.resampled_data import wave
+from classes.spiderPlot import PlotControls
 from classes.viewer import Viewer
 from classes.channel_ import CustomSignal
 from classes.gluer import Gluer
@@ -12,17 +17,17 @@ import pandas as pd
 import numpy as np
 import pyqtgraph as pg
 import pyqtgraph.exporters
-from reportlab.lib.pagesizes import letter
-from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Image , Spacer
+# from reportlab.lib.pagesizes import letter
+# from reportlab.lib import colors
+# from reportlab.lib.styles import getSampleStyleSheet
+# from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Image , Spacer
 import copy
 from PyQt5.QtCore import Qt
 from feature_classes.realTimeSignal import RealTimeSignal
 from feature_classes.navigations import Navigations
 from helper_functions.compile_qrc import compile_qrc
 
-compile_qrc()
+# compile_qrc()
 
 import CompiledImages  
 
