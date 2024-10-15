@@ -20,7 +20,7 @@
    <string>MainWindow</string>
   </property>
   <property name="toolTip">
-   <string>Rewind/NoRewind</string>
+   <string/>
   </property>
   <property name="styleSheet">
    <string notr="true">* {
