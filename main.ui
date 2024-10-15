@@ -213,7 +213,7 @@ QSlider::add-page:horizontal {
        <string notr="true"/>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="MainPage">
        <layout class="QGridLayout" name="gridLayout_2">
@@ -1810,7 +1810,8 @@ border-bottom: 2px solid #39bef7
                </size>
               </property>
               <property name="styleSheet">
-               <string notr="true">font-size: 40px
+               <string notr="true">font-size: 40px;
+border-bottom: 2px solid #39bef7
 </string>
               </property>
               <property name="text">
@@ -2201,7 +2202,9 @@ border-radius: 10px
                </size>
               </property>
               <property name="styleSheet">
-               <string notr="true">font-size: 40px
+               <string notr="true">font-size: 40px;
+border-bottom: 2px solid #39bef7
+
 
 </string>
               </property>
@@ -2461,7 +2464,9 @@ QWidget {
                </size>
               </property>
               <property name="styleSheet">
-               <string notr="true">font-size: 40px</string>
+               <string notr="true">font-size: 40px;
+border-bottom: 2px solid #39bef7;
+</string>
               </property>
               <property name="text">
                <string>Real Time Signal Viewer</string>
