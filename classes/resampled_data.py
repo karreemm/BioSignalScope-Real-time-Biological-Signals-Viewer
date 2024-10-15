@@ -8,9 +8,11 @@ class wave:
         Args:
             - dir: List of the directories of the data sheets in CSV format.
         """
+        if len(dir) <= 1 :  
+            self.dir = ['emg', 'ECG', 'RSP_AB']
+        else: self.dir = dir
         print("Input directories:", dir)
 
-        self.dir = ['emg', 'ECG', 'RSP_AB']
         # Read CSV files and store them in raw_data list
         self.raw_data = [pd.read_csv(f'test_signals/{directory}.csv') for directory in self.dir]
         self.data_columns = [dataframe.columns for dataframe in self.raw_data]
@@ -31,6 +33,10 @@ class wave:
         # Resample and combine data
         self.data_samples = self.concatenate_resampled_data(self.raw_data, self.time_grid)
     
+    def set_files(self, files):
+        self.dir = files
+        
+            
     def calc_sample_rate(self, dataframe):
         """Calculate the sampling rate of a dataframe based on the time intervals."""
         if len(dataframe) < 2:

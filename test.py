@@ -35,10 +35,12 @@ import copy
 
 import CompiledImages  
 
-class Main(QMainWindow):
+class test(QMainWindow):
     def __init__(self):
-        super(Main, self).__init__()
+        super(test, self).__init__()
+
         loadUi('main.ui', self)
+
 
         self.setWindowIcon(QIcon('logo.png'))
         self.setWindowTitle('Multi Signals Viewer')
@@ -77,6 +79,8 @@ class Main(QMainWindow):
         self.NonRectangleSignalButton = self.findChild(QPushButton, 'NonRectangleSignalButton')
         self.NonRectangleSignalButton.clicked.connect(self.go_to_non_rectangle_signal_page)
 
+        self.NonRectangleGraphTimeSlider = self.findChild(QSlider, 'horizontalSlider')
+        
         self.BackHomeButton1 = self.findChild(QPushButton, 'BackHomeButton1')
         self.BackHomeButton1.clicked.connect(self.go_to_home_page)
 
@@ -95,9 +99,8 @@ class Main(QMainWindow):
         self.non_rectangle_multiple_csv_loader = CSVLoader(self.UploadSignalNonRectangle)
 
         wave_instance = wave(self.non_rectangle_multiple_csv_loader.csv_files, interpolation_order)
-        graph = SpiderPlot(wave_instance.data_samples)
         self.horizontalLayout_15 = self.findChild(QHBoxLayout, 'horizontalLayout_15')
-        self.horizontalLayout_15.addWidget(graph)
+        
         
         self.PlayPauseNonRectangleButton = self.findChild(QPushButton, 'PlayPauseNonRectangleButton')
         
@@ -111,10 +114,11 @@ class Main(QMainWindow):
         
         self.ChangeColorButtonNonRectangle = self.findChild(QPushButton, 'ChangeColorButtonNonRectangle')
         
-        
-        self.spider_viewer_control = PlotControls(graph, self.BackButtonNonRectangle, self.NextButtonNonRectangle, 
-                                                  self.SpeedSliderNonRectangleGraph, self.PlayPauseNonRectangleButton, self.ReplayNonRectangleButton, self.ChangeColorButtonNonRectangle)
-        
+        self.graph = SpiderPlot(wave_instance.data_samples, self.NonRectangleGraphTimeSlider)
+    
+        self.spider_viewer_control = PlotControls(self.graph, self.BackButtonNonRectangle, self.NextButtonNonRectangle, 
+                                                  self.SpeedSliderNonRectangleGraph, self.PlayPauseNonRectangleButton, self.ReplayNonRectangleButton, self.ChangeColorButtonNonRectangle,self.NonRectangleGraphTimeSlider)
+        self.horizontalLayout_15.addWidget(self.graph)
         
         self.NonRectangleSignalButton = self.findChild(QPushButton, 'NonRectangleSignalButton')
         self.NonRectangleSignalButton.clicked.connect(self.go_to_non_rectangle_signal_page)
@@ -805,6 +809,6 @@ class Main(QMainWindow):
     
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = Main()
+    window = test()
     window.show()
     sys.exit(app.exec_())

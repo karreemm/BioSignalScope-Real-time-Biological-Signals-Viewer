@@ -8,12 +8,12 @@ from math import cos, sin, pi, radians
 import pandas as pd
 
 class SpiderPlot(QWidget):
-    def __init__(self, data_samples:pd.DataFrame):
+    def __init__(self, data_samples:pd.DataFrame, time_slider):
         super().__init__()
         
         # Initial window setup
         self.data = data_samples
-        
+        self.time_slider = time_slider
         self.max_values = self.get_max_values(self.data)
         print(f'max values in the dataframes {self.max_values}')
         # Polygon properties
@@ -24,7 +24,7 @@ class SpiderPlot(QWidget):
         self.axis_labels = self.data.columns[1:]
         self.polygon_pen = QPen(Qt.black, 2)
         self.axis_pen =  QPen(Qt.gray, 2)
-        self.spider_pen =  QPen(Qt.black, 2)
+        self.spider_pen =  QPen(Qt.white, 2)
 
         
   # Default number of vertices (triangle)
@@ -56,10 +56,20 @@ class SpiderPlot(QWidget):
         if self.current_row_idx >= self.data_points - 1:
             self.timer.stop()           
         self.current_row =  self.data.loc[self.current_row_idx, :].values.flatten().tolist()
+
+        if self.current_row_idx >= self.time_slider.maximum():
+            self.time_slider.setValue(self.time_slider.maximum()-1)
+        self.time_slider.setValue(self.current_row_idx)
+         
+
         self.update()
     def repaint_animation(self,row = -1):  
         if row != -1:
             self.current_row =  self.data.loc[row, :].values.flatten().tolist()
+            self.time_slider.setValue(self.current_row_idx)
+
+            if self.current_row_idx >= self.time_slider.maximum():
+                self.time_slider.setValue(self.time_slider.maximum()-1)
             self.repaint()
    
         # self.current_row_idx += 1
@@ -192,7 +202,7 @@ class SpiderPlot(QWidget):
 
 
 class PlotControls(QWidget):
-    def __init__(self, SpiderPlot, backward_button, forward_button, speed_control, start_stop_button, replay_button, color_control_button):
+    def __init__(self, SpiderPlot, backward_button, forward_button, speed_control, start_stop_button, replay_button, color_control_button, time_slider):
         super().__init__()
         
         self.spider_plot = SpiderPlot
@@ -224,14 +234,15 @@ class PlotControls(QWidget):
 
         self.replay_button = replay_button
         self.replay_button.clicked.connect(self.replay_plotting)
-        self.time_slider = QSlider(Qt.Horizontal)
+        self.time_slider = time_slider
         self.time_slider.setMinimum(0)
-        self.time_slider.setMaximum(self.spider_plot.data_points - 1)
+        print(f'data points{self.spider_plot.data_points+1}')
+        self.time_slider.setMaximum(self.spider_plot.data_points -3)
         self.time_slider.setValue(0)
         self.time_slider.setTickPosition(QSlider.TicksBelow)
         self.time_slider.setTickInterval(1)
         self.time_slider.valueChanged.connect(self.slider_changed)
-        control_layout.addWidget(self.time_slider)
+        # control_layout.addWidget(self.time_slider)
 
         self.speed_slider = speed_control
         self.speed_slider.setMinimum(1)
@@ -243,7 +254,7 @@ class PlotControls(QWidget):
         self.start_stop_flag = False
     def start_plotting(self):
         self.spider_plot.timer.start(self.convert_speed_to_interval(self.speed))
-
+        
     def stop_plotting(self):
         self.spider_plot.timer.stop()
         
@@ -251,6 +262,7 @@ class PlotControls(QWidget):
         if self.start_stop_flag:
             self.start_plotting()
             self.start_stop_flag = False
+            
         else: 
             self.stop_plotting()
             self.start_stop_flag = True
@@ -265,7 +277,7 @@ class PlotControls(QWidget):
         # Move forward one step in the data            
         self.spider_plot.current_row_idx = min(self.spider_plot.current_row_idx + 1, self.spider_plot.data_points - 1)
         self.spider_plot.repaint_animation(self.spider_plot.current_row_idx)
-        # self.time_slider.setValue(self.spider_plot.current_row_idx)
+        self.time_slider.setValue(self.spider_plot.current_row_idx)
         self.auto_update_slider()
 
 
@@ -274,12 +286,15 @@ class PlotControls(QWidget):
         if self.spider_plot.current_row_idx > 0:
             self.spider_plot.current_row_idx -= 1
             self.spider_plot.repaint_animation(self.spider_plot.current_row_idx)  # Update the plot to reflect the new index
-            # self.time_slider.setValue(self.spider_plot.current_row_idx)
+            self.time_slider.setValue(self.spider_plot.current_row_idx)
+            self.auto_update_slider()
 
         # self.time_slider.setValue(self.spider_plot.current_row_idx)
     def replay_plotting(self):
             self.spider_plot.current_row_idx = 0
             self.start_plotting()
+            self.time_slider.setValue(self.spider_plot.current_row_idx)
+
     def slider_changed(self, value):
         # Update the current row index based on the slider position
         self.spider_plot.current_row_idx = value

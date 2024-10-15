@@ -1,10 +1,11 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QFileDialog, QLabel
+from classes.resampled_data import wave
 
 class CSVLoader(QWidget):
     def __init__(self, load_button):
         super().__init__()
-
+        self.wave = wave
         self.csv_files = []
         
         self.load_button =load_button
@@ -19,10 +20,12 @@ class CSVLoader(QWidget):
         # Open the file dialog to select multiple CSV files
         files, _ = QFileDialog.getOpenFileNames(self, "Open CSV Files", "", "CSV Files (*.csv)")
         self.csv_files = []
-
         # If files are selected, store the file paths
         if files:
             self.csv_files.extend(files)
+            self.wave.set_files(self.csv_files)
+            print(f'CSV files:{self.csv_files}'  )
+
             
 
     
