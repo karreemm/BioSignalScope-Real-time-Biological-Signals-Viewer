@@ -6,7 +6,6 @@ from PyQt5.uic import loadUi
 
 from PyQt5.QtGui import QIcon
 from classes.spiderPlot import SpiderPlot
-from classes.CSVLoader import CSVLoader
 from classes.resampled_data import wave
 from classes.spiderPlot import PlotControls
 from classes.viewer import Viewer
@@ -73,6 +72,47 @@ class Main(QMainWindow):
 
         self.Pages = self.findChild(QStackedWidget, 'stackedWidget') 
 
+        
+        self.NonRectangleSignalButton = self.findChild(QPushButton, 'NonRectangleSignalButton')
+        self.NonRectangleSignalButton.clicked.connect(self.go_to_non_rectangle_signal_page)
+
+        self.NonRectangleGraphTimeSlider = self.findChild(QSlider, 'horizontalSlider')
+        
+        self.BackHomeButton1 = self.findChild(QPushButton, 'BackHomeButton1')
+        self.BackHomeButton1.clicked.connect(self.go_to_home_page)
+
+        self.BackHomeButton2 = self.findChild(QPushButton, 'BackHomeButton2')
+        self.BackHomeButton2.clicked.connect(self.go_to_home_page)
+
+        self.BackHomeButton3 = self.findChild(QPushButton, 'BackHomeButton3')
+        self.BackHomeButton3.clicked.connect(self.go_to_home_page)
+        
+        self.NonRectangleGraph = self.findChild(QFrame, 'NonRectangleGraph')
+        
+        self.UploadSignalNonRectangle= self.findChild(QPushButton, 'UploadSignalNonRectangle')
+        self.UploadSignalNonRectangle.clicked.connect(self.draw_new_graph)
+
+        target_sampling_rate = 10  # The desired sampling rate
+        interpolation_order = 'linear'  # Interpolation method, could be 'linear', 'quadratic', etc.
+
+        self.wave_instance = None
+        self.horizontalLayout_15 = self.findChild(QHBoxLayout, 'horizontalLayout_15')
+        
+        
+        self.PlayPauseNonRectangleButton = self.findChild(QPushButton, 'PlayPauseNonRectangleButton')
+        
+        self.ReplayNonRectangleButton = self.findChild(QPushButton, 'ReplayNonRectangleButton')
+
+        self.SpeedSliderNonRectangleGraph = self.findChild(QSlider,'SpeedSliderNonRectangleGraph')
+        
+        self.BackButtonNonRectangle = self.findChild(QPushButton, 'BackButtonNonRectangle')
+        
+        self.NextButtonNonRectangle = self.findChild(QPushButton, 'NextButtonNonRectangle')
+        
+        self.ChangeColorButtonNonRectangle = self.findChild(QPushButton, 'ChangeColorButtonNonRectangle')
+        
+        self.graph = None
+        self.spider_viewer_control = None
         
         
         self.NonRectangleSignalButton = self.findChild(QPushButton, 'NonRectangleSignalButton')
@@ -245,6 +285,24 @@ class Main(QMainWindow):
         self.replay_button_2 = self.findChild(QPushButton, 'ReplayButtonGraph2')
         self.replay_button_2.clicked.connect(lambda:self.replay_signal('2'))
         
+    def draw_new_graph(self):
+
+            files, _ = QFileDialog.getOpenFileNames(self, "Open CSV Files", "", "CSV Files (*.csv)")
+            csv_files = []
+            # If files are selected, store the file paths
+            if files:
+                csv_files.extend(files)
+                self.wave_instance = wave(files_directories = csv_files)
+                print(f'CSV files:{csv_files}'  )
+                self.horizontalLayout_15.removeWidget(self.graph)
+
+                self.graph = SpiderPlot(self.wave_instance.data_samples, self.NonRectangleGraphTimeSlider)    
+                self.spider_viewer_control = PlotControls(self.PlayImage, self.PauseImage ,self.graph, self.BackButtonNonRectangle, self.NextButtonNonRectangle, 
+                                                    self.SpeedSliderNonRectangleGraph, self.PlayPauseNonRectangleButton, self.ReplayNonRectangleButton, self.ChangeColorButtonNonRectangle,self.NonRectangleGraphTimeSlider)
+                self.horizontalLayout_15.addWidget(self.graph)
+      
+            
+    
         # linking button 
           
     def replay_signal(self, viewer:str):
