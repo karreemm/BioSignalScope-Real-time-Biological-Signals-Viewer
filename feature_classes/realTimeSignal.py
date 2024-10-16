@@ -7,7 +7,7 @@ class RealTimeSignal:
     def __init__(self):
         self.PlayImage = QIcon(':/Images/playW.png')
         self.PauseImage = QIcon(':/Images/pauseW.png')
-       
+
         self.is_playing = True
         self.setDisabled = False
 

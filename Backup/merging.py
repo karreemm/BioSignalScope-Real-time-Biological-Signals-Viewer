@@ -1,10 +1,12 @@
 import subprocess
+import requests
 import sys
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QApplication,QSlider,  QMainWindow,QLineEdit,  QStackedWidget, QPushButton,QComboBox,  QMessageBox, QWidget, QColorDialog, QFrame, QVBoxLayout, QFileDialog ,QScrollBar, QHBoxLayout
 from PyQt5.uic import loadUi
 from PyQt5.QtGui import QIcon
 from classes.spiderPlot import SpiderPlot
+from classes.CSVLoader import CSVLoader
 from classes.resampled_data import wave
 from classes.spiderPlot import PlotControls
 from classes.viewer import Viewer
@@ -32,8 +34,7 @@ class Main(QMainWindow):
     def __init__(self):
         super(Main, self).__init__()
         loadUi('main.ui', self)
-        self.navigation = Navigations()
-        self.RealTimeSignal = RealTimeSignal()
+
         self.setWindowIcon(QIcon('logo.png'))
         self.setWindowTitle('Multi Signals Viewer')
 
@@ -42,6 +43,9 @@ class Main(QMainWindow):
 
         self.setMinimumHeight(min_height)
         self.setMinimumWidth(min_width)
+
+        self.real_time_signal = RealTimeSignal()
+        self.navigation = Navigations()
 
         self.PlayImage = QIcon(':/Images/playW.png')
         self.PauseImage = QIcon(':/Images/pauseW.png')
@@ -66,34 +70,33 @@ class Main(QMainWindow):
         self.is_linked = True
 
         self.Pages = self.findChild(QStackedWidget, 'stackedWidget') 
-        self.MainPage = self.Pages.indexOf(self.findChild(QWidget , 'MainPage'))
-        self.RealTimeSignalPage = self.Pages.indexOf(self.findChild(QWidget , 'RealTimeSignalPage'))
-        self.NonRectangleSignalPage = self.Pages.indexOf(self.findChild(QWidget , 'NonRectangleSignalPage'))
+        
         self.NonRectangleSignalButton = self.findChild(QPushButton, 'NonRectangleSignalButton')
         self.NonRectangleSignalButton.clicked.connect(self.go_to_non_rectangle_signal_page)
 
         self.NonRectangleGraphTimeSlider = self.findChild(QSlider, 'horizontalSlider')
         
         self.BackHomeButton1 = self.findChild(QPushButton, 'BackHomeButton1')
-        self.BackHomeButton1.clicked.connect(self.navigation.go_to_home_page)
+        self.BackHomeButton1.clicked.connect(self.go_to_home_page)
 
-        # self.BackHomeButton2 = self.findChild(QPushButton, 'BackHomeButton2')
-        # self.BackHomeButton2.clicked.connect(self.navigation.go_to_home_page)
+        self.BackHomeButton2 = self.findChild(QPushButton, 'BackHomeButton2')
+        self.BackHomeButton2.clicked.connect(self.go_to_home_page)
 
         self.BackHomeButton3 = self.findChild(QPushButton, 'BackHomeButton3')
-        self.BackHomeButton3.clicked.connect(self.navigation.go_to_home_page)
+        self.BackHomeButton3.clicked.connect(self.go_to_home_page)
         
         self.NonRectangleGraph = self.findChild(QFrame, 'NonRectangleGraph')
         
         self.UploadSignalNonRectangle= self.findChild(QPushButton, 'UploadSignalNonRectangle')
-        self.UploadSignalNonRectangle.clicked.connect(self.draw_new_graph)
 
         target_sampling_rate = 10  # The desired sampling rate
         interpolation_order = 'linear'  # Interpolation method, could be 'linear', 'quadratic', etc.
+        self.non_rectangle_multiple_csv_loader = CSVLoader(self.UploadSignalNonRectangle)
 
-        self.wave_instance = None
+        wave_instance = wave(self.non_rectangle_multiple_csv_loader.csv_files, interpolation_order)
+        graph = SpiderPlot(wave_instance.data_samples , self.NonRectangleGraphTimeSlider)
         self.horizontalLayout_15 = self.findChild(QHBoxLayout, 'horizontalLayout_15')
-        
+        self.horizontalLayout_15.addWidget(graph)
         
         self.PlayPauseNonRectangleButton = self.findChild(QPushButton, 'PlayPauseNonRectangleButton')
         
@@ -107,45 +110,30 @@ class Main(QMainWindow):
         
         self.ChangeColorButtonNonRectangle = self.findChild(QPushButton, 'ChangeColorButtonNonRectangle')
         
-        self.graph = None
-        self.spider_viewer_control = None
         
+        self.spider_viewer_control = PlotControls(graph, self.BackButtonNonRectangle, self.NextButtonNonRectangle, 
+                                                  self.SpeedSliderNonRectangleGraph, self.PlayPauseNonRectangleButton, self.ReplayNonRectangleButton, self.ChangeColorButtonNonRectangle , self.NonRectangleGraphTimeSlider)
         
+        self.NonRectangleSignalPage =  self.Pages.indexOf(self.findChild(QWidget, 'NonRectangleSignalPage'))
+        self.MainPage =  self.Pages.indexOf(self.findChild(QWidget, 'MainPage'))
+        self.RealTimeSignalPage =  self.Pages.indexOf(self.findChild(QWidget, 'RealTimePage'))
+
         self.NonRectangleSignalButton = self.findChild(QPushButton, 'NonRectangleSignalButton')
         self.NonRectangleSignalButton.clicked.connect(self.navigation.go_to_non_rectangle_signal_page)
 
-        # self.BackHomeButton1 = self.findChild(QPushButton, 'BackHomeButton1')
-        # self.BackHomeButton1.clicked.connect(self.navigation.go_to_home_page)
+        self.BackHomeButton1 = self.findChild(QPushButton, 'BackHomeButton1')
+        self.BackHomeButton1.clicked.connect(self.navigation.go_to_home_page)
 
         self.BackHomeButton2 = self.findChild(QPushButton, 'BackHomeButton2')
         self.BackHomeButton2.clicked.connect(self.go_to_home_page_from_gluing)
 
-        # self.BackHomeButton3 = self.findChild(QPushButton, 'BackHomeButton3')
-        # self.BackHomeButton3.clicked.connect(self.navigation.go_to_home_page)
+        self.BackHomeButton3 = self.findChild(QPushButton, 'BackHomeButton3')
+        self.BackHomeButton3.clicked.connect(self.navigation.go_to_home_page)
 
         self.RealTimeSignalButton = self.findChild(QPushButton, 'RealTimeSignalButton')
         self.RealTimeSignalButton.clicked.connect(self.navigation.go_to_real_time_page)
-        
-        self.RealTimeViewSignalButton = self.findChild(QPushButton, 'RealTimeViewSignalButton')
-        self.RealTimeViewSignalButton.clicked.connect(self.RealTimeSignal.show_real_time_graph)
-        self.RealTimeViewSignalButton.clicked.connect(self.RealTimeSignal.disable_view_button)
 
-        self.RealTimeSignalInput = self.findChild(QLineEdit , "RealTimeSignalInput")
-        self.RealTimeSignalInput.textChanged.connect(self.RealTimeSignal.enable_view_button)
-        
-        self.PlayPauseButtonRealTime = self.findChild(QPushButton , "PlayPauseButtonRealTime")
-        self.PlayPauseButtonRealTime.clicked.connect(self.RealTimeSignal.toggle_play_pause_real_time)
-        
-        self.RealTimeScroll = self.findChild(QScrollBar , "RealTimeScroll")
-        self.RealTimeScroll.setOrientation(Qt.Horizontal)
-        self.RealTimeScroll.valueChanged.connect(self.RealTimeSignal.scroll_graph)
-
-        self.graphWidget = pg.PlotWidget()
-        self.layout = QtWidgets.QVBoxLayout(self.RealTimeSignalFrame)
-        self.layout.addWidget(self.graphWidget)
-        
         self.navigation.initialize(self.NonRectangleSignalButton, self.BackHomeButton1, self.BackHomeButton2, self.BackHomeButton3, self.RealTimeSignalButton, self.RealTimeSignalPage, self.MainPage, self.NonRectangleSignalPage, self.Pages)
-        self.RealTimeSignal.initialize(self.RealTimeSignalInput , self.RealTimeViewSignalButton , self.PlayPauseButtonRealTime , self.RealTimeScroll, self.graphWidget)
 
         self.PlayPauseButtonGraph1 = self.findChild(QPushButton, 'PlayPauseButtonGraph1')
         self.PlayPauseButtonGraph1.clicked.connect(self.play_pause_graph1)
@@ -176,8 +164,6 @@ class Main(QMainWindow):
         self.GluingModeButton = self.findChild(QPushButton, 'GluingModeButton')
         self.GluingModeButton.clicked.connect(self.gluing_mode)
 
-        self.isGlueRegionShowing = False
-        
         self.UpdateGluingButton = self.findChild(QPushButton , "UpdateGluingButton")
         self.UpdateGluingButton.clicked.connect(self.update_gluing_interpolate)
         
@@ -211,7 +197,29 @@ class Main(QMainWindow):
         
 
         self.RealTimeSignalButton = self.findChild(QPushButton, 'RealTimeSignalButton')
-        self.RealTimeSignalButton.clicked.connect(self.go_to_real_time_page)
+        self.RealTimeSignalButton.clicked.connect(self.navigation.go_to_real_time_page)
+
+        self.RealTimeSignalInput = self.findChild(QLineEdit, 'RealTimeSignalInput')
+        self.RealTimeSignalInput.textChanged.connect(self.real_time_signal.enable_view_button)
+
+        self.RealTimeViewSignalButton = self.findChild(QPushButton, 'RealTimeViewSignalButton')
+        self.RealTimeViewSignalButton.clicked.connect(self.real_time_signal.show_real_time_graph)
+        self.RealTimeViewSignalButton.clicked.connect(self.real_time_signal.disable_view_button)
+
+        self.RealTimeSignalFrame = self.findChild(QFrame, 'RealTimeSignalFrame')
+
+        self.PlayPauseButtonRealTime = self.findChild(QPushButton, 'PlayPauseButtonRealTime')
+        self.PlayPauseButtonRealTime.clicked.connect(self.real_time_signal.toggle_play_pause_real_time)
+
+        self.RealTimeScroll = self.findChild(QScrollBar, 'RealTimeScroll')
+        self.RealTimeScroll.setOrientation(Qt.Horizontal)
+        self.RealTimeScroll.valueChanged.connect(self.real_time_signal.scroll_graph)
+
+        self.graphWidget = pg.PlotWidget()
+        self.layout = QtWidgets.QVBoxLayout(self.RealTimeSignalFrame)
+        self.layout.addWidget(self.graphWidget)
+
+        self.real_time_signal.initialize(self.RealTimeSignalInput, self.RealTimeViewSignalButton, self.PlayPauseButtonRealTime, self.RealTimeScroll, self.graphWidget)
         
         # Adding functionality of going to glue window button
         self.StartGluingButton.clicked.connect(self.start_gluing)
@@ -327,21 +335,6 @@ class Main(QMainWindow):
         self.replay_button_1.clicked.connect(lambda:self.replay_signal('1'))
         self.replay_button_2 = self.findChild(QPushButton, 'ReplayButtonGraph2')
         self.replay_button_2.clicked.connect(lambda:self.replay_signal('2'))
-        
-    def draw_new_graph(self):
-        files, _ = QFileDialog.getOpenFileNames(self, "Open CSV Files", "", "CSV Files (*.csv)")
-        csv_files = []
-        # If files are selected, store the file paths
-        if files:
-            csv_files.extend(files)
-            self.wave_instance = wave(files_directories = csv_files)
-            print(f'CSV files:{csv_files}'  )
-            self.horizontalLayout_15.removeWidget(self.graph)
-
-            self.graph = SpiderPlot(self.wave_instance.data_samples, self.NonRectangleGraphTimeSlider)    
-            self.spider_viewer_control = PlotControls(self.PlayImage, self.PauseImage ,self.graph, self.BackButtonNonRectangle, self.NextButtonNonRectangle, 
-                                                self.SpeedSliderNonRectangleGraph, self.PlayPauseNonRectangleButton, self.ReplayNonRectangleButton, self.ChangeColorButtonNonRectangle,self.NonRectangleGraphTimeSlider)
-            self.horizontalLayout_15.addWidget(self.graph)
         
         # linking button 
         
@@ -479,12 +472,15 @@ class Main(QMainWindow):
         if page_index != -1:
             self.Pages.setCurrentIndex(page_index)
 
+    def go_to_home_page(self):
+        page_index = self.Pages.indexOf(self.findChild(QWidget, 'MainPage'))
+        if page_index != -1:
+            self.Pages.setCurrentIndex(page_index)
             
     def go_to_home_page_from_gluing(self):
         page_index = self.Pages.indexOf(self.findChild(QWidget, 'MainPage'))
         self.viewer1.removeItem(self.viewer1.gluing_selected_region)
         self.viewer2.removeItem(self.viewer2.gluing_selected_region)
-        self.isGlueRegionShowing = False
         self.StartGluingButton.setEnabled(False)
         if page_index != -1:
             self.Pages.setCurrentIndex(page_index)
@@ -580,15 +576,10 @@ class Main(QMainWindow):
             # print(color.name())
 
     def gluing_mode(self):
-        if(not self.isGlueRegionShowing):
-            self.StartGluingButton.setEnabled(True)
-            self.viewer1.show_glue_rectangle_func()
-            self.viewer2.show_glue_rectangle_func()
-        else:
-            self.StartGluingButton.setEnabled(False)
-            self.viewer1.removeItem(self.viewer1.gluing_selected_region)
-            self.viewer2.removeItem(self.viewer2.gluing_selected_region)
-        self.isGlueRegionShowing = not self.isGlueRegionShowing
+        self.StartGluingButton.setEnabled(True)
+        self.viewer1.show_glue_rectangle_func()
+        self.viewer2.show_glue_rectangle_func()
+    
     def start_gluing(self):
         selected_channel_index_viewer_1 = self.signals_dropdown_1.currentIndex()
         selected_channel_index_viewer_2 = self.signals_dropdown_2.currentIndex()
@@ -910,10 +901,10 @@ class Main(QMainWindow):
                 self.play_pause_graph2()
             pass
 
-    def go_to_real_time_page(self):
-        page_index = self.Pages.indexOf(self.findChild(QWidget, 'RealTimePage'))
-        if page_index != -1:
-            self.Pages.setCurrentIndex(page_index)
+    # def go_to_real_time_page(self):
+    #     page_index = self.Pages.indexOf(self.findChild(QWidget, 'RealTimePage'))
+    #     if page_index != -1:
+    #         self.Pages.setCurrentIndex(page_index)
 
     def link_graphs(self):
         if self.is_linked:
