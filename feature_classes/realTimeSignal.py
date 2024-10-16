@@ -28,6 +28,8 @@ class RealTimeSignal:
         self.data_line = self.graphWidget.plot(self.x, self.y)
         self.PlayPauseButtonRealTime.setIcon(self.PauseImage)
 
+        self.graphWidget.setMouseEnabled(x=False, y=False) 
+
     def show_real_time_graph(self):
         self.timer.start()
 
@@ -51,6 +53,8 @@ class RealTimeSignal:
             self.RealTimeScroll.setRange(0, max(0, len(self.y) - 20))
             self.RealTimeScroll.setValue(len(self.y) - 20)
 
+            self.adjust_y_range()
+
         except Exception as e:
             print(f"Error fetching data: {e}")   
 
@@ -71,3 +75,6 @@ class RealTimeSignal:
 
     def enable_view_button(self):
         self.RealTimeViewSignalButton.setDisabled(False)
+
+    def adjust_y_range(self):
+        self.graphWidget.setYRange(67200, 67700)
