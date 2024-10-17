@@ -17,7 +17,7 @@ import pyqtgraph.exporters
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Image , Spacer
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Image , Spacer , Paragraph , PageBreak
 import copy
 from PyQt5.QtCore import Qt
 from feature_classes.realTimeSignal import RealTimeSignal
@@ -435,11 +435,11 @@ class Main(QMainWindow):
                     # self.viewer2.play()
                     # self.viewer2.pause()
                     scrolling_x_axis_scrollbar_viewer2_page_step = 1075
-                    self.scrolling_x_axis_scrollbar_viewer2.setMaximum(self.viewer2.x_axis[-1] - scrolling_x_axis_scrollbar_viewer2_page_step)
-                    self.scrolling_y_axis_scrollbar_viewer2.setMinimum(self.viewer2.min_signals_value)
+                    self.scrolling_x_axis_scrollbar_viewer2.setMaximum(int(self.viewer2.x_axis[-1] - scrolling_x_axis_scrollbar_viewer2_page_step))
+                    self.scrolling_y_axis_scrollbar_viewer2.setMinimum(int(self.viewer2.min_signals_value))
                     self.scrolling_y_axis_scrollbar_viewer2.setPageStep(int(self.viewer2.viewBox.viewRange()[1][1] - self.viewer2.viewBox.viewRange()[1][0]))
                     scrolling_y_axis_scrollbar_viewer2_page_step = 325
-                    self.scrolling_y_axis_scrollbar_viewer2.setMaximum(self.viewer2.max_signals_value + int(self.viewer2.viewBox.viewRange()[1][1] - self.viewer2.viewBox.viewRange()[1][0]) - scrolling_y_axis_scrollbar_viewer2_page_step)
+                    self.scrolling_y_axis_scrollbar_viewer2.setMaximum(int(self.viewer2.max_signals_value + int(self.viewer2.viewBox.viewRange()[1][1] - self.viewer2.viewBox.viewRange()[1][0]) - scrolling_y_axis_scrollbar_viewer2_page_step))
                     self.viewer1.update_x_axis()
                     if self.viewer1.x_axis[-1] < self.viewer1.viewRange()[0][1]:
                         self.replay_signal('1')
@@ -463,11 +463,11 @@ class Main(QMainWindow):
                         self.viewer2.pause()
                         self.PlayPauseButtonGraph2.setIcon(self.PlayImage)
                     scrolling_x_axis_scrollbar_viewer1_page_step = 1075
-                    self.scrolling_x_axis_scrollbar_viewer1.setMaximum(self.viewer1.x_axis[-1] - scrolling_x_axis_scrollbar_viewer1_page_step)
-                    self.scrolling_y_axis_scrollbar_viewer1.setMinimum(self.viewer1.min_signals_value)
+                    self.scrolling_x_axis_scrollbar_viewer1.setMaximum(int(self.viewer1.x_axis[-1] - scrolling_x_axis_scrollbar_viewer1_page_step))
+                    self.scrolling_y_axis_scrollbar_viewer1.setMinimum(int(self.viewer1.min_signals_value))
                     self.scrolling_y_axis_scrollbar_viewer1.setPageStep(int(self.viewer1.viewBox.viewRange()[1][1] - self.viewer1.viewBox.viewRange()[1][0]))
                     scrolling_y_axis_scrollbar_viewer1_page_step = 325
-                    self.scrolling_y_axis_scrollbar_viewer1.setMaximum(self.viewer1.max_signals_value + int(self.viewer1.viewBox.viewRange()[1][1] - self.viewer1.viewBox.viewRange()[1][0]) - scrolling_y_axis_scrollbar_viewer1_page_step)
+                    self.scrolling_y_axis_scrollbar_viewer1.setMaximum(int(self.viewer1.max_signals_value + int(self.viewer1.viewBox.viewRange()[1][1] - self.viewer1.viewBox.viewRange()[1][0]) - scrolling_y_axis_scrollbar_viewer1_page_step))
                     self.viewer2.update_x_axis()
                     if self.viewer2.x_axis[-1] < self.viewer2.viewRange()[0][1]:
                         self.replay_signal('2')
@@ -627,7 +627,7 @@ class Main(QMainWindow):
                 self.glued_interpolated_overlapped_signal_x_values = np.concatenate([signal_2_x_values_before_interpolated_part , x_overlapped ,signal_1_x_values_after_interpolated_part])
                 self.glued_interpolated_overlapped_signal_y_values = np.concatenate([signal_2_y_values_before_interpolated_part , self.y_interpolated , signal_1_y_values_after_interpolated_part])
                 
-                self.glued_viewer.plot(self.glued_interpolated_overlapped_signal_x_values , self.glued_interpolated_overlapped_signal_y_values)
+                self.glued_viewer.plot(self.glued_interpolated_overlapped_signal_x_values , self.glued_interpolated_overlapped_signal_y_values , pen = pg.mkPen(color = 'red'))
                 self.gluer_interpolate.get_statistics(self.glued_interpolated_overlapped_signal_x_values ,self.glued_interpolated_overlapped_signal_y_values )
                 self.update_statistics()
                 
@@ -636,7 +636,7 @@ class Main(QMainWindow):
                 self.glued_interpolated_gapped_signal_x_values = np.concatenate([self.glued_signal_2_x_values , x_gap ,self.glued_signal_1_x_values])
                 self.glued_interpolated_gapped_signal_y_values = np.concatenate([self.to_be_glued_signal_2.signal , self.y_interpolated , self.to_be_glued_signal_1.signal])
                 
-                self.glued_viewer.plot(self.glued_interpolated_gapped_signal_x_values , self.glued_interpolated_gapped_signal_y_values)
+                self.glued_viewer.plot(self.glued_interpolated_gapped_signal_x_values , self.glued_interpolated_gapped_signal_y_values , pen = pg.mkPen(color = 'red'))
                 self.gluer_interpolate.get_statistics(self.glued_interpolated_gapped_signal_x_values ,self.glued_interpolated_gapped_signal_y_values )
                 self.update_statistics()
                 
@@ -651,25 +651,16 @@ class Main(QMainWindow):
                 signal_2_x_values_as_int = [int(x) for x in self.gluer_interpolate.signal_2_x_values]
                 x_overlapped_first_value_index_in_signal_1 = signal_1_x_values_as_int.index(int(x_overlapped[0]))
                 x_overlapped_last_value_index_in_signal_2 = signal_2_x_values_as_int.index(int(x_overlapped[-1]))
-                # print(f"x_overlapped: {x_overlapped}")
-                # print(f"signal_2_x_values: {signal_2_x_values_as_int} , length: {len(signal_2_x_values_as_int)}")
+
                 signal_1_x_values_before_interpolated_part = self.gluer_interpolate.signal_1_x_values[:x_overlapped_first_value_index_in_signal_1]
                 signal_2_x_values_after_interpolated_part = signal_2_x_values_as_int[x_overlapped_last_value_index_in_signal_2:]
-                # print(f'signal_2_x_values_after_interpoaltion: {signal_2_x_values_after_interpolated_part}')
-                
-                # signal_1_x_values_before_interpolated_part_as_int = [int(x) for x in signal_1_x_values_before_interpolated_part]
-                # signal_2_x_values_after_interpolated_part_as_int = [int(x) for x in signal_2_x_values_after_interpolated_part]
-                
-                # print(f"signal_2_y_values = {self.gluer_interpolate.signal_2.signal} , length: {len(self.gluer_interpolate.signal_2.signal)}")
-                # print(f"signal_2_x_values = {signal_2_x_values_after_interpolated_part_as_int} , length: {len(signal_2_x_values_after_interpolated_part_as_int)}")
-                
+            
                 signal_1_y_values_before_interpolated_part = self.gluer_interpolate.signal_1.signal[:x_overlapped_first_value_index_in_signal_1]
                 signal_2_y_values_after_interpolated_part = self.gluer_interpolate.signal_2.signal[x_overlapped_last_value_index_in_signal_2 : ]
                 
                 self.glued_interpolated_overlapped_signal_x_values = np.concatenate([signal_1_x_values_before_interpolated_part , x_overlapped ,signal_2_x_values_after_interpolated_part])
                 self.glued_interpolated_overlapped_signal_y_values = np.concatenate([signal_1_y_values_before_interpolated_part , self.y_interpolated , signal_2_y_values_after_interpolated_part])
-                # print(f'glued_interpolated_overlapped_signal_y_values: {glued_interpolated_overlapped_signal_y_values} , length = {len(glued_interpolated_overlapped_signal_y_values)}')
-                self.glued_viewer.plot(self.glued_interpolated_overlapped_signal_x_values , self.glued_interpolated_overlapped_signal_y_values)
+                self.glued_viewer.plot(self.glued_interpolated_overlapped_signal_x_values , self.glued_interpolated_overlapped_signal_y_values , pen = pg.mkPen(color = 'red'))
                 self.gluer_interpolate.get_statistics(self.glued_interpolated_overlapped_signal_x_values ,self.glued_interpolated_overlapped_signal_y_values )
                 self.update_statistics()
 
@@ -678,7 +669,7 @@ class Main(QMainWindow):
                 self.glued_interpolated_gapped_signal_x_values = np.concatenate([self.glued_signal_1_x_values , x_gap ,self.glued_signal_2_x_values])
                 self.glued_interpolated_gapped_signal_y_values = np.concatenate([self.to_be_glued_signal_1.signal , self.y_interpolated , self.to_be_glued_signal_2.signal])
                 
-                self.glued_viewer.plot(self.glued_interpolated_gapped_signal_x_values , self.glued_interpolated_gapped_signal_y_values)
+                self.glued_viewer.plot(self.glued_interpolated_gapped_signal_x_values , self.glued_interpolated_gapped_signal_y_values , pen = pg.mkPen(color = 'red'))
                 self.gluer_interpolate.get_statistics(self.glued_interpolated_gapped_signal_x_values ,self.glued_interpolated_gapped_signal_y_values )
                 self.update_statistics()
                 
@@ -696,8 +687,8 @@ class Main(QMainWindow):
     
     def add_to_pdf_report(self):
         captured_data_region_exported_image = pyqtgraph.exporters.ImageExporter(self.glued_viewer.getPlotItem())
-        captured_data_region_exported_image.parameters()['width'] = 2000  # Set the export width
-        captured_data_region_exported_image.parameters()['height'] = 1000  # Set the export height
+        captured_data_region_exported_image.parameters()['width'] = 2000  
+        captured_data_region_exported_image.parameters()['height'] = 1000  
         captured_data_region_exported_image.export(f"./captured_report_signals/captured_region{self.captured_report_images_counter}.png")
         self.captured_report_images_filenames.append(f"./captured_report_signals/captured_region{self.captured_report_images_counter}.png")
         self.captured_report_images_counter += 1
@@ -709,35 +700,46 @@ class Main(QMainWindow):
     def generate_pdf_report(self):
         doc = SimpleDocTemplate("report.pdf", pagesize=letter)
         elements = []
-        width, height = letter
+        styles = getSampleStyleSheet()
         
-        for i, (image_filename, stats) in enumerate(zip(self.captured_report_images_filenames, self.captured_report_images_statistics)):  
+        title = Paragraph("Team 6", styles['Title'])
+        elements.append(title)
+        elements.append(Spacer(1, 20))
+        centered_style = styles['Heading2']
+        centered_style.alignment = 1
+        for i, (image_filename, stats) in enumerate(zip(self.captured_report_images_filenames, self.captured_report_images_statistics)):
+            signal_title = Paragraph(f"Signal {i + 1}", centered_style)
+            elements.append(signal_title)
+            elements.append(Spacer(1, 20))
+
             img = Image(image_filename, width=600, height=300)
             elements.append(img)
             elements.append(Spacer(1, 20))
+
             data = [
-                ['Mean', 'Std Dev', 'Duration', 'Min', 'Max'],  
+                ['Mean', 'Std Dev', 'Duration', 'Min', 'Max'],
                 [f"{float(stats[0]):.2f}", f"{float(stats[1]):.2f}", f"{float(stats[2]):.2f}", f"{float(stats[3]):.2f}", f"{float(stats[4]):.2f}"]
             ]
 
-            # Create and style the table
-            table = Table(data, colWidths=[80, 80, 80, 80, 80])  
+            table = Table(data, colWidths=[80, 80, 80, 80, 80])
             table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),  
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke), 
+                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
                 ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'), 
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
                 ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),  
-                ('GRID', (0, 0), (-1, -1), 1, colors.black),  
+                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
             ]))
-
             elements.append(table)
+
+            if i < len(self.captured_report_images_filenames) - 1:
+                elements.append(PageBreak())
 
         doc.build(elements)
         self.captured_report_images_filenames.clear()
         self.captured_report_images_statistics.clear()
-        
+            
     def move_signal_left(self):
         self.glued_viewer.clear()
         self.glued_signal_2_x_values = [x - 50 for x in self.glued_signal_2_x_values ]
@@ -772,21 +774,21 @@ class Main(QMainWindow):
                             self.viewer1.clear()
                             self.viewer1.add_channel(signal)
                             scrolling_x_axis_scrollbar_viewer1_page_step = 1075
-                            self.scrolling_x_axis_scrollbar_viewer1.setMaximum(self.viewer1.x_axis[-1] - scrolling_x_axis_scrollbar_viewer1_page_step)
-                            self.scrolling_y_axis_scrollbar_viewer1.setMinimum(self.viewer1.min_signals_value)
+                            self.scrolling_x_axis_scrollbar_viewer1.setMaximum(int(self.viewer1.x_axis[-1] - scrolling_x_axis_scrollbar_viewer1_page_step))
+                            self.scrolling_y_axis_scrollbar_viewer1.setMinimum(int(self.viewer1.min_signals_value))
                             self.scrolling_y_axis_scrollbar_viewer1.setPageStep(int(self.viewer1.viewBox.viewRange()[1][1] - self.viewer1.viewBox.viewRange()[1][0]))
                             scrolling_y_axis_scrollbar_viewer1_page_step = 325
-                            self.scrolling_y_axis_scrollbar_viewer1.setMaximum(self.viewer1.max_signals_value + int(self.viewer1.viewBox.viewRange()[1][1] - self.viewer1.viewBox.viewRange()[1][0]) - scrolling_y_axis_scrollbar_viewer1_page_step)
+                            self.scrolling_y_axis_scrollbar_viewer1.setMaximum(int(self.viewer1.max_signals_value + int(self.viewer1.viewBox.viewRange()[1][1] - self.viewer1.viewBox.viewRange()[1][0]) - scrolling_y_axis_scrollbar_viewer1_page_step))
                             
                         else:
                             self.viewer2.clear()
                             self.viewer2.add_channel(signal)
                             scrolling_x_axis_scrollbar_viewer2_page_step = 1075
-                            self.scrolling_x_axis_scrollbar_viewer2.setMaximum(self.viewer2.x_axis[-1] - scrolling_x_axis_scrollbar_viewer2_page_step)
-                            self.scrolling_y_axis_scrollbar_viewer2.setMinimum(self.viewer2.min_signals_value)
+                            self.scrolling_x_axis_scrollbar_viewer2.setMaximum(int(self.viewer2.x_axis[-1] - scrolling_x_axis_scrollbar_viewer2_page_step))
+                            self.scrolling_y_axis_scrollbar_viewer2.setMinimum(int(self.viewer2.min_signals_value))
                             self.scrolling_y_axis_scrollbar_viewer2.setPageStep(int(self.viewer2.viewBox.viewRange()[1][1] - self.viewer2.viewBox.viewRange()[1][0]))
                             scrolling_y_axis_scrollbar_viewer2_page_step = 325
-                            self.scrolling_y_axis_scrollbar_viewer2.setMaximum(self.viewer2.max_signals_value + int(self.viewer2.viewBox.viewRange()[1][1] - self.viewer2.viewBox.viewRange()[1][0]) - scrolling_y_axis_scrollbar_viewer2_page_step)
+                            self.scrolling_y_axis_scrollbar_viewer2.setMaximum(int(self.viewer2.max_signals_value + int(self.viewer2.viewBox.viewRange()[1][1] - self.viewer2.viewBox.viewRange()[1][0]) - scrolling_y_axis_scrollbar_viewer2_page_step))
                             
                     if viewer_number == "1":
                             self.number_of_viewer_1_signals+=1
@@ -830,8 +832,7 @@ class Main(QMainWindow):
                 self.viewer1.viewBox.setAutoVisible(x=False, y=False)
                 self.scrolling_y_axis_scrollbar_viewer1.blockSignals(True)
                 self.scrolling_y_axis_scrollbar_viewer1.setValue(int(y_axis_slider_value))
-                # self.scrolling_y_axis_scrollbar.setPageStep(int(self.viewer1.viewBox.viewRange()[1][1] - self.viewer1.viewBox.viewRange()[1][0]))
-                # self.scrolling_y_axis_scrollbar.
+                
                 self.scrolling_y_axis_scrollbar_viewer1.blockSignals(False)
         else:
             self.scrolling_y_axis_scrollbar_viewer1.setDisabled(True)
@@ -842,7 +843,6 @@ class Main(QMainWindow):
     def set_viewer2_sliders_value(self , view,ranges):
         x_axis_slider_value = ranges[0][0]
         y_axis_slider_value = ranges[1][0]
-        # print(ranges)
         self.scrolling_x_axis_scrollbar_viewer2.blockSignals(True)
         self.scrolling_x_axis_scrollbar_viewer2.setValue(int(x_axis_slider_value))
         self.scrolling_x_axis_scrollbar_viewer2.blockSignals(False)
@@ -855,8 +855,7 @@ class Main(QMainWindow):
                 self.viewer2.viewBox.setAutoVisible(x=False, y=False)
                 self.scrolling_y_axis_scrollbar_viewer2.blockSignals(True)
                 self.scrolling_y_axis_scrollbar_viewer2.setValue(int(y_axis_slider_value))
-                # self.scrolling_y_axis_scrollbar.setPageStep(int(self.viewer2.viewBox.viewRange()[1][1] - self.viewer2.viewBox.viewRange()[1][0]))
-                # self.scrolling_y_axis_scrollbar.
+                
                 self.scrolling_y_axis_scrollbar_viewer2.blockSignals(False)
         else:
             self.scrolling_y_axis_scrollbar_viewer2.setDisabled(True)

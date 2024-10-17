@@ -165,7 +165,7 @@ class Viewer(pg.PlotWidget):
         if isinstance(new_channel , CustomSignal):
             self.__channels.append(new_channel)
             # self.x_axis = list(range(max([len(signal) for signal in self.__channels]))) ## max len in the signals imported
-            self.plot( channel_x_values ,new_channel.signal)## pass the x_axis from the length of the signal
+            self.plot( channel_x_values ,new_channel.signal , pen = pg.mkPen(color = 'red'))## pass the x_axis from the length of the signal
         else:
             raise Exception("The new channel must be of class CustomSignal")
     

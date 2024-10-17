@@ -27,6 +27,7 @@ class RealTimeSignal:
 
         self.data_line = self.graphWidget.plot(self.x, self.y)
         self.PlayPauseButtonRealTime.setIcon(self.PauseImage)
+        # self.graphWidget.setMouseEnabled(x=False, y=False) 
 
     def show_real_time_graph(self):
         self.timer.start()
@@ -42,6 +43,7 @@ class RealTimeSignal:
             price = float(data['bpi']['USD']['rate'].replace(',', ''))
 
             self.y.append(price)
+            # self.adjust_y_range()
 
             if len(self.x) < len(self.y):
                 self.x.append(self.x[-1] + 1)
@@ -71,3 +73,6 @@ class RealTimeSignal:
 
     def enable_view_button(self):
         self.RealTimeViewSignalButton.setDisabled(False)
+    
+    # def adjust_y_range(self):
+    #     self.graphWidget.setYRange(67200, 67700)
