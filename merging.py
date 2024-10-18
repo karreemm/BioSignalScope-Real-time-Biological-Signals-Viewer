@@ -47,8 +47,8 @@ class Main(QMainWindow):
         self.PauseImage = QIcon(':/Images/pauseW.png')
         self.HideImage = QIcon(':/Images/hideW.png')
         self.ShowImage = QIcon(':/Images/showW.png')
-        self.RewindImage = QIcon(':/Images/rewind.png')
-        self.NoRewindImage = QIcon(':/Images/noRewind.png')
+        self.RewindImage = QIcon(':/Images/rewindNew.png')
+        self.NoRewindImage = QIcon(':/Images/noRewindNew.png')
         self.LinkImage = QIcon(':/Images/linkB.png')
         self.UnlinkImage = QIcon(':/Images/unlink.png')
 

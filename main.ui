@@ -402,7 +402,7 @@ border-radius: 10px
                 </property>
                 <property name="icon">
                  <iconset resource="Images.qrc">
-                  <normaloff>:/Images/noRewind.png</normaloff>:/Images/noRewind.png</iconset>
+                  <normaloff>:/Images/noRewindNew.png</normaloff>:/Images/noRewindNew.png</iconset>
                 </property>
                 <property name="iconSize">
                  <size>
@@ -946,7 +946,7 @@ border-radius: 10px
                 </property>
                 <property name="icon">
                  <iconset resource="Images.qrc">
-                  <normaloff>:/Images/noRewind.png</normaloff>:/Images/noRewind.png</iconset>
+                  <normaloff>:/Images/noRewindNew.png</normaloff>:/Images/noRewindNew.png</iconset>
                 </property>
                 <property name="iconSize">
                  <size>
@@ -1414,7 +1414,7 @@ QLineEdit:disabled {
               </property>
               <property name="icon">
                <iconset resource="Images.qrc">
-                <normaloff>:/Images/start.png</normaloff>:/Images/start.png</iconset>
+                <normaloff>:/Images/startNew.png</normaloff>:/Images/startNew.png</iconset>
               </property>
               <property name="iconSize">
                <size>

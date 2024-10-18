@@ -101,13 +101,9 @@
     <file>Images/glueNew.png</file>
     <file>Images/nonRectangleNew.png</file>
     <file>Images/rewindNew.png</file>
+    <file>Images/noRewindNew.png</file>
     <file>Images/realTimeNew.png</file>
-
-
-
-
-
-
+    <file>Images/startNew.png</file>
 
   </qresource>
 </RCC>
