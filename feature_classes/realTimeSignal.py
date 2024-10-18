@@ -2,13 +2,13 @@ import requests
 from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QIcon
 import pyqtgraph as pg
-
+import validators
 class RealTimeSignal:
     def __init__(self):
         self.PlayImage = QIcon(':/Images/playW.png')
         self.PauseImage = QIcon(':/Images/pauseW.png')
 
-        self.is_playing = True
+        self.is_playing = False
         self.setDisabled = False
 
         self.x = list(range(1))  
@@ -18,19 +18,27 @@ class RealTimeSignal:
         self.timer.setInterval(500) 
         self.timer.timeout.connect(self.update_plot_data)
 
-    def initialize(self, RealTimeSignalInput, RealTimeViewSignalButton, PlayPauseButtonRealTime, RealTimeScroll, graphWidget):
+    def initialize(self, RealTimeSignalInput, RealTimeViewSignalButton, PlayPauseButtonRealTime, RealTimeScroll, graphWidget ,Pages , RealTimeSignalPage):
         self.RealTimeSignalInput = RealTimeSignalInput
         self.RealTimeViewSignalButton = RealTimeViewSignalButton
         self.PlayPauseButtonRealTime = PlayPauseButtonRealTime
         self.RealTimeScroll = RealTimeScroll
         self.graphWidget = graphWidget
+        self.RealTimeSignalPage = RealTimeSignalPage
+        self.Pages = Pages
 
         self.data_line = self.graphWidget.plot(self.x, self.y)
-        self.PlayPauseButtonRealTime.setIcon(self.PauseImage)
+        self.PlayPauseButtonRealTime.setIcon(self.PlayImage)
         # self.graphWidget.setMouseEnabled(x=False, y=False) 
-
+        
         self.graphWidget.setMouseEnabled(x=False, y=False) 
-
+    def validate_api_link(self):
+        is_text_valid_api_link = validators.url(self.RealTimeSignalInput.text())
+        if(is_text_valid_api_link):
+            self.timer.start()
+            self.PlayPauseButtonRealTime.setIcon(self.PauseImage)
+            self.is_playing = not self.is_playing
+        
     def show_real_time_graph(self):
         self.timer.start()
 
@@ -55,7 +63,7 @@ class RealTimeSignal:
             self.RealTimeScroll.setRange(0, max(0, len(self.y) - 20))
             self.RealTimeScroll.setValue(len(self.y) - 20)
 
-            self.adjust_y_range()
+            # self.adjust_y_range()
 
         except Exception as e:
             print(f"Error fetching data: {e}")   
@@ -78,5 +86,13 @@ class RealTimeSignal:
     def enable_view_button(self):
         self.RealTimeViewSignalButton.setDisabled(False)
     
+    
+    def go_to_real_time_page(self):
+        if self.RealTimeSignalPage != -1:
+            self.Pages.setCurrentIndex(self.RealTimeSignalPage)
+            self.is_playing = False
+            api_link = self.RealTimeSignalInput.text()
+            self.RealTimeSignalInput.clear()
+            self.RealTimeSignalInput.setText(api_link)
     # def adjust_y_range(self):
     #     self.graphWidget.setYRange(67200, 67700)

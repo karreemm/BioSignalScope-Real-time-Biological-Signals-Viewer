@@ -67,7 +67,7 @@ class Main(QMainWindow):
 
         self.Pages = self.findChild(QStackedWidget, 'stackedWidget') 
         self.MainPage = self.Pages.indexOf(self.findChild(QWidget , 'MainPage'))
-        self.RealTimeSignalPage = self.Pages.indexOf(self.findChild(QWidget , 'RealTimeSignalPage'))
+        self.RealTimeSignalPage = self.Pages.indexOf(self.findChild(QWidget , 'RealTimePage'))
         self.NonRectangleSignalPage = self.Pages.indexOf(self.findChild(QWidget , 'NonRectangleSignalPage'))
         self.NonRectangleSignalButton = self.findChild(QPushButton, 'NonRectangleSignalButton')
         self.NonRectangleSignalButton.clicked.connect(self.go_to_non_rectangle_signal_page)
@@ -81,7 +81,7 @@ class Main(QMainWindow):
         # self.BackHomeButton2.clicked.connect(self.navigation.go_to_home_page)
 
         self.BackHomeButton3 = self.findChild(QPushButton, 'BackHomeButton3')
-        self.BackHomeButton3.clicked.connect(self.navigation.go_to_home_page)
+        self.BackHomeButton3.clicked.connect(self.go_to_home_page_from_real_time_signal)
         
         self.NonRectangleGraph = self.findChild(QFrame, 'NonRectangleGraph')
         
@@ -122,16 +122,13 @@ class Main(QMainWindow):
 
         # self.BackHomeButton3 = self.findChild(QPushButton, 'BackHomeButton3')
         # self.BackHomeButton3.clicked.connect(self.navigation.go_to_home_page)
-
-        self.RealTimeSignalButton = self.findChild(QPushButton, 'RealTimeSignalButton')
-        self.RealTimeSignalButton.clicked.connect(self.navigation.go_to_real_time_page)
         
         self.RealTimeViewSignalButton = self.findChild(QPushButton, 'RealTimeViewSignalButton')
         # self.RealTimeViewSignalButton.clicked.connect(self.RealTimeSignal.show_real_time_graph)
         # self.RealTimeViewSignalButton.clicked.connect(self.RealTimeSignal.disable_view_button)
 
         self.RealTimeSignalInput = self.findChild(QLineEdit , "RealTimeSignalInput")
-        self.RealTimeSignalInput.textChanged.connect(self.RealTimeSignal.enable_view_button)
+        self.RealTimeSignalInput.textChanged.connect(self.RealTimeSignal.validate_api_link)
         
         self.PlayPauseButtonRealTime = self.findChild(QPushButton , "PlayPauseButtonRealTime")
         self.PlayPauseButtonRealTime.clicked.connect(self.RealTimeSignal.toggle_play_pause_real_time)
@@ -144,8 +141,9 @@ class Main(QMainWindow):
         self.layout = QtWidgets.QVBoxLayout(self.RealTimeSignalFrame)
         self.layout.addWidget(self.graphWidget)
         
+        
         self.navigation.initialize(self.NonRectangleSignalButton, self.BackHomeButton1, self.BackHomeButton2, self.BackHomeButton3, self.RealTimeSignalButton, self.RealTimeSignalPage, self.MainPage, self.NonRectangleSignalPage, self.Pages)
-        self.RealTimeSignal.initialize(self.RealTimeSignalInput , self.RealTimeViewSignalButton , self.PlayPauseButtonRealTime , self.RealTimeScroll, self.graphWidget)
+        self.RealTimeSignal.initialize(self.RealTimeSignalInput , self.RealTimeViewSignalButton , self.PlayPauseButtonRealTime , self.RealTimeScroll, self.graphWidget , self.Pages , self.RealTimeSignalPage)
 
         self.PlayPauseButtonGraph1 = self.findChild(QPushButton, 'PlayPauseButtonGraph1')
         self.PlayPauseButtonGraph1.clicked.connect(self.play_pause_graph1)
@@ -208,10 +206,11 @@ class Main(QMainWindow):
         self.GeneratePDFReport = self.findChild(QPushButton , "GeneratePDFButton")
         self.GeneratePDFReport.clicked.connect(self.generate_pdf_report)
 
-        
+        self.interpolation_order_combo_box = self.findChild(QComboBox , "comboBox_2")
+        self.interpolation_order_combo_box.activated.connect(self.update_gluing_interpolate)
 
         self.RealTimeSignalButton = self.findChild(QPushButton, 'RealTimeSignalButton')
-        self.RealTimeSignalButton.clicked.connect(self.go_to_real_time_page)
+        self.RealTimeSignalButton.clicked.connect(self.RealTimeSignal.go_to_real_time_page)
         
         # Adding functionality of going to glue window button
         self.StartGluingButton.clicked.connect(self.start_gluing)
@@ -491,6 +490,12 @@ class Main(QMainWindow):
         if page_index != -1:
             self.Pages.setCurrentIndex(page_index)
             
+    def go_to_home_page_from_real_time_signal(self):
+        page_index = self.Pages.indexOf(self.findChild(QWidget, 'MainPage'))
+        self.RealTimeSignal.timer.stop()
+        if page_index != -1:
+            self.Pages.setCurrentIndex(page_index)
+            
     def go_to_gluing_page(self , data_x_viewer_1 , data_y_viewer_1 , data_x_viewer_2 , data_y_viewer_2):
         self.glued_viewer.clear()
         self.to_be_glued_signal_1 = CustomSignal(data_y_viewer_1)
@@ -504,6 +509,7 @@ class Main(QMainWindow):
         self.glued_viewer.add_glued_moving_channel(self.to_be_glued_signal_2, data_x_viewer_2)
         self.glued_signal_1_x_values = data_x_viewer_1
         self.glued_signal_2_x_values = data_x_viewer_2
+        self.update_gluing_interpolate()
         
     def play_pause_graph1(self):
         if self.is_playing_graph1:
@@ -600,7 +606,6 @@ class Main(QMainWindow):
         
     def update_gluing_interpolate(self):
         self.glued_viewer.clear()
-        self.interpolation_order_combo_box = self.findChild(QComboBox , "comboBox_2")
         interpolation_order = self.interpolation_order_combo_box.currentIndex()
         self.gluer_interpolate = Gluer(self.to_be_glued_signal_1 , self.to_be_glued_signal_2 ,self.glued_signal_1_x_values , self.glued_signal_2_x_values )
         self.y_interpolated= self.gluer_interpolate.interpolate( interpolation_order)
@@ -629,7 +634,15 @@ class Main(QMainWindow):
                 self.glued_interpolated_overlapped_signal_x_values = np.concatenate([signal_2_x_values_before_interpolated_part , x_overlapped ,signal_1_x_values_after_interpolated_part])
                 self.glued_interpolated_overlapped_signal_y_values = np.concatenate([signal_2_y_values_before_interpolated_part , self.y_interpolated , signal_1_y_values_after_interpolated_part])
                 
-                self.glued_viewer.plot(self.glued_interpolated_overlapped_signal_x_values , self.glued_interpolated_overlapped_signal_y_values , pen = pg.mkPen(color = 'red'))
+                x_overlapped.insert(0 , signal_2_x_values_before_interpolated_part[-1])
+                x_overlapped.append(signal_1_x_values_after_interpolated_part[0])
+                self.y_interpolated = list(self.y_interpolated)
+                self.y_interpolated.append(signal_1_y_values_after_interpolated_part[0])
+                self.y_interpolated.insert(0, signal_2_y_values_before_interpolated_part[-1])
+                
+                self.glued_viewer.plot(signal_2_x_values_before_interpolated_part , signal_2_y_values_before_interpolated_part , pen = pg.mkPen(color = 'red'))
+                self.glued_viewer.plot(x_overlapped , self.y_interpolated , pen = pg.mkPen(color = 'blue'))
+                self.glued_viewer.plot(signal_1_x_values_after_interpolated_part ,signal_1_y_values_after_interpolated_part , pen = pg.mkPen(color = 'red'))
                 self.gluer_interpolate.get_statistics(self.glued_interpolated_overlapped_signal_x_values ,self.glued_interpolated_overlapped_signal_y_values )
                 self.update_statistics()
                 
@@ -638,7 +651,16 @@ class Main(QMainWindow):
                 self.glued_interpolated_gapped_signal_x_values = np.concatenate([self.glued_signal_2_x_values , x_gap ,self.glued_signal_1_x_values])
                 self.glued_interpolated_gapped_signal_y_values = np.concatenate([self.to_be_glued_signal_2.signal , self.y_interpolated , self.to_be_glued_signal_1.signal])
                 
-                self.glued_viewer.plot(self.glued_interpolated_gapped_signal_x_values , self.glued_interpolated_gapped_signal_y_values , pen = pg.mkPen(color = 'red'))
+                x_gap = list(x_gap)
+                x_gap.insert(0 , self.glued_signal_2_x_values[-1])
+                x_gap.append(self.glued_signal_1_x_values[0])
+                self.y_interpolated = list(self.y_interpolated)
+                self.y_interpolated.append(self.to_be_glued_signal_1.signal[0])
+                self.y_interpolated.insert(0, self.to_be_glued_signal_2.signal[-1])
+                
+                self.glued_viewer.plot(self.glued_signal_2_x_values , self.to_be_glued_signal_2.signal , pen = pg.mkPen(color = 'red'))
+                self.glued_viewer.plot(x_gap , self.y_interpolated , pen = pg.mkPen(color = 'blue'))
+                self.glued_viewer.plot(self.glued_signal_1_x_values , self.to_be_glued_signal_1.signal , pen = pg.mkPen(color = 'red'))
                 self.gluer_interpolate.get_statistics(self.glued_interpolated_gapped_signal_x_values ,self.glued_interpolated_gapped_signal_y_values )
                 self.update_statistics()
                 
@@ -662,7 +684,17 @@ class Main(QMainWindow):
                 
                 self.glued_interpolated_overlapped_signal_x_values = np.concatenate([signal_1_x_values_before_interpolated_part , x_overlapped ,signal_2_x_values_after_interpolated_part])
                 self.glued_interpolated_overlapped_signal_y_values = np.concatenate([signal_1_y_values_before_interpolated_part , self.y_interpolated , signal_2_y_values_after_interpolated_part])
-                self.glued_viewer.plot(self.glued_interpolated_overlapped_signal_x_values , self.glued_interpolated_overlapped_signal_y_values , pen = pg.mkPen(color = 'red'))
+                
+                
+                x_overlapped.insert(0 , signal_1_x_values_before_interpolated_part[-1])
+                x_overlapped.append(signal_2_x_values_after_interpolated_part[0])
+                self.y_interpolated = list(self.y_interpolated)
+                self.y_interpolated.insert(0, signal_1_y_values_before_interpolated_part[-1])
+                self.y_interpolated.append(signal_2_y_values_after_interpolated_part[0])
+                
+                self.glued_viewer.plot(signal_1_x_values_before_interpolated_part , signal_1_y_values_before_interpolated_part , pen = pg.mkPen(color = 'red'))
+                self.glued_viewer.plot(x_overlapped , self.y_interpolated , pen = pg.mkPen(color = 'blue'))
+                self.glued_viewer.plot(signal_2_x_values_after_interpolated_part , signal_2_y_values_after_interpolated_part , pen = pg.mkPen(color = 'red'))
                 self.gluer_interpolate.get_statistics(self.glued_interpolated_overlapped_signal_x_values ,self.glued_interpolated_overlapped_signal_y_values )
                 self.update_statistics()
 
@@ -671,7 +703,16 @@ class Main(QMainWindow):
                 self.glued_interpolated_gapped_signal_x_values = np.concatenate([self.glued_signal_1_x_values , x_gap ,self.glued_signal_2_x_values])
                 self.glued_interpolated_gapped_signal_y_values = np.concatenate([self.to_be_glued_signal_1.signal , self.y_interpolated , self.to_be_glued_signal_2.signal])
                 
-                self.glued_viewer.plot(self.glued_interpolated_gapped_signal_x_values , self.glued_interpolated_gapped_signal_y_values , pen = pg.mkPen(color = 'red'))
+                x_gap = list(x_gap)
+                x_gap.insert(0 , self.glued_signal_1_x_values[-1])
+                x_gap.append(self.glued_signal_2_x_values[0])
+                self.y_interpolated = list(self.y_interpolated)
+                self.y_interpolated.insert(0,  self.to_be_glued_signal_1.signal[-1])
+                self.y_interpolated.append(self.to_be_glued_signal_2.signal[0])
+                
+                self.glued_viewer.plot(self.glued_signal_1_x_values , self.to_be_glued_signal_1.signal , pen = pg.mkPen(color = 'red'))
+                self.glued_viewer.plot(x_gap , self.y_interpolated , pen = pg.mkPen(color = 'blue'))
+                self.glued_viewer.plot(self.glued_signal_2_x_values , self.to_be_glued_signal_2.signal , pen = pg.mkPen(color = 'red'))
                 self.gluer_interpolate.get_statistics(self.glued_interpolated_gapped_signal_x_values ,self.glued_interpolated_gapped_signal_y_values )
                 self.update_statistics()
                 
@@ -689,7 +730,7 @@ class Main(QMainWindow):
     
     def add_to_pdf_report(self):
         captured_data_region_exported_image = pyqtgraph.exporters.ImageExporter(self.glued_viewer.getPlotItem())
-        captured_data_region_exported_image.parameters()['width'] = 2000  
+        captured_data_region_exported_image.parameters()['width'] = 3950  
         captured_data_region_exported_image.parameters()['height'] = 1000  
         captured_data_region_exported_image.export(f"./captured_report_signals/captured_region{self.captured_report_images_counter}.png")
         self.captured_report_images_filenames.append(f"./captured_report_signals/captured_region{self.captured_report_images_counter}.png")
@@ -714,7 +755,7 @@ class Main(QMainWindow):
             elements.append(signal_title)
             elements.append(Spacer(1, 20))
 
-            img = Image(image_filename, width=600, height=300)
+            img = Image(image_filename, width=612, height=310)
             elements.append(img)
             elements.append(Spacer(1, 20))
 

@@ -69,10 +69,10 @@ class Gluer():
     
     def get_statistics(self , glued_interpoalted_signal_x_values , glued_interpoalted_signal_y_values):
         statistics = {
-                "mean": np.mean(glued_interpoalted_signal_y_values),
-                "std": np.std(glued_interpoalted_signal_y_values),
-                "min": np.min(glued_interpoalted_signal_y_values),
-                "max": np.max(glued_interpoalted_signal_y_values),
+                "mean": round(np.mean(glued_interpoalted_signal_y_values), 3),
+                "std": round(np.std(glued_interpoalted_signal_y_values) , 3),
+                "min": round(np.min(glued_interpoalted_signal_y_values), 3),
+                "max": round(np.max(glued_interpoalted_signal_y_values),3),
                 "duration": len(glued_interpoalted_signal_x_values)
 }
         self.__max = str(statistics["max"])

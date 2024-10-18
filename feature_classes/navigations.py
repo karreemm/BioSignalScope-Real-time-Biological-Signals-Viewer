@@ -13,10 +13,6 @@ class Navigations:
     def go_to_non_rectangle_signal_page(self):
         if self.NonRectangleSignalPage != -1:
             self.Pages.setCurrentIndex(self.NonRectangleSignalPage)
-
-    def go_to_real_time_page(self):
-        if self.RealTimeSignalPage != -1:
-            self.Pages.setCurrentIndex(self.RealTimeSignalPage)
     
     def go_to_home_page(self):
         if self.MainPage != -1:
