@@ -98,6 +98,15 @@
 
     <file>Images/unlink.png</file>
 
+    <file>Images/glueNew.png</file>
+    <file>Images/nonRectangleNew.png</file>
+    <file>Images/rewindNew.png</file>
+    <file>Images/realTimeNew.png</file>
+
+
+
+
+
 
 
   </qresource>

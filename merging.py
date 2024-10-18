@@ -127,8 +127,8 @@ class Main(QMainWindow):
         self.RealTimeSignalButton.clicked.connect(self.navigation.go_to_real_time_page)
         
         self.RealTimeViewSignalButton = self.findChild(QPushButton, 'RealTimeViewSignalButton')
-        self.RealTimeViewSignalButton.clicked.connect(self.RealTimeSignal.show_real_time_graph)
-        self.RealTimeViewSignalButton.clicked.connect(self.RealTimeSignal.disable_view_button)
+        # self.RealTimeViewSignalButton.clicked.connect(self.RealTimeSignal.show_real_time_graph)
+        # self.RealTimeViewSignalButton.clicked.connect(self.RealTimeSignal.disable_view_button)
 
         self.RealTimeSignalInput = self.findChild(QLineEdit , "RealTimeSignalInput")
         self.RealTimeSignalInput.textChanged.connect(self.RealTimeSignal.enable_view_button)
@@ -266,10 +266,12 @@ class Main(QMainWindow):
         # Auto fit mode 
         self.view_modes_dropdown_1 = self.findChild(QComboBox, 'ModeComboBoxGraph1')
         self.view_modes_dropdown_1.currentIndexChanged.connect(lambda index : self.change_view_mode(index, '1'))
-        self.change_view_mode(0, '1')
+        # self.change_view_mode(1, '1')
+        self.view_modes_dropdown_1.setCurrentIndex(1)
         self.view_modes_dropdown_2 = self.findChild(QComboBox, 'ModeComboBoxGraph2')
         self.view_modes_dropdown_2.currentIndexChanged.connect(lambda index : self.change_view_mode(index, '2'))
-        self.change_view_mode(0, '2')
+        # self.change_view_mode(1, '2')
+        self.view_modes_dropdown_2.setCurrentIndex(1)
         
         # Viewer 1 Scroll bars Initialization
         self.scrolling_x_axis_scrollbar_viewer1 = self.findChild(QScrollBar , "HorizontalScrollGraph1")
@@ -760,10 +762,10 @@ class Main(QMainWindow):
                     df = pd.read_csv(file_path)
                     for i, col in enumerate(df.columns):
                         if viewer_number == '1':
-                            signal = CustomSignal(label=f"{col}_signal_{self.number_of_viewer_1_signals}_1", signal=df[col].values )
+                            signal = CustomSignal(label=f"Untitled_{self.number_of_viewer_1_signals}_signal_1", signal=df[col].values )
                             self.signals_dropdown_1.addItem(signal.label)
                         else:
-                            signal = CustomSignal(label=f"{col}_signal_{self.number_of_viewer_2_signals}_2", signal=df[col].values )
+                            signal = CustomSignal(label=f"Untitled_{self.number_of_viewer_2_signals}_signal_2", signal=df[col].values )
                             self.signals_dropdown_2.addItem(signal.label)
                     ## testing ##
                         # print(f"Column Name: {col}")
