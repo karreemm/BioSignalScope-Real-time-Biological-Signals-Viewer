@@ -30,6 +30,31 @@ class wave:
         # Resample and combine data
         self.data_samples = self.concatenate_resampled_data(self.raw_data, self.time_grid)
     
+    def transform_ecg_to_amplitude_phase(self, file_path):
+        # Step 1: Read the ECG data from the CSV file
+        data = pd.read_csv(file_path)
+        
+        # Make sure the file contains the correct columns
+        print(f'data shape{data.shape}')
+        time_values = data['time'].values
+        ecg_values = data['value'].values
+        
+        # Step 2: Perform the Fourier Transform
+        fft_result = np.fft.fft(ecg_values)
+        freqs = np.fft.fftfreq(len(ecg_values), d=(time_values[1] - time_values[0]))
+        
+        # Step 3: Calculate amplitude and phase
+        amplitude = np.abs(fft_result)
+        phase = np.angle(fft_result)
+        
+        # Step 4: Combine the results into a DataFrame
+        amplitude_phase_df = pd.DataFrame({'Frequency': freqs, 'Amplitude': amplitude, 'Phase': phase})
+        
+        # Return only the positive frequencies (excluding the mirrored part for negative frequencies)
+        amplitude_phase_df = amplitude_phase_df[amplitude_phase_df['Frequency'] >= 0].reset_index(drop=True)
+        
+        return amplitude_phase_df
+        
     
     def set_files(self, files):
      self.data_files_directories = files
