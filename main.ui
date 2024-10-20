@@ -213,7 +213,7 @@ QSlider::add-page:horizontal {
        <string notr="true"/>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="MainPage">
        <layout class="QGridLayout" name="gridLayout_2">
@@ -441,7 +441,7 @@ QComboBox QAbstractItemView {
                 </property>
                 <item>
                  <property name="text">
-                  <string>Scrollable Mode</string>
+                  <string>free Mode</string>
                  </property>
                 </item>
                 <item>
@@ -985,7 +985,7 @@ QComboBox QAbstractItemView {
                 </property>
                 <item>
                  <property name="text">
-                  <string>Scrollable Mode</string>
+                  <string>free Mode</string>
                  </property>
                 </item>
                 <item>

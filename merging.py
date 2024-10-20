@@ -174,8 +174,8 @@ class Main(QMainWindow):
 
         self.isGlueRegionShowing = False
         
-        self.UpdateGluingButton = self.findChild(QPushButton , "UpdateGluingButton")
-        self.UpdateGluingButton.clicked.connect(self.update_gluing_interpolate)
+        #self.UpdateGluingButton = self.findChild(QPushButton , "UpdateGluingButton")
+        #self.UpdateGluingButton.clicked.connect(self.update_gluing_interpolate)
         
         self.MoveSignalLeftButton = self.findChild(QPushButton , "pushButton_2")
         self.MoveSignalLeftButton.clicked.connect(self.move_signal_left)
@@ -801,10 +801,10 @@ class Main(QMainWindow):
                     df = pd.read_csv(file_path)
                     for i, col in enumerate(df.columns):
                         if viewer_number == '1':
-                            signal = CustomSignal(label=f"Untitled_{self.number_of_viewer_1_signals}_signal_1", signal=df[col].values )
+                            signal = CustomSignal(label=f"Untitled_{self.number_of_viewer_1_signals+1}_viewer_1", signal=df[col].values )
                             self.signals_dropdown_1.addItem(signal.label)
                         else:
-                            signal = CustomSignal(label=f"Untitled_{self.number_of_viewer_2_signals}_signal_2", signal=df[col].values )
+                            signal = CustomSignal(label=f"Untitled_{self.number_of_viewer_2_signals+1}_viewer_2", signal=df[col].values )
                             self.signals_dropdown_2.addItem(signal.label)
                     ## testing ##
                         # print(f"Column Name: {col}")
