@@ -18,9 +18,8 @@ class RealTimeSignal:
         self.timer.setInterval(500) 
         self.timer.timeout.connect(self.update_plot_data)
 
-    def initialize(self, RealTimeSignalInput, RealTimeViewSignalButton, PlayPauseButtonRealTime, RealTimeScroll, graphWidget ,Pages , RealTimeSignalPage):
+    def initialize(self, RealTimeSignalInput, PlayPauseButtonRealTime, RealTimeScroll, graphWidget ,Pages , RealTimeSignalPage):
         self.RealTimeSignalInput = RealTimeSignalInput
-        self.RealTimeViewSignalButton = RealTimeViewSignalButton
         self.PlayPauseButtonRealTime = PlayPauseButtonRealTime
         self.RealTimeScroll = RealTimeScroll
         self.graphWidget = graphWidget
@@ -80,11 +79,11 @@ class RealTimeSignal:
     def scroll_graph(self, value):
         self.graphWidget.setXRange(value, value + 20)
 
-    def disable_view_button(self):
-        self.RealTimeViewSignalButton.setDisabled(True)
+    # def disable_view_button(self):
+    #     self.RealTimeViewSignalButton.setDisabled(True)
 
-    def enable_view_button(self):
-        self.RealTimeViewSignalButton.setDisabled(False)
+    # def enable_view_button(self):
+    #     self.RealTimeViewSignalButton.setDisabled(False)
     
     
     def go_to_real_time_page(self):

@@ -123,7 +123,6 @@ class Main(QMainWindow):
         # self.BackHomeButton3 = self.findChild(QPushButton, 'BackHomeButton3')
         # self.BackHomeButton3.clicked.connect(self.navigation.go_to_home_page)
         
-        self.RealTimeViewSignalButton = self.findChild(QPushButton, 'RealTimeViewSignalButton')
         # self.RealTimeViewSignalButton.clicked.connect(self.RealTimeSignal.show_real_time_graph)
         # self.RealTimeViewSignalButton.clicked.connect(self.RealTimeSignal.disable_view_button)
 
@@ -143,7 +142,7 @@ class Main(QMainWindow):
         
         
         self.navigation.initialize(self.NonRectangleSignalButton, self.BackHomeButton1, self.BackHomeButton2, self.BackHomeButton3, self.RealTimeSignalButton, self.RealTimeSignalPage, self.MainPage, self.NonRectangleSignalPage, self.Pages)
-        self.RealTimeSignal.initialize(self.RealTimeSignalInput , self.RealTimeViewSignalButton , self.PlayPauseButtonRealTime , self.RealTimeScroll, self.graphWidget , self.Pages , self.RealTimeSignalPage)
+        self.RealTimeSignal.initialize(self.RealTimeSignalInput  , self.PlayPauseButtonRealTime , self.RealTimeScroll, self.graphWidget , self.Pages , self.RealTimeSignalPage)
 
         self.PlayPauseButtonGraph1 = self.findChild(QPushButton, 'PlayPauseButtonGraph1')
         self.PlayPauseButtonGraph1.clicked.connect(self.play_pause_graph1)
