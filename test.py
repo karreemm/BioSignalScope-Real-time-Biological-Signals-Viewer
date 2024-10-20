@@ -5,10 +5,8 @@ from PyQt5.QtWidgets import QApplication, QHBoxLayout,QSlider,  QMainWindow,QLin
 from PyQt5.uic import loadUi
 
 from PyQt5.QtGui import QIcon
-from classes.spiderPlot import SpiderPlot
-from classes.CSVLoader import CSVLoader
 from classes.resampled_data import wave
-from classes.spiderPlot import PlotControls
+from classes.spiderPlot import SpiderPlot, PlotControls, PhasorGraph, PhasorPlotControls
 from classes.viewer import Viewer
 from classes.channel_ import CustomSignal
 from classes.gluer import Gluer
@@ -116,8 +114,8 @@ class test(QMainWindow):
         
         self.graph = None
         self.spider_viewer_control = None
-        
-        
+        self.phasor_graph_controls = None
+                
         self.NonRectangleSignalButton = self.findChild(QPushButton, 'NonRectangleSignalButton')
         self.NonRectangleSignalButton.clicked.connect(self.go_to_non_rectangle_signal_page)
 
@@ -291,16 +289,16 @@ class test(QMainWindow):
     def draw_new_graph(self):
 
             files, _ = QFileDialog.getOpenFileNames(self, "Open CSV Files", "", "CSV Files (*.csv)")
-            csv_files = []
+            csv_files = None
             # If files are selected, store the file paths
             if files:
-                csv_files.extend(files)
-                self.wave_instance = wave(files_directories = csv_files)
+                csv_files =files
+                # self.wave_instance = wave(files_directories = csv_files)
                 print(f'CSV files:{csv_files}'  )
                 self.horizontalLayout_15.removeWidget(self.graph)
 
-                self.graph = SpiderPlot(self.wave_instance.data_samples, self.NonRectangleGraphTimeSlider)    
-                self.spider_viewer_control = PlotControls(self.PlayImage, self.PauseImage ,self.graph, self.BackButtonNonRectangle, self.NextButtonNonRectangle, 
+                self.graph = PhasorGraph(csv_files, self.NonRectangleGraphTimeSlider)    
+                self.phasor_graph_controls = PhasorPlotControls(self.PlayImage, self.PauseImage ,self.graph, self.BackButtonNonRectangle, self.NextButtonNonRectangle, 
                                                     self.SpeedSliderNonRectangleGraph, self.PlayPauseNonRectangleButton, self.ReplayNonRectangleButton, self.ChangeColorButtonNonRectangle,self.NonRectangleGraphTimeSlider)
                 self.horizontalLayout_15.addWidget(self.graph)
       
