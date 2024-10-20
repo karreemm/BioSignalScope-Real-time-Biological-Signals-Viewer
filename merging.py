@@ -1,4 +1,3 @@
-import subprocess
 import sys
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QApplication,QSlider,  QMainWindow,QLineEdit,  QStackedWidget, QPushButton,QComboBox,  QMessageBox, QWidget, QColorDialog, QFrame, QVBoxLayout, QFileDialog ,QScrollBar, QHBoxLayout
@@ -142,7 +141,7 @@ class Main(QMainWindow):
         
         
         self.navigation.initialize(self.NonRectangleSignalButton, self.BackHomeButton1, self.BackHomeButton2, self.BackHomeButton3, self.RealTimeSignalButton, self.RealTimeSignalPage, self.MainPage, self.NonRectangleSignalPage, self.Pages)
-        self.RealTimeSignal.initialize(self.RealTimeSignalInput  , self.PlayPauseButtonRealTime , self.RealTimeScroll, self.graphWidget , self.Pages , self.RealTimeSignalPage)
+        self.RealTimeSignal.initialize(self.RealTimeSignalInput  , self.PlayPauseButtonRealTime , self.RealTimeScroll, self.graphWidget , self.Pages , self.RealTimeSignalPage , self.MainPage)
 
         self.PlayPauseButtonGraph1 = self.findChild(QPushButton, 'PlayPauseButtonGraph1')
         self.PlayPauseButtonGraph1.clicked.connect(self.play_pause_graph1)
