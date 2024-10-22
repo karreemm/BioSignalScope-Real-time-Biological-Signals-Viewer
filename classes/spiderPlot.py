@@ -181,7 +181,7 @@ class SpiderPlot(QWidget):
             y = int(center_y - (self.radius + 20) * sin(angle))
             formatted_value = f'{self.max_values[i]:.2f}'
 
-            painter.drawText(x - 20, y, 60, 20, Qt.AlignCenter, f'{label}, {formatted_value}')
+            painter.drawText(x - 20, y, 80, 40, Qt.AlignCenter, f'{label}, {formatted_value}')
 
 
 class PlotControls(QWidget):
@@ -302,17 +302,49 @@ class PlotControls(QWidget):
                                                     self.SpeedSliderNonRectangleGraph, self.PlayPauseNonRectangleButton, self.ReplayNonRectangleButton, self.ChangeColorButtonNonRectangle,self.NonRectangleGraphTimeSlider)
                 self.horizontalLayout_15.addWidget(self.graph)
 
+class phasorGraphPoint(QPoint):
+    def __init__(self, phase, frequency, amplitude, index, radius, maximum, center_x, center_y):
+        super().__init__()
+        self.phase = phase
+        self.frequency = frequency
+        self.amplitude = amplitude
+        self.index = index
+        self.radius = radius
+        self.max = maximum
+        self.center_x = center_x
+        self.center_y = center_y
+        self.qpoint = [self.createQpoint()]
+        
+    def createQpoint(self):
+        normalized_amplitude = self.amplitude / self.max
+        normalized_amplitude = max(0, min(1, normalized_amplitude))
+        
+        scaled_radius = self.radius * normalized_amplitude
+        
+        x = int(self.center_x + scaled_radius * cos(self.phase))
+        y = int(self.center_y - scaled_radius * sin(self.phase))
+        self.setX(x)
+        self.setY(y)
+        
+        return x,y
+
 class PhasorGraph(QWidget):
         def __init__(self, data_path, time_slider):
             super().__init__()
             print(f'CSV files:{data_path}'  )
- 
+
             self.data = self.transform_ecg_to_amplitude_phase(data_path[0])
             print(f'sahpe {self.data.shape}, columns: {self.data.columns}')
-            # Initial window setup
+            self.current_row_idx = 0
+            self.current_batch_idx = 0
+            self.current_row =  self.data.loc[self.current_row_idx, :].values.flatten().tolist()
             self.freq = self.data['Frequency']
             self.amp = self.data['Amplitude']
             self.phase = self.data['Phase']
+            self.data_points= len(self.amp)
+            
+            self.current_points = []
+            self.current_phase = 0
             
             print(f'frequincies:{self.freq}, ampllitudes: {self.amp}')
             
@@ -320,44 +352,44 @@ class PhasorGraph(QWidget):
             self.max_amp = max(abs(self.amp))
             print(f'max ')
             print(f'max values in the dataframes {self.max_amp}')
-            self.data_points= len(self.amp)
-            # Polygon properties
-            self.radius = 250  # Radius for the circle in which the polygon is inscribed4
+            self.center_x = self.width() // 2
+            self.center_y = self.height() // 2    
+            self.radius = 250 
+            
+            self.all_batches = self.transform_data_to_qpoints(7, self.data_points//7 , self.center_x, self.center_y)
             print(f'shape of the data will be plotted{self.data.shape}')
             
-            self.current_x = None
-            self.current_y = None      
+  
             self.circle_pen = QPen(Qt.black, 2)
             self.inner_pen =  QPen(Qt.gray, 2, Qt.DotLine)
             self.point_pen =  QPen(Qt.white, 4)
             self.line_pen  =  QPen(Qt.white, 3, Qt.DotLine)
-            self.current_row_idx = 0
             
             self.timer = QTimer()
             self.timer.timeout.connect(self.update_animation)
             self.time_interval = 100
             self.timer.start(self.time_interval)
-        def transform_ecg_to_amplitude_phase(self, file_path):
-            # Step 1: Read the ECG data from the CSV file
-            data = pd.read_csv(file_path)
+        def add_point(self, new_point):
+            if self.current_phase >= pi:
+                point = self.current_points.pop(0)
+                self.current_phase -=  point.phase
+            self.current_points.append(new_point)
+            self.current_phase += new_point.phase
             
-            # Make sure the file contains the correct columns
+            self.update_animation()
+            
+        def transform_ecg_to_amplitude_phase(self, file_path):
+            data = pd.read_csv(file_path)
             print(f'data shape{data.shape}')
             time_values = data['time'].values
             ecg_values = data['value'].values
-            
-            # Step 2: Perform the Fourier Transform
+        
             fft_result = np.fft.fft(ecg_values)
             freqs = np.fft.fftfreq(len(ecg_values), d=(time_values[1] - time_values[0]))
             
-            # Step 3: Calculate amplitude and phase
             amplitude = np.abs(fft_result)
             phase = np.angle(fft_result)
-            
-            # Step 4: Combine the results into a DataFrame
-            amplitude_phase_df = pd.DataFrame({'Frequency': freqs, 'Amplitude': amplitude, 'Phase': phase})
-            
-            # Return only the positive frequencies (excluding the mirrored part for negative frequencies)
+            amplitude_phase_df = pd.DataFrame({'Frequency': freqs, 'Amplitude': amplitude, 'Phase': phase}) 
             amplitude_phase_df = amplitude_phase_df[amplitude_phase_df['Frequency'] >= 0].reset_index(drop=True)
             
             return amplitude_phase_df
@@ -392,21 +424,61 @@ class PhasorGraph(QWidget):
                     self.repaint()
                 
         def paintEvent(self, event):
-        # Initialize QPainter object
             painter = QPainter(self)
             painter.setRenderHint(QPainter.Antialiasing)
             
-            # Calculate the center of the widget
-            center_x = self.width() // 2
-            center_y = self.height() // 2
-                    
-            # Draw the polygon
+            self.draw_circle(painter, self.center_x, self.center_y, self.radius)
+            self.draw_grid(painter, self.center_x, self.center_y)
+            
+            self.draw_phasor_point(painter,self.center_x, self.center_y)
+            # self.draw_axis_labels(painter, center_x, center_y)
+    
+        def transform_data_to_qpoints(self, batch_size, num_batches, center_x, center_y):
+            """
+            Transforms data into batches of QPoint objects representing vertices for plotting.
 
-            self.draw_circle(painter, center_x, center_y, self.radius)
-            self.draw_grid(painter, center_x, center_y)
-            self.draw_phasor_point(painter,center_x, center_y)
-            self.draw_axis_labels(painter, center_x, center_y)
+            Parameters:
+                batch_size (int): Number of points per batch.
+                num_batches (int): Number of batches to generate.
+                center_x (int): X-coordinate of the center.
+                center_y (int): Y-coordinate of the center.
 
+            Returns:
+                List[List[QPoint]]: List of batches, each containing a list of QPoint objects.
+            """
+            all_batches = []
+
+            for batch_index in range(num_batches):
+                vertices = []
+
+                for _ in range(batch_size):
+                    # Get the current frequency, phase, and amplitude
+                    current_row =  self.data.loc[self.current_row_idx, :].values.flatten().tolist()
+
+                    freq = current_row[0]
+                    phase = current_row[2]
+                    amplitude = abs(current_row[1])
+
+                    # Normalize the amplitude
+                    max_amplitude = self.max_amp
+                    normalized_amplitude = amplitude / max_amplitude
+                    normalized_amplitude = max(0, min(1, normalized_amplitude))
+
+                    # Scale the radius based on the normalized amplitude
+                    scaled_radius = self.radius * normalized_amplitude
+
+                    # Calculate the x and y coordinates
+                    current_x = int(center_x + scaled_radius * cos(phase))
+                    current_y = int(center_y - scaled_radius * sin(phase))
+
+                    # Add the QPoint to the list
+                    vertices.append(QPoint(current_x, current_y))
+
+                # Add the current batch to the list of all batches
+                all_batches.append(vertices)
+
+            return all_batches
+                 
 
         def frequency_to_color(self, frequency):
             # Map the frequency to a value between 0 and 1
@@ -420,6 +492,7 @@ class PhasorGraph(QWidget):
             
         # Create a QColor from the interpolated values
             return QColor(red, 0, blue)
+        
         def draw_grid(self, painter, center_x, center_y, num_levels=5):
     # Create a dotted pen style for the circles
             painter.setPen(self.inner_pen)
@@ -436,35 +509,96 @@ class PhasorGraph(QWidget):
             painter.drawEllipse(center_x - r, center_y - r, 2 * r, 2 * r)
             center = QPoint(center_x, center_y)
             painter.drawPoint(center)
+         
+        def drawtheseq(self, painter, center_x, center_y):
+            painter.setPen(self.line_pen)
             
+            for i in range(len(self.current_points)):
+                if i > 0: 
+                    painter.drawLine(self.current_points[i - 1], self.current_points[i])
+
+                painter.setPen(self.point_pen)
+                painter.drawPoint(self.current_points[i])
+                painter.setPen(self.line_pen)
+
+
+            if self.current_phase > pi:  
+                point = self.points.pop(0)
+                self.current_phase -= point.phase            
+        
+        # def draw_batches(self, painter, center_x, center_y):
+        #     # Parameters for the transformation
+        #     batch_size = 7
+        #     num_batches = self.num_vertices//7
+            
+        #     # Get the list of batches of QPoints
+            
+        #     # Set the pen color based on the frequency
+        #     current_row_freq =  self.data.loc[self.current_row_idx, :].values.flatten().tolist()
+
+        #     freq = current_row_freq[0]
+        #     point_color = self.frequency_to_color(freq)
+        #     self.point_pen.setColor(point_color)
+        #     self.line_pen.setColor(point_color)
+
+        #     # Draw each batch
+        #     for i in range(len(self.all_batches[self.current_batch_idx])-1):
+        #         current_row =  self.data.loc[self.current_row_idx, :].values.flatten().tolist()
+
+        #         batch = self.all_batches[self.current_batch_idx]
+        #         current_point = batch[i]
+        #         next_vertex = batch[(i + 1) % len(batch)]  # Wrap around to the first vertex
+        #         print(f'point:{batch[i]}, next: {next_vertex} ')
+        #         painter.setPen(self.point_pen)
+        #         painter.drawEllipse(batch[i].x() - 2, batch[i].y() - 2, 4, 4)
+
+        #         painter.drawLine(current_point,next_vertex)
+        #         # painter.setPen(self.point_pen)
+        #         # self.update()
+        #     self.current_batch_idx += 1
+
+        
         def draw_phasor_point(self, painter, center_x, center_y):
-            # Get the current frequency, phase, and amplitude
+            size = 7
+            vertices =[]
+            max_amplitude = self.max_amp
             freq = self.current_row[0]
             phase = self.current_row[2]
             amplitude = abs(self.current_row[1])
-            
-            # Normalize amplitude
-            max_amplitude = self.max_amp
             normalized_amplitude = amplitude / max_amplitude
             normalized_amplitude = max(0, min(1, normalized_amplitude))
             
-            # Scale the radius based on the normalized amplitude
             scaled_radius = self.radius * normalized_amplitude
             
-            # Calculate x and y coordinates for the phasor point
             self.current_x = int(center_x + scaled_radius * cos(phase))
             self.current_y = int(center_y - scaled_radius * sin(phase))
             
-            # Set the color based on the frequency
+            current_point = QPoint(self.current_x, self.current_y)
+            next_row =self.data.loc[self.current_row_idx+1, :].values.flatten().tolist()
+            print(next_row)
+            
+            next_freq = next_row[0]
+            next_phase = next_row[2]
+            next_amplitude = abs(next_row[1])
+            next_normalized_amplitude = next_amplitude / max_amplitude
+            next_normalized_amplitude = max(0, min(1, next_normalized_amplitude))
+            
+            next_scaled_radius = self.radius * next_normalized_amplitude
+            
+            next_x = int(center_x + scaled_radius * cos(next_phase))
+            next_y = int(center_y - scaled_radius * sin(next_phase))
+            
+            next_point = QPoint(next_x ,next_y)
+            
+            print(f'append{QPoint(self.current_x, self.current_y)}')
             point_color = self.frequency_to_color(freq)
             self.point_pen.setColor(point_color)
             self.line_pen.setColor(point_color)
             
-            # Draw the phasor point
-            painter.setPen(self.point_pen)
+            # painter.drawLine(QPoint(center_x, center_y), QPoint(self.current_x, self.current_y))
             painter.drawEllipse(self.current_x - 2, self.current_y - 2, 4, 4)
-            painter.setPen(self.line_pen)
-            painter.drawLine(QPoint(center_x, center_y), QPoint(self.current_x, self.current_y))
+            painter.drawLine(current_point, next_point)
+                
         def draw_axis_labels(self, painter, center_x, center_y):
             font = painter.font()
             font.setPointSize(8)
@@ -565,7 +699,7 @@ class PhasorPlotControls(QWidget):
         # Update the current row index based on the slider position
         self.widget.current_row_idx = self.time_slider.value()
         self.widget.repaint_animation(self.widget.current_row_idx)
-
+        
     def auto_update_slider(self):
         # Update the slider position based on the current row index
         self.time_slider.setValue(self.widget.current_row_idx)

@@ -6,7 +6,8 @@ from PyQt5.uic import loadUi
 
 from PyQt5.QtGui import QIcon
 from classes.resampled_data import wave
-from classes.spiderPlot import SpiderPlot, PlotControls, PhasorGraph, PhasorPlotControls
+from classes.spiderPlot import SpiderPlot, PlotControls,PhasorPlotControls
+from classes.modifiedNonRect import PhasorGraph
 from classes.viewer import Viewer
 from classes.channel_ import CustomSignal
 from classes.gluer import Gluer
@@ -290,7 +291,7 @@ class test(QMainWindow):
 
             files, _ = QFileDialog.getOpenFileNames(self, "Open CSV Files", "", "CSV Files (*.csv)")
             csv_files = None
-            # If files are selected, store the file paths
+            # If files are selz ected, store the file paths
             if files:
                 csv_files =files
                 # self.wave_instance = wave(files_directories = csv_files)
