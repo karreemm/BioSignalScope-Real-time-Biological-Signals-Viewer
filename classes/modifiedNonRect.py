@@ -12,6 +12,8 @@ class PhasorGraph(QWidget):
         def __init__(self, data_path, time_slider):
             super().__init__()
             print(f'CSV files:{data_path}'  )
+            
+            super().setFixedSize(400, 400)
 
             self.data = self.transform_ecg_to_amplitude_phase(data_path[0])
 
@@ -160,11 +162,7 @@ class PhasorGraph(QWidget):
         def drawtheseq(self, painter, center_x, center_y):
             painter.setPen(self.line_pen)
             for i in range(len(self.current_points)):
-                if i > 0: 
-                    # painter.drawLine(self.current_points[i - 1], self.current_points[i])
-                    painter.drawLine(QPoint(self.center_x, self.center_y), self.current_points[i])
-
-                
+                              
                 self.point_pen.setColor(self.frequency_to_color(self.current_points[i].frequency))
                 # self.draw_axis_labels(painter, self.current_points[i].x(), self.current_points[i].y())
 
@@ -172,6 +170,10 @@ class PhasorGraph(QWidget):
                 painter.drawEllipse(self.current_points[i].x() - 2, self.current_points[i].y() - 2, 4, 4)
 
                 painter.setPen(self.line_pen)
+                if i > 0: 
+                    # painter.drawLine(self.current_points[i - 1], self.current_points[i])
+                    painter.drawLine(QPoint(self.center_x, self.center_y), self.current_points[i])
+
 
 
           

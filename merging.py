@@ -64,6 +64,7 @@ class Main(QMainWindow):
 
         self.is_linked = True
 
+
         self.Pages = self.findChild(QStackedWidget, 'stackedWidget') 
         self.MainPage = self.Pages.indexOf(self.findChild(QWidget , 'MainPage'))
         self.RealTimeSignalPage = self.Pages.indexOf(self.findChild(QWidget , 'RealTimePage'))
@@ -83,7 +84,7 @@ class Main(QMainWindow):
         self.BackHomeButton3.clicked.connect(self.go_to_home_page_from_real_time_signal)
         
         self.NonRectangleGraph = self.findChild(QFrame, 'NonRectangleGraph')
-        
+        self.nonrectLayout = QHBoxLayout()
         self.UploadSignalNonRectangle= self.findChild(QPushButton, 'UploadSignalNonRectangle')
         self.UploadSignalNonRectangle.clicked.connect(self.draw_new_graph)
 
@@ -328,21 +329,41 @@ class Main(QMainWindow):
         self.replay_button_2.clicked.connect(lambda:self.replay_signal('2'))
         
     def draw_new_graph(self):
+        files, _ = QFileDialog.getOpenFileNames(self, "Open CSV Files", "", "CSV Files (*.csv)")
+        
+        # If files are selected, store the file paths
+        if files:
+            csv_files = files
+            print(f'CSV files: {csv_files}')
+            
+            # Remove the old graph from the layout and delete it properly
+            if self.graph is not None:
+                self.nonrectLayout.removeWidget(self.graph)
+                self.graph.deleteLater()  # Safely delete the old graph widget
+                self.graph = None
+            
+            # Create a new PhasorGraph instance
+            self.graph = PhasorGraph(csv_files, self.NonRectangleGraphTimeSlider)
+            print(f'Width: {self.graph.width()}, Height: {self.graph.height()}')
+            # Recreate the controls for the new graph
+            self.phasor_graph_controls = PhasorPlotControls(
+                self.PlayImage, self.PauseImage, self.graph, self.BackButtonNonRectangle, 
+                self.NextButtonNonRectangle, self.SpeedSliderNonRectangleGraph, 
+                self.PlayPauseNonRectangleButton, self.ReplayNonRectangleButton, 
+                self.ChangeColorButtonNonRectangle, self.NonRectangleGraphTimeSlider
+            )
+            # Add the new graph to the layout
+            self.nonrectLayout.addWidget(self.graph)
+            self.horizontalLayout_15.addWidget(self.graph)
+            
+            # Align the layout (if needed)
+            # self.horizontalLayout_15.setAlignment(self.graph, Qt.AlignCenter) # Uncomment if you need alignment
+            
+            print(f'Number of elements after: {self.horizontalLayout_15.count()}')
 
-            files, _ = QFileDialog.getOpenFileNames(self, "Open CSV Files", "", "CSV Files (*.csv)")
-            csv_files = None
-            # If files are selz ected, store the file paths
-            if files:
-                csv_files =files
-                # self.wave_instance = wave(files_directories = csv_files)
-                print(f'CSV files:{csv_files}'  )
-                self.horizontalLayout_15.removeWidget(self.graph)
 
-                self.graph = PhasorGraph(csv_files, self.NonRectangleGraphTimeSlider)    
-                self.phasor_graph_controls = PhasorPlotControls(self.PlayImage, self.PauseImage ,self.graph, self.BackButtonNonRectangle, self.NextButtonNonRectangle, 
-                                                    self.SpeedSliderNonRectangleGraph, self.PlayPauseNonRectangleButton, self.ReplayNonRectangleButton, self.ChangeColorButtonNonRectangle,self.NonRectangleGraphTimeSlider)
-                self.horizontalLayout_15.addWidget(self.graph)
-       
+    
+
     def replay_signal(self, viewer:str):
         if viewer == '1':
             if not self.is_playing_graph1:

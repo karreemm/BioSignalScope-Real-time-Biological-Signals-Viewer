@@ -290,18 +290,19 @@ class Main(QMainWindow):
     def draw_new_graph(self):
 
             files, _ = QFileDialog.getOpenFileNames(self, "Open CSV Files", "", "CSV Files (*.csv)")
-            csv_files = None
-            # If files are selz ected, store the file paths
+            csv_files = []
+            # If files are selected, store the file paths
             if files:
-                csv_files =files
-                # self.wave_instance = wave(files_directories = csv_files)
+                csv_files.extend(files)
+                self.wave_instance = wave(files_directories = csv_files)
                 print(f'CSV files:{csv_files}'  )
                 self.horizontalLayout_15.removeWidget(self.graph)
 
-                self.graph = PhasorGraph(csv_files, self.NonRectangleGraphTimeSlider)    
-                self.phasor_graph_controls = PhasorPlotControls(self.PlayImage, self.PauseImage ,self.graph, self.BackButtonNonRectangle, self.NextButtonNonRectangle, 
+                self.graph = SpiderPlot(self.wave_instance.data_samples, self.NonRectangleGraphTimeSlider)    
+                self.spider_viewer_control = PlotControls(self.PlayImage, self.PauseImage ,self.graph, self.BackButtonNonRectangle, self.NextButtonNonRectangle, 
                                                     self.SpeedSliderNonRectangleGraph, self.PlayPauseNonRectangleButton, self.ReplayNonRectangleButton, self.ChangeColorButtonNonRectangle,self.NonRectangleGraphTimeSlider)
                 self.horizontalLayout_15.addWidget(self.graph)
+      
             
     
         # linking button 
