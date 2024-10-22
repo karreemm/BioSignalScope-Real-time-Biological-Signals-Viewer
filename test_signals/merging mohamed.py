@@ -4,12 +4,14 @@ from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QApplication,QSlider,  QMainWindow,QLineEdit,  QStackedWidget, QPushButton,QComboBox,  QMessageBox, QWidget, QColorDialog, QFrame, QVBoxLayout, QFileDialog ,QScrollBar, QHBoxLayout
 from PyQt5.uic import loadUi
 from PyQt5.QtGui import QIcon
-from classes.spiderPlot import SpiderPlot
-from classes.resampled_data import wave
-from classes.spiderPlot import PlotControls
+
+
+from classes.spiderPlot import PhasorPlotControls
 from classes.viewer import Viewer
 from classes.channel_ import CustomSignal
 from classes.gluer import Gluer
+from classes.modifiedNonRect import PhasorGraph 
+
 import pandas as pd 
 import numpy as np
 import pyqtgraph as pg
@@ -329,19 +331,20 @@ class Main(QMainWindow):
         self.replay_button_2.clicked.connect(lambda:self.replay_signal('2'))
         
     def draw_new_graph(self):
-        files, _ = QFileDialog.getOpenFileNames(self, "Open CSV Files", "", "CSV Files (*.csv)")
-        csv_files = []
-        # If files are selected, store the file paths
-        if files:
-            csv_files.extend(files)
-            self.wave_instance = wave(files_directories = csv_files)
-            print(f'CSV files:{csv_files}'  )
-            self.horizontalLayout_15.removeWidget(self.graph)
 
-            self.graph = SpiderPlot(self.wave_instance.data_samples, self.NonRectangleGraphTimeSlider)    
-            self.spider_viewer_control = PlotControls(self.PlayImage, self.PauseImage ,self.graph, self.BackButtonNonRectangle, self.NextButtonNonRectangle, 
-                                                self.SpeedSliderNonRectangleGraph, self.PlayPauseNonRectangleButton, self.ReplayNonRectangleButton, self.ChangeColorButtonNonRectangle,self.NonRectangleGraphTimeSlider)
-            self.horizontalLayout_15.addWidget(self.graph)
+            files, _ = QFileDialog.getOpenFileNames(self, "Open CSV Files", "", "CSV Files (*.csv)")
+            csv_files = None
+            # If files are selz ected, store the file paths
+            if files:
+                csv_files =files
+                # self.wave_instance = wave(files_directories = csv_files)
+                print(f'CSV files:{csv_files}'  )
+                self.horizontalLayout_15.removeWidget(self.graph)
+
+                self.graph = PhasorGraph(csv_files, self.NonRectangleGraphTimeSlider)    
+                self.phasor_graph_controls = PhasorPlotControls(self.PlayImage, self.PauseImage ,self.graph, self.BackButtonNonRectangle, self.NextButtonNonRectangle, 
+                                                    self.SpeedSliderNonRectangleGraph, self.PlayPauseNonRectangleButton, self.ReplayNonRectangleButton, self.ChangeColorButtonNonRectangle,self.NonRectangleGraphTimeSlider)
+                self.horizontalLayout_15.addWidget(self.graph)
         
         # linking button 
         

@@ -166,7 +166,7 @@ class PhasorGraph(QWidget):
 
                 
                 self.point_pen.setColor(self.frequency_to_color(self.current_points[i].frequency))
-                self.draw_axis_labels(painter, self.current_points[i].x(), self.current_points[i].y())
+                # self.draw_axis_labels(painter, self.current_points[i].x(), self.current_points[i].y())
 
                 painter.setPen(self.point_pen)
                 painter.drawEllipse(self.current_points[i].x() - 2, self.current_points[i].y() - 2, 4, 4)
