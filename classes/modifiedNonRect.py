@@ -11,12 +11,11 @@ class PhasorGraph(QWidget):
         super().__init__()
         print(f'CSV files:{data_path}')
         
-        super().setFixedSize(400, 400)
-        self.graph_type = 'Line'
-        if self.graph_type == 'Line':
+        super().setFixedSize(600, 600)
+        if pathFlag == True:
             self.data = pd.read_csv(data_path[0])
         else:
-            self.data = self.transform_ecg_to_amplitude_phase(data_path[0])
+            self.data = data_path
 
         print(f'shape {self.data.shape}, columns: {self.data.columns}')
         self.current_row_idx = 0
@@ -34,7 +33,7 @@ class PhasorGraph(QWidget):
         print(f'max values in the dataframes {self.max_amp}')
         self.center_x = self.width() // 2
         self.center_y = self.height() // 2
-        self.radius = 200
+        self.radius = 300
 
         print(f'shape of the data will be plotted {self.data.shape}')
         
@@ -146,11 +145,11 @@ class PhasorGraph(QWidget):
             
                 next_point = self.current_points[i + 1]
 
-            # painter.setPen(self.line_pen)
-            # painter.drawLine(current_point, next_point)
+            painter.setPen(self.line_pen)
+            painter.drawLine(current_point, next_point)
             
-            painter.setPen(self.point_pen)
-            painter.drawPoint(current_point)
+            # painter.setPen(self.point_pen)
+            # painter.drawPoint(current_point)
             # painter.drawEllipse(current_point.x() - 2, current_point.y() - 2, 3, 3)
 
       

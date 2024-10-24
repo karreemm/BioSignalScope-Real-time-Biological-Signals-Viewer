@@ -535,7 +535,7 @@ class Main(QMainWindow):
         if page_index != -1:
             self.Pages.setCurrentIndex(page_index)
         data = self.generate_phasor_data(num_points=200, frequency=2.0, amplitude=1.0, phase_shift=0.5, noise_level=0.05)
-        self.graph = PhasorGraph(data = data, pathFlag= False)
+        self.graph = PhasorGraph(data_path = data, pathFlag= False)
 
         print(f'Width: {self.graph.width()}, Height: {self.graph.height()}')
         # Recreate the controls for the new graph
