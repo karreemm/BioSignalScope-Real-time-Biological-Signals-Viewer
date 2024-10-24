@@ -140,33 +140,19 @@ class SpiderPlot(QWidget):
     def draw_spider(self, painter, center_x, center_y):
         spider_pen = self.spider_pen
         painter.setPen(spider_pen)
-        
-        # Calculate the angle between each vertex
-        values = self.current_row[1:]  # Exclude the 'time' column
-        angle_step = 2 * pi / self.num_vertices
-
-        # List to store vertices
+        values = self.current_row[1:]  
         vertices = []
         
-        # Calculate the coordinates for each vertex
         for vertix in range(self.num_vertices):
-            angle = vertix * angle_step
-            # Normalize the value to be between 0 and 1
             normalized_value = values[vertix] / self.max_values[vertix]
-            
-            # Ensure normalized_value is clamped between 0 and 1
             normalized_value = max(0, min(1, normalized_value))
-            
-            # Scale the radius based on the normalized value
             scaled_radius = self.radius * normalized_value
-            
             x = int(center_x + scaled_radius * cos(angle))
-            y = int(center_y - scaled_radius * sin(angle))  # Negative because of Qt's inverted y-axis
+            y = int(center_y - scaled_radius * sin(angle))  
             vertices.append(QPoint(x, y))
-            
-        # Draw lines between the vertices
+
         for vertix in range(self.num_vertices):
-            next_vertex = vertices[(vertix + 1) % self.num_vertices]  # Wrap around to the first vertex
+            next_vertex = vertices[(vertix + 1) % self.num_vertices]
             painter.drawLine(vertices[vertix], next_vertex)
         
     def draw_axis_labels(self, painter, center_x, center_y):
@@ -329,7 +315,7 @@ class phasorGraphPoint(QPoint):
         return x,y
 
 class PhasorGraph(QWidget):
-        def __init__(self, data_path, time_slider):
+        def __init__(self, data_path):
             super().__init__()
             print(f'CSV files:{data_path}'  )
 
@@ -348,7 +334,6 @@ class PhasorGraph(QWidget):
             
             print(f'frequincies:{self.freq}, ampllitudes: {self.amp}')
             
-            self.time_slider = time_slider
             self.max_amp = max(abs(self.amp))
             print(f'max ')
             print(f'max values in the dataframes {self.max_amp}')
@@ -407,20 +392,20 @@ class PhasorGraph(QWidget):
                 self.timer.stop()           
             self.current_row =  self.data.loc[self.current_row_idx, :].values.flatten().tolist()
 
-            if self.current_row_idx >= self.time_slider.maximum():
-                self.time_slider.setValue(self.time_slider.maximum())
-            self.time_slider.setValue(self.current_row_idx)
-            if self.current_row_idx <= self.time_slider.maximum():
+            # if self.current_row_idx >= self.time_slider.maximum():
+            #     self.time_slider.setValue(self.time_slider.maximum())
+            # self.time_slider.setValue(self.current_row_idx)
+            if self.current_row_idx <= len(self.data):
                 self.update()
         def repaint_animation(self,row = -1):  
             if row != -1:
                 self.current_row =  self.data.loc[row, :].values.flatten().tolist()
-                self.time_slider.setValue(self.current_row_idx)
+                # self.time_slider.setValue(self.current_row_idx)
 
-                if self.current_row_idx >= self.time_slider.maximum():
-                    self.time_slider.setValue(self.time_slider.maximum())
-                self.time_slider.setValue(self.current_row_idx)
-                if self.current_row_idx <= self.time_slider.maximum():
+                # if self.current_row_idx >= self.time_slider.maximum():
+                #     self.time_slider.setValue(self.time_slider.maximum())
+                # self.time_slider.setValue(self.current_row_idx)
+                if self.current_row_idx <= len(self.data):
                     self.repaint()
                 
         def paintEvent(self, event):
@@ -613,7 +598,7 @@ class PhasorGraph(QWidget):
             painter.drawText(self.current_x - 20, self.current_y, 60, 20, Qt.AlignCenter, formatted_value)
 
 class PhasorPlotControls(QWidget):
-    def __init__(self, PlayImage,PauseImage, PhasorGraph, backward_button, forward_button, speed_control, start_stop_button, replay_button, color_control_button, time_slider):
+    def __init__(self, PlayImage,PauseImage, PhasorGraph, backward_button, forward_button, speed_control, start_stop_button, replay_button, color_control_button):
         super().__init__()
         
         self.widget = PhasorGraph
@@ -636,13 +621,13 @@ class PhasorPlotControls(QWidget):
         self.replay_button = replay_button
         self.replay_button.clicked.connect(self.replay_plotting)
         
-        self.time_slider = time_slider
-        self.time_slider.setMinimum(0)
-        self.time_slider.setMaximum(self.widget.data_points -2) 
-        self.time_slider.setValue(0)
-        self.time_slider.setTickPosition(QSlider.TicksBelow)
-        self.time_slider.setTickInterval(1)
-        self.time_slider.valueChanged.connect(self.slider_changed)
+        # self.time_slider = time_slider
+        # self.time_slider.setMinimum(0)
+        # self.time_slider.setMaximum(self.widget.data_points -2) 
+        # self.time_slider.setValue(0)
+        # self.time_slider.setTickPosition(QSlider.TicksBelow)
+        # self.time_slider.setTickInterval(1)
+        # self.time_slider.valueChanged.connect(self.slider_changed)
 
         self.speed_slider = speed_control
         self.speed_slider.setMinimum(1)
@@ -692,17 +677,18 @@ class PhasorPlotControls(QWidget):
         # self.time_slider.setValue(self.spider_plot.current_row_idx)
     def replay_plotting(self):
             self.widget.current_row_idx = 0
+            self.widget.current_points = []
             self.start_plotting()
-            self.time_slider.setValue(self.widget.current_row_idx)
+            # self.time_slider.setValue(self.widget.current_row_idx)
 
-    def slider_changed(self):
-        # Update the current row index based on the slider position
-        self.widget.current_row_idx = self.time_slider.value()
-        self.widget.repaint_animation(self.widget.current_row_idx)
+    # def slider_changed(self):
+    #     # Update the current row index based on the slider position
+    #     self.widget.current_row_idx = self.time_slider.value()
+    #     self.widget.repaint_animation(self.widget.current_row_idx)
         
-    def auto_update_slider(self):
-        # Update the slider position based on the current row index
-        self.time_slider.setValue(self.widget.current_row_idx)
+    # def auto_update_slider(self):
+    #     # Update the slider position based on the current row index
+    #     self.time_slider.setValue(self.widget.current_row_idx)
         
     def change_speed(self):
         # Adjust speed based on the slider value

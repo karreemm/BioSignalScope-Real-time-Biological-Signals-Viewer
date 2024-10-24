@@ -20,15 +20,11 @@ class wave:
         self.sampling_rates = [self.calc_sample_rate(df) for df in self.raw_data]
         
         self.offset_values = []
-        # Use the minimum sampling rate as the target rate
-        self.sampling_rate = min(self.sampling_rates)
-        self.time_grid = self.create_time_grid(self.min_time, self.max_time, self.sampling_rate)
         
         # Set the interpolation order
         self.interp_order = interp_order
         
         # Resample and combine data
-        self.data_samples = self.concatenate_resampled_data(self.raw_data, self.time_grid)
     
     def transform_ecg_to_amplitude_phase(self, file_path):
         # Step 1: Read the ECG data from the CSV file

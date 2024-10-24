@@ -328,9 +328,44 @@ class Main(QMainWindow):
         self.replay_button_2 = self.findChild(QPushButton, 'ReplayButtonGraph2')
         self.replay_button_2.clicked.connect(lambda:self.replay_signal('2'))
         
+    def generate_phasor_data(self, num_points=100, frequency=1.0, amplitude=1.0, phase_shift=0.0, noise_level=0.1):
+        """
+        Generates synthetic phasor-like data with time and value columns for plotting in PhasorGraph.
+        
+        Parameters:
+        - num_points: Number of data points to generate.
+        - frequency: Frequency of the sinusoidal signal.
+        - amplitude: Amplitude of the sinusoidal signal.
+        - phase_shift: Phase shift for the signal in radians.
+        - noise_level: Standard deviation of the added Gaussian noise.
+        
+        Returns:
+        - A pandas DataFrame with 'time' and 'value' columns.
+        """
+        # Generate a time vector
+        time = np.linspace(0, 2 * np.pi, num_points)
+        
+        # Create the corresponding values using a sinusoidal function
+        values = amplitude * np.sin(frequency * time + phase_shift)
+        
+        # Add some noise to the values to simulate real-world data
+        noise = np.random.normal(0, noise_level, num_points)
+        noisy_values = values + noise
+        
+        # Create a DataFrame with the generated data
+        data = pd.DataFrame({
+            'time': time,
+            'value': noisy_values
+        })
+        
+        return data
+
+    # Example of usage
+
+    # Save the generated data to a CSV file
     def draw_new_graph(self):
         files, _ = QFileDialog.getOpenFileNames(self, "Open CSV Files", "", "CSV Files (*.csv)")
-        
+
         # If files are selected, store the file paths
         if files:
             csv_files = files
@@ -343,14 +378,16 @@ class Main(QMainWindow):
                 self.graph = None
             
             # Create a new PhasorGraph instance
-            self.graph = PhasorGraph(csv_files, self.NonRectangleGraphTimeSlider)
+            # self.graph = PhasorGraph(csv_files, self.NonRectangleGraphTimeSlider)
+            self.graph = PhasorGraph(data_path=csv_files, pathFlag= True)
+
             print(f'Width: {self.graph.width()}, Height: {self.graph.height()}')
             # Recreate the controls for the new graph
             self.phasor_graph_controls = PhasorPlotControls(
                 self.PlayImage, self.PauseImage, self.graph, self.BackButtonNonRectangle, 
                 self.NextButtonNonRectangle, self.SpeedSliderNonRectangleGraph, 
                 self.PlayPauseNonRectangleButton, self.ReplayNonRectangleButton, 
-                self.ChangeColorButtonNonRectangle, self.NonRectangleGraphTimeSlider
+                self.ChangeColorButtonNonRectangle
             )
             # Add the new graph to the layout
             self.nonrectLayout.addWidget(self.graph)
@@ -497,6 +534,22 @@ class Main(QMainWindow):
         page_index = self.Pages.indexOf(self.findChild(QWidget, 'NonRectangleSignalPage'))
         if page_index != -1:
             self.Pages.setCurrentIndex(page_index)
+        data = self.generate_phasor_data(num_points=200, frequency=2.0, amplitude=1.0, phase_shift=0.5, noise_level=0.05)
+        self.graph = PhasorGraph(data = data, pathFlag= False)
+
+        print(f'Width: {self.graph.width()}, Height: {self.graph.height()}')
+        # Recreate the controls for the new graph
+        self.phasor_graph_controls = PhasorPlotControls(
+            self.PlayImage, self.PauseImage, self.graph, self.BackButtonNonRectangle, 
+            self.NextButtonNonRectangle, self.SpeedSliderNonRectangleGraph, 
+            self.PlayPauseNonRectangleButton, self.ReplayNonRectangleButton, 
+            self.ChangeColorButtonNonRectangle
+        )
+        # Add the new graph to the layout
+        self.nonrectLayout.addWidget(self.graph)
+        self.horizontalLayout_15.addWidget(self.graph)
+        
+        
 
             
     def go_to_home_page_from_gluing(self):

@@ -109,7 +109,7 @@ class Main(QMainWindow):
         
         self.ChangeColorButtonNonRectangle = self.findChild(QPushButton, 'ChangeColorButtonNonRectangle')
         
-        self.graph = None
+        self.graph = PhasorGraph('RSP_AB.csv', self.NonRectangleGraphTimeSlider)    
         self.spider_viewer_control = None
         
         
