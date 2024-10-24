@@ -68,12 +68,16 @@ class PhasorGraph(QWidget):
         return adjusted_data, offset_values
 
     def update_animation(self):
+        print('called update')
+        
         self.current_row_idx += 1
         if self.current_row_idx >= self.data_points - 1:
             self.timer.stop()
             
         self.current_row = self.data.loc[self.current_row_idx, :].values.flatten().tolist()
-        self.add_point()
+        for i in range(self.current_row_idx):
+                self.add_point()   
+        # self.add_point()
 
         if self.current_phase >= 2* pi:
             self.current_points.pop(0)
@@ -84,11 +88,13 @@ class PhasorGraph(QWidget):
         self.update()
 
     def repaint_animation(self, row=-1):
+        print('called repaint')
         if row != -1:
             self.current_row_idx = row
             self.current_row = self.data.loc[self.current_row_idx, :].values.flatten().tolist()
-            
-            # if self.current_row_idx < len(self.current_points):
+            # self.current_points =[]
+
+        # if self.current_row_idx < len(self.current_points):
             #     self.current_points.pop()
             # if self.current_phase >= 2* pi:
             #     self.current_points.pop(0)

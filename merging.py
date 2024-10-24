@@ -75,7 +75,7 @@ class Main(QMainWindow):
         self.NonRectangleGraphTimeSlider = self.findChild(QSlider, 'horizontalSlider')
         
         self.BackHomeButton1 = self.findChild(QPushButton, 'BackHomeButton1')
-        self.BackHomeButton1.clicked.connect(self.navigation.go_to_home_page)
+        self.BackHomeButton1.clicked.connect(self.delete_none_rectangle)
 
         # self.BackHomeButton2 = self.findChild(QPushButton, 'BackHomeButton2')
         # self.BackHomeButton2.clicked.connect(self.navigation.go_to_home_page)
@@ -141,7 +141,7 @@ class Main(QMainWindow):
         self.layout.addWidget(self.graphWidget)
         
         
-        self.navigation.initialize(self.NonRectangleSignalButton, self.BackHomeButton1, self.BackHomeButton2, self.BackHomeButton3, self.RealTimeSignalButton, self.RealTimeSignalPage, self.MainPage, self.NonRectangleSignalPage, self.Pages)
+        self.navigation.initialize( self.NonRectangleSignalButton, self.BackHomeButton1, self.BackHomeButton2, self.BackHomeButton3, self.RealTimeSignalButton, self.RealTimeSignalPage, self.MainPage, self.NonRectangleSignalPage, self.Pages, self.graph)
         self.RealTimeSignal.initialize(self.RealTimeSignalInput  , self.PlayPauseButtonRealTime , self.RealTimeScroll, self.graphWidget , self.Pages , self.RealTimeSignalPage , self.MainPage)
 
         self.PlayPauseButtonGraph1 = self.findChild(QPushButton, 'PlayPauseButtonGraph1')
@@ -328,6 +328,13 @@ class Main(QMainWindow):
         self.replay_button_2 = self.findChild(QPushButton, 'ReplayButtonGraph2')
         self.replay_button_2.clicked.connect(lambda:self.replay_signal('2'))
         
+    
+    def delete_none_rectangle(self):
+        if self.graph:
+            self.graph = None
+        self.navigation.go_to_home_page()
+        
+    
     def generate_phasor_data(self, num_points=100, frequency=1.0, amplitude=1.0, phase_shift=0.0, noise_level=0.1):
         """
         Generates synthetic phasor-like data with time and value columns for plotting in PhasorGraph.
@@ -342,6 +349,10 @@ class Main(QMainWindow):
         Returns:
         - A pandas DataFrame with 'time' and 'value' columns.
         """
+        if self.graph is not None:
+                self.nonrectLayout.removeWidget(self.graph)
+                self.graph = None
+        
         # Generate a time vector
         time = np.linspace(0, 2 * np.pi, num_points)
         
@@ -534,6 +545,11 @@ class Main(QMainWindow):
         page_index = self.Pages.indexOf(self.findChild(QWidget, 'NonRectangleSignalPage'))
         if page_index != -1:
             self.Pages.setCurrentIndex(page_index)
+        
+        if self.graph is not None:
+                self.nonrectLayout.removeWidget(self.graph)
+                self.graph = None
+                
         data = self.generate_phasor_data(num_points=200, frequency=2.0, amplitude=1.0, phase_shift=0.5, noise_level=0.05)
         self.graph = PhasorGraph(data_path = data, pathFlag= False)
 

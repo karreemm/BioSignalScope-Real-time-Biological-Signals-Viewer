@@ -664,15 +664,18 @@ class PhasorPlotControls(QWidget):
         # Move forward one step in the data            
         self.widget.current_row_idx = min(self.widget.current_row_idx + 1, self.widget.data_points - 1)
         self.widget.repaint_animation(self.widget.current_row_idx)
-        self.auto_update_slider()
+        self.widget.update_animation()
+
 
 
     def backward_plotting(self):
     # Move backward one step in the data
         if self.widget.current_row_idx > 0:
-            self.widget.current_row_idx -= 1
+            
+            self.widget.current_points.pop()
+            self.widget.current_row_idx -= 2
             self.widget.repaint_animation(self.widget.current_row_idx)  # Update the plot to reflect the new index
-            self.auto_update_slider()
+            self.widget.update_animation()
 
         # self.time_slider.setValue(self.spider_plot.current_row_idx)
     def replay_plotting(self):
