@@ -36,7 +36,7 @@ class SpiderPlot(QWidget):
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_animation)
-        self.time_interval = 100
+        self.time_interval = 5
         self.timer.start(self.time_interval)
         
 
@@ -204,8 +204,8 @@ class PlotControls(QWidget):
 
         self.speed_slider = speed_control
         self.speed_slider.setMinimum(1)
-        self.speed_slider.setMaximum(100)
-        self.speed_slider.setValue(50)  # Default speed
+        self.speed_slider.setMaximum(10)
+        self.speed_slider.setValue(5)  # Default speed
         self.speed_slider.valueChanged.connect(self.change_speed)
         self.speed = 50
         self.start_stop_flag = False
@@ -268,7 +268,7 @@ class PlotControls(QWidget):
 
     def convert_speed_to_interval(self, speed):
         # Convert speed (1-100) to time interval (10-1000 ms)
-        return int(1010 - (speed * 10))
+        return int(1+(10-speed)*(4/9))
 
     
     

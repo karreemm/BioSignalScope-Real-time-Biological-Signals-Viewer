@@ -939,13 +939,18 @@ class Main(QMainWindow):
         if viewer_number == '1':
             if index == 0:
                 self.viewer1.y_axis_scroll_bar_enabled = True
+                if not self.is_linked:
+                    self.viewer2.y_axis_scroll_bar_enabled = True
             else:
                 self.viewer1.y_axis_scroll_bar_enabled = False
+                if not self.is_linked:
+                    self.viewer2.y_axis_scroll_bar_enabled = False
         else:
-            if index == 0:
-                self.viewer2.y_axis_scroll_bar_enabled = True
-            else:
-                self.viewer2.y_axis_scroll_bar_enabled = False
+            if not self.is_linked:
+                if index == 0:
+                    self.viewer2.y_axis_scroll_bar_enabled = True
+                else:
+                    self.viewer2.y_axis_scroll_bar_enabled = False
     
     def set_viewer1_sliders_value(self , view,ranges):
         x_axis_slider_value = ranges[0][0]
@@ -1050,10 +1055,20 @@ class Main(QMainWindow):
             if len(self.viewer1.channels) and len(self.viewer2.channels):
                 self.viewer1.setXLink(self.viewer2)
                 self.viewer1.setYLink(self.viewer2)
+                self.upload_button_2.setDisabled(True)
+                self.PlayPauseButtonGraph2.setDisabled(True)
+                self.RewindButtonGraph2.setDisabled(True)
+                self.replay_button_2.setDisabled(True)
+                self.view_modes_dropdown_2.setDisabled(True)
         else:
             self.LinkGraphsButton.setIcon(self.UnlinkImage)
             self.viewer1.setXLink(None)
             self.viewer1.setYLink(None)
+            self.upload_button_2.setEnabled(True)
+            self.PlayPauseButtonGraph2.setEnabled(True)
+            self.RewindButtonGraph2.setEnabled(True)
+            self.replay_button_2.setEnabled(True)
+            self.view_modes_dropdown_2.setEnabled(True)
         self.is_linked = not self.is_linked
     
     def show_error(self, message:str):

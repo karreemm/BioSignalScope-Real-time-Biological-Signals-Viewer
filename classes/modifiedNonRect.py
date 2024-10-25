@@ -44,7 +44,7 @@ class PhasorGraph(QWidget):
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_animation)
-        self.time_interval = 100
+        self.time_interval = 5
         self.timer.start(self.time_interval)
 
     def add_point(self):
