@@ -1,5 +1,5 @@
 class CustomSignal():
-    def __init__(self, signal, color = "red", label = "signal", visability=True):
+    def __init__(self, signal, color = "r", label = "signal", visability=True):
         self.__color = color
         self.__label = label
         self.__signal = signal

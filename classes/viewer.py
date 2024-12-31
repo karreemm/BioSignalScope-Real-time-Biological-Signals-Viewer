@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout
 from PyQt5.QtCore import QTimer
 import pyqtgraph as pg
 import pandas as pd
+import numpy as np
 from math import inf
 
 class Viewer(pg.PlotWidget):
@@ -11,7 +12,7 @@ class Viewer(pg.PlotWidget):
         super().__init__()
         self.__channels = []
         self.__rewind_state = False
-        self.__cine_speed = 1
+        self.__cine_speed = 60
         self.__zoom = 1
         
         self.x_axis = []
@@ -22,10 +23,11 @@ class Viewer(pg.PlotWidget):
         
         self.viewBox = self.getViewBox()
         
-        self.y_axis_scroll_bar_enabled = True 
+        self.y_axis_scroll_bar_enabled = False 
         
         self.counter = 0
         self.time_window = 1000
+        
         
         self.max_signals_value = -inf
         self.min_signals_value = inf    
@@ -41,18 +43,34 @@ class Viewer(pg.PlotWidget):
         # self.play()
         
         
+        
+    def show_glue_rectangle_func(self):
+            self.gluing_selected_region = pg.LinearRegionItem(values=[self.viewRange()[0][0]+50,self.viewRange()[0][0]+150])
+            self.addItem(self.gluing_selected_region)
+    def process_region_coord(self , selected_channel_index):
+        selected_region = self.gluing_selected_region.getRegion()   
+        # print(selected_region)  
+        data_y = self.channels[selected_channel_index].signal[int(selected_region[0]): int(selected_region[1])]
+        data_x = np.linspace(int(selected_region[0]) , int(selected_region[1]) , num= int(selected_region[1]) - int(selected_region[0]))
+        return [data_x , data_y]
+        
     def update_signal(self):
         if self.time_window + self.counter < len(self.x_axis):
             self.counter += 20
             # print(f"{self.viewRange()} range in updating")
         else:
-            self.counter = 0
+            if self.__rewind_state:
+                self.counter = 0
+            # else:
+            #     self.pause()
         self.setXRange(min(self.x_axis[self.counter:self.counter + self.time_window]), max(self.x_axis[self.counter:self.counter + self.time_window])  )
         # self.setXRange(self.viewRange()[0][0]+self.counter, self.viewRange()[0][1]+self.counter)
             
         min_interval_value = inf
         max_interval_value = -inf
         for channel in self.__channels:
+            if self.counter + self.time_window > len(channel):
+                continue
             min_channel_interval_value = min(channel.signal[self.counter:self.counter + self.time_window])
             if min_channel_interval_value < min_interval_value:
                 min_interval_value = min_channel_interval_value
@@ -97,6 +115,11 @@ class Viewer(pg.PlotWidget):
         
         # print(f'{self.viewRange()} mm')
         
+    def replay(self):
+        if len(self.__channels):
+            self.play()
+            self.counter = 0
+        
     def pause(self):
         self.play_state = False
         self.timer.stop()
@@ -112,16 +135,37 @@ class Viewer(pg.PlotWidget):
     def zoom_out(self):
         pass
     
+    def update_x_axis(self):
+        self.x_axis = list(range(max([len(signal) for signal in self.__channels])))
+    
     def add_channel(self , new_channel):
         if isinstance(new_channel , CustomSignal):
             self.__channels.append(new_channel)
             self.x_axis = list(range(max([len(signal) for signal in self.__channels]))) ## max len in the signals imported
             for channel in self.__channels:
-                self.plot(self.x_axis,channel.signal)
+                self.plot( [i for i in  range(len(channel.signal))] ,channel.signal, pen = pg.mkPen(color = channel.color))## pass the x_axis from the length of the signal
+                print(channel.color)
                 if min(channel.signal) < self.min_signals_value:
                     self.min_signals_value = min(channel.signal)
                 if max(channel.signal) > self.max_signals_value:
                     self.max_signals_value = max(channel.signal)
+        else:
+            raise Exception("The new channel must be of class CustomSignal")
+        
+    def plot_internal_signals(self):
+        for channel in self.__channels:
+                self.plot( [i for i in  range(len(channel.signal))] ,channel.signal, pen = pg.mkPen(color = channel.color))## pass the x_axis from the length of the signal
+                print(channel.color)
+                if min(channel.signal) < self.min_signals_value:
+                    self.min_signals_value = min(channel.signal)
+                if max(channel.signal) > self.max_signals_value:
+                    self.max_signals_value = max(channel.signal)
+        
+    def add_glued_moving_channel(self , new_channel , channel_x_values):
+        if isinstance(new_channel , CustomSignal):
+            self.__channels.append(new_channel)
+            # self.x_axis = list(range(max([len(signal) for signal in self.__channels]))) ## max len in the signals imported
+            self.plot( channel_x_values ,new_channel.signal , pen = pg.mkPen(color = 'red'))## pass the x_axis from the length of the signal
         else:
             raise Exception("The new channel must be of class CustomSignal")
     
@@ -160,8 +204,8 @@ class Viewer(pg.PlotWidget):
         """
         if(new_speed > 0):
             self.__cine_speed = new_speed
-            self.pause()
-            self.play()
+            # self.pause()
+            # self.play()
         else: 
             raise Exception("Speed of cine must be greater than zero")
         pass
@@ -170,9 +214,9 @@ class Viewer(pg.PlotWidget):
     def rewind_state(self):
         return self.__rewind_state
     
-    # @rewind_state.setter
-    # def rewind_state(self, new_rewind_state):
-    #     self.__rewind_state = new_rewind_state
+    @rewind_state.setter
+    def rewind_state(self, new_rewind_state):
+        self.__rewind_state = new_rewind_state
     
     @property
     def channels(self):
