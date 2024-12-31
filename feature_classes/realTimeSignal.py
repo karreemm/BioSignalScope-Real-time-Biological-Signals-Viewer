@@ -96,13 +96,6 @@ class RealTimeSignal:
 
     def scroll_graph(self, value):
         self.graphWidget.setXRange(value, value + 20)
-
-    # def disable_view_button(self):
-    #     self.RealTimeViewSignalButton.setDisabled(True)
-
-    # def enable_view_button(self):
-    #     self.RealTimeViewSignalButton.setDisabled(False)
-    
     
     def go_to_real_time_page(self):
         if self.RealTimeSignalPage != -1:
@@ -113,3 +106,5 @@ class RealTimeSignal:
             self.RealTimeSignalInput.setText(api_link)
     def adjust_y_range(self):
         self.graphWidget.setYRange(67200, 68700)
+
+    # API Link: https://api.coindesk.com/v1/bpi/currentprice.json

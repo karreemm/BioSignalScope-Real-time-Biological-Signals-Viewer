@@ -1,15 +1,10 @@
-import subprocess
 import sys
 from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtWidgets import QApplication, QHBoxLayout,QSlider,  QMainWindow,QLineEdit,  QStackedWidget, QPushButton,QComboBox,  QMessageBox, QWidget, QColorDialog, QFrame, QVBoxLayout, QFileDialog ,QScrollBar
+from PyQt5.QtWidgets import QApplication,QSlider,  QMainWindow,QLineEdit,  QStackedWidget, QPushButton,QComboBox,  QMessageBox, QWidget, QColorDialog, QFrame, QVBoxLayout, QFileDialog ,QScrollBar, QHBoxLayout
 from PyQt5.uic import loadUi
-
 from PyQt5.QtGui import QIcon
-from classes.spiderPlot import SpiderPlot
-from classes.resampled_data import wave
-from classes.spiderPlot import PlotControls
+from classes.spiderPlot import PhasorPlotControls
 from classes.modifiedNonRect import PhasorGraph
-
 from classes.viewer import Viewer
 from classes.channel_ import CustomSignal
 from classes.gluer import Gluer
@@ -17,31 +12,26 @@ import pandas as pd
 import numpy as np
 import pyqtgraph as pg
 import pyqtgraph.exporters
-# from reportlab.lib.pagesizes import letter
-# from reportlab.lib import colors
-# from reportlab.lib.styles import getSampleStyleSheet
-# from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Image , Spacer
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Image , Spacer , Paragraph , PageBreak
 import copy
+from PyQt5.QtCore import Qt
+from feature_classes.realTimeSignal import RealTimeSignal
+from feature_classes.navigations import Navigations
+from helper_functions.compile_qrc import compile_qrc
 
-# def compile_qrc():
-#     qrc_file = 'Images.qrc'
-#     output_file = 'CompiledImages.py'
-#     try:
-#         subprocess.run(['pyrcc5', qrc_file, '-o', output_file], check=True)
-#         print(f"Compiled {qrc_file} to {output_file}")
-#     except subprocess.CalledProcessError as e:
-#         print(f"Failed to compile {qrc_file}: {e}")
-
-# compile_qrc()
-
-import CompiledImages  
+compile_qrc()
+from CompiledImages import *
 
 class Main(QMainWindow):
     def __init__(self):
         super(Main, self).__init__()
         loadUi('main.ui', self)
-
-        self.setWindowIcon(QIcon('logo.png'))
+        self.navigation = Navigations()
+        self.RealTimeSignal = RealTimeSignal()
+        self.setWindowIcon(QIcon(':/Images/logo.png'))
         self.setWindowTitle('Multi Signals Viewer')
 
         min_height = 900
@@ -54,8 +44,8 @@ class Main(QMainWindow):
         self.PauseImage = QIcon(':/Images/pauseW.png')
         self.HideImage = QIcon(':/Images/hideW.png')
         self.ShowImage = QIcon(':/Images/showW.png')
-        self.RewindImage = QIcon(':/Images/rewind.png')
-        self.NoRewindImage = QIcon(':/Images/noRewind.png')
+        self.RewindImage = QIcon(':/Images/rewindNew.png')
+        self.NoRewindImage = QIcon(':/Images/noRewindNew.png')
         self.LinkImage = QIcon(':/Images/linkB.png')
         self.UnlinkImage = QIcon(':/Images/unlink.png')
 
@@ -73,34 +63,28 @@ class Main(QMainWindow):
         self.is_linked = True
 
         self.Pages = self.findChild(QStackedWidget, 'stackedWidget') 
-
-        
+        self.MainPage = self.Pages.indexOf(self.findChild(QWidget , 'MainPage'))
+        self.RealTimeSignalPage = self.Pages.indexOf(self.findChild(QWidget , 'RealTimePage'))
+        self.NonRectangleSignalPage = self.Pages.indexOf(self.findChild(QWidget , 'NonRectangleSignalPage'))
         self.NonRectangleSignalButton = self.findChild(QPushButton, 'NonRectangleSignalButton')
         self.NonRectangleSignalButton.clicked.connect(self.go_to_non_rectangle_signal_page)
 
         self.NonRectangleGraphTimeSlider = self.findChild(QSlider, 'horizontalSlider')
         
         self.BackHomeButton1 = self.findChild(QPushButton, 'BackHomeButton1')
-        self.BackHomeButton1.clicked.connect(self.go_to_home_page)
-
-        self.BackHomeButton2 = self.findChild(QPushButton, 'BackHomeButton2')
-        self.BackHomeButton2.clicked.connect(self.go_to_home_page)
+        self.BackHomeButton1.clicked.connect(self.delete_none_rectangle)
 
         self.BackHomeButton3 = self.findChild(QPushButton, 'BackHomeButton3')
-        self.BackHomeButton3.clicked.connect(self.go_to_home_page)
+        self.BackHomeButton3.clicked.connect(self.go_to_home_page_from_real_time_signal)
         
         self.NonRectangleGraph = self.findChild(QFrame, 'NonRectangleGraph')
-        
+        self.nonrectLayout = QHBoxLayout()
         self.UploadSignalNonRectangle= self.findChild(QPushButton, 'UploadSignalNonRectangle')
         self.UploadSignalNonRectangle.clicked.connect(self.draw_new_graph)
 
-        target_sampling_rate = 10  # The desired sampling rate
-        interpolation_order = 'linear'  # Interpolation method, could be 'linear', 'quadratic', etc.
-
         self.wave_instance = None
         self.horizontalLayout_15 = self.findChild(QHBoxLayout, 'horizontalLayout_15')
-        
-        
+             
         self.PlayPauseNonRectangleButton = self.findChild(QPushButton, 'PlayPauseNonRectangleButton')
         
         self.ReplayNonRectangleButton = self.findChild(QPushButton, 'ReplayNonRectangleButton')
@@ -116,18 +100,28 @@ class Main(QMainWindow):
         self.graph = None
         self.spider_viewer_control = None
         
-        
         self.NonRectangleSignalButton = self.findChild(QPushButton, 'NonRectangleSignalButton')
-        self.NonRectangleSignalButton.clicked.connect(self.go_to_non_rectangle_signal_page)
-
-        self.BackHomeButton1 = self.findChild(QPushButton, 'BackHomeButton1')
-        self.BackHomeButton1.clicked.connect(self.go_to_home_page)
+        self.NonRectangleSignalButton.clicked.connect(self.navigation.go_to_non_rectangle_signal_page)
 
         self.BackHomeButton2 = self.findChild(QPushButton, 'BackHomeButton2')
-        self.BackHomeButton2.clicked.connect(self.go_to_home_page)
+        self.BackHomeButton2.clicked.connect(self.go_to_home_page_from_gluing)
 
-        self.BackHomeButton3 = self.findChild(QPushButton, 'BackHomeButton3')
-        self.BackHomeButton3.clicked.connect(self.go_to_home_page)
+        self.RealTimeSignalInput = self.findChild(QLineEdit , "RealTimeSignalInput")
+        self.RealTimeSignalInput.textChanged.connect(self.RealTimeSignal.validate_api_link)
+        
+        self.PlayPauseButtonRealTime = self.findChild(QPushButton , "PlayPauseButtonRealTime")
+        self.PlayPauseButtonRealTime.clicked.connect(self.RealTimeSignal.toggle_play_pause_real_time)
+        
+        self.RealTimeScroll = self.findChild(QScrollBar , "RealTimeScroll")
+        self.RealTimeScroll.setOrientation(Qt.Horizontal)
+        self.RealTimeScroll.valueChanged.connect(self.RealTimeSignal.scroll_graph)
+
+        self.graphWidget = pg.PlotWidget()
+        self.layout = QtWidgets.QVBoxLayout(self.RealTimeSignalFrame)
+        self.layout.addWidget(self.graphWidget)
+        
+        self.navigation.initialize( self.NonRectangleSignalButton, self.BackHomeButton1, self.BackHomeButton2, self.BackHomeButton3, self.RealTimeSignalButton, self.RealTimeSignalPage, self.MainPage, self.NonRectangleSignalPage, self.Pages, self.graph)
+        self.RealTimeSignal.initialize(self.RealTimeSignalInput  , self.PlayPauseButtonRealTime , self.RealTimeScroll, self.graphWidget , self.Pages , self.RealTimeSignalPage , self.MainPage)
 
         self.PlayPauseButtonGraph1 = self.findChild(QPushButton, 'PlayPauseButtonGraph1')
         self.PlayPauseButtonGraph1.clicked.connect(self.play_pause_graph1)
@@ -158,8 +152,7 @@ class Main(QMainWindow):
         self.GluingModeButton = self.findChild(QPushButton, 'GluingModeButton')
         self.GluingModeButton.clicked.connect(self.gluing_mode)
 
-        self.UpdateGluingButton = self.findChild(QPushButton , "UpdateGluingButton")
-        self.UpdateGluingButton.clicked.connect(self.update_gluing_interpolate)
+        self.isGlueRegionShowing = False
         
         self.MoveSignalLeftButton = self.findChild(QPushButton , "pushButton_2")
         self.MoveSignalLeftButton.clicked.connect(self.move_signal_left)
@@ -177,7 +170,6 @@ class Main(QMainWindow):
 
         self.LinkGraphsButton = self.findChild(QPushButton, 'LinkGraphsButton')
         self.LinkGraphsButton.clicked.connect(self.link_graphs)
-        # self.LinkGraphsButton.setIcon(self.LinkImage)
         
         self.AddToPDFReport = self.findChild(QPushButton ,"AddToReportButton")
         self.AddToPDFReport.clicked.connect(self.add_to_pdf_report)
@@ -188,8 +180,11 @@ class Main(QMainWindow):
         self.GeneratePDFReport = self.findChild(QPushButton , "GeneratePDFButton")
         self.GeneratePDFReport.clicked.connect(self.generate_pdf_report)
 
+        self.interpolation_order_combo_box = self.findChild(QComboBox , "comboBox_2")
+        self.interpolation_order_combo_box.activated.connect(self.update_gluing_interpolate)
+
         self.RealTimeSignalButton = self.findChild(QPushButton, 'RealTimeSignalButton')
-        self.RealTimeSignalButton.clicked.connect(self.go_to_real_time_page)
+        self.RealTimeSignalButton.clicked.connect(self.RealTimeSignal.go_to_real_time_page)
         
         # Adding functionality of going to glue window button
         self.StartGluingButton.clicked.connect(self.start_gluing)
@@ -244,10 +239,28 @@ class Main(QMainWindow):
         # Auto fit mode 
         self.view_modes_dropdown_1 = self.findChild(QComboBox, 'ModeComboBoxGraph1')
         self.view_modes_dropdown_1.currentIndexChanged.connect(lambda index : self.change_view_mode(index, '1'))
-        self.change_view_mode(0, '1')
+        # self.change_view_mode(1, '1')
+        self.view_modes_dropdown_1.setCurrentIndex(1)
         self.view_modes_dropdown_2 = self.findChild(QComboBox, 'ModeComboBoxGraph2')
         self.view_modes_dropdown_2.currentIndexChanged.connect(lambda index : self.change_view_mode(index, '2'))
-        self.change_view_mode(0, '2')
+        # self.change_view_mode(1, '2')
+        self.view_modes_dropdown_2.setCurrentIndex(1)
+        
+        # Viewer 1 Scroll bars Initialization
+        self.scrolling_x_axis_scrollbar_viewer1 = self.findChild(QScrollBar , "HorizontalScrollGraph1")
+        self.scrolling_x_axis_scrollbar_viewer1.valueChanged.connect(lambda: self.viewer1.scrolling_x_axis_scrollbar_effect(self.scrolling_x_axis_scrollbar_viewer1.value()))
+        
+        self.scrolling_y_axis_scrollbar_viewer1 = self.findChild(QScrollBar , "VerticalScrollGraph1")
+        self.viewer1.viewBox.sigRangeChanged.connect(self.set_viewer1_sliders_value)
+        self.scrolling_y_axis_scrollbar_viewer1.valueChanged.connect(lambda: self.viewer1.scrolling_y_axis_scrollbar_effect(self.scrolling_y_axis_scrollbar_viewer1.value()))
+        
+        # Viewer 2 Scroll bars Initialization
+        self.scrolling_x_axis_scrollbar_viewer2 = self.findChild(QScrollBar , "HorizontalScrollGraph2")
+        self.scrolling_x_axis_scrollbar_viewer2.valueChanged.connect(lambda: self.viewer2.scrolling_x_axis_scrollbar_effect(self.scrolling_x_axis_scrollbar_viewer2.value()))
+        
+        self.scrolling_y_axis_scrollbar_viewer2 = self.findChild(QScrollBar , "VerticalScrollGraph2")
+        self.viewer2.viewBox.sigRangeChanged.connect(self.set_viewer2_sliders_value)
+        self.scrolling_y_axis_scrollbar_viewer2.valueChanged.connect(lambda: self.viewer2.scrolling_y_axis_scrollbar_effect(self.scrolling_y_axis_scrollbar_viewer2.value()))
         
         # initializing the signals dropdown 
         self.signals_dropdown_1 = self.findChild(QComboBox, 'SignalsComboBoxGraph1')
@@ -265,14 +278,14 @@ class Main(QMainWindow):
         self.move_signal_button_2 = self.findChild(QPushButton, 'MoveToGraph1Button')
         self.move_signal_button_2.clicked.connect(lambda:self.move_signal('2'))
         
-        #signals renameing
+        #signals renaming
         self.signals_naming_textbox_1 = self.findChild(QLineEdit, 'SignalTitleInputGraph1')
         self.signals_naming_textbox_1.textChanged.connect(lambda: self.change_signal_label('1'))
         self.signals_naming_textbox_2 = self.findChild(QLineEdit, 'SignalTitleInputGraph2')
         self.signals_naming_textbox_2.textChanged.connect(lambda: self.change_signal_label('2'))
         
         # speed assignment 
-        self.signal_speed_slider_1 = self.findChild(QSlider , 'SpeedSliderGraph1')
+        self.signal_speed_slider_1 = self.findChild(QSlider, 'SpeedSliderGraph1')
         self.signal_speed_slider_1.setRange(0,4)
         self.signal_speed_slider_1.setTickInterval(1)
         self.signal_speed_slider_1.valueChanged.connect(lambda value: self.on_slider_value_changed(value, '1'))
@@ -287,26 +300,85 @@ class Main(QMainWindow):
         self.replay_button_2 = self.findChild(QPushButton, 'ReplayButtonGraph2')
         self.replay_button_2.clicked.connect(lambda:self.replay_signal('2'))
         
+    def delete_none_rectangle(self):
+        if self.graph:
+            self.graph = None
+        self.navigation.go_to_home_page()
+        
+    def generate_phasor_data(self, num_points=100, frequency=1.0, amplitude=1.0, phase_shift=0.0, noise_level=0.1):
+        """
+        Generates synthetic phasor-like data with time and value columns for plotting in PhasorGraph.
+        
+        Parameters:
+        - num_points: Number of data points to generate.
+        - frequency: Frequency of the sinusoidal signal.
+        - amplitude: Amplitude of the sinusoidal signal.
+        - phase_shift: Phase shift for the signal in radians.
+        - noise_level: Standard deviation of the added Gaussian noise.
+        
+        Returns:
+        - A pandas DataFrame with 'time' and 'value' columns.
+        """
+        if self.graph is not None:
+                self.nonrectLayout.removeWidget(self.graph)
+                self.graph = None
+        
+        # Generate a time vector
+        time = np.linspace(0, 2 * np.pi, num_points)
+        
+        # Create the corresponding values using a sinusoidal function
+        values = amplitude * np.sin(frequency * time + phase_shift)
+        
+        # Add some noise to the values to simulate real-world data
+        noise = np.random.normal(0, noise_level, num_points)
+        noisy_values = values + noise
+        
+        # Create a DataFrame with the generated data
+        data = pd.DataFrame({
+            'time': time,
+            'value': noisy_values
+        })
+        
+        return data
+
+    # Example of usage
+
+    # Save the generated data to a CSV file
     def draw_new_graph(self):
+        files, _ = QFileDialog.getOpenFileNames(self, "Open CSV Files", "", "CSV Files (*.csv)")
 
-            files, _ = QFileDialog.getOpenFileNames(self, "Open CSV Files", "", "CSV Files (*.csv)")
-            csv_files = []
-            # If files are selected, store the file paths
-            if files:
-                csv_files.extend(files)
-                self.wave_instance = wave(files_directories = csv_files)
-                print(f'CSV files:{csv_files}'  )
-                self.horizontalLayout_15.removeWidget(self.graph)
-
-                self.graph = SpiderPlot(self.wave_instance.data_samples, self.NonRectangleGraphTimeSlider)    
-                self.spider_viewer_control = PlotControls(self.PlayImage, self.PauseImage ,self.graph, self.BackButtonNonRectangle, self.NextButtonNonRectangle, 
-                                                    self.SpeedSliderNonRectangleGraph, self.PlayPauseNonRectangleButton, self.ReplayNonRectangleButton, self.ChangeColorButtonNonRectangle,self.NonRectangleGraphTimeSlider)
-                self.horizontalLayout_15.addWidget(self.graph)
-      
+        # If files are selected, store the file paths
+        if files:
+            csv_files = files
+            print(f'CSV files: {csv_files}')
             
-    
-        # linking button 
-          
+            # Remove the old graph from the layout and delete it properly
+            if self.graph is not None:
+                self.nonrectLayout.removeWidget(self.graph)
+                self.graph.deleteLater()  # Safely delete the old graph widget
+                self.graph = None
+            
+            # Create a new PhasorGraph instance
+            # self.graph = PhasorGraph(csv_files, self.NonRectangleGraphTimeSlider)
+            self.graph = PhasorGraph(data_path=csv_files, pathFlag= True)
+
+            print(f'Width: {self.graph.width()}, Height: {self.graph.height()}')
+            # Recreate the controls for the new graph
+            self.phasor_graph_controls = PhasorPlotControls(
+                self.PlayImage, self.PauseImage, self.graph, self.BackButtonNonRectangle, 
+                self.NextButtonNonRectangle, self.SpeedSliderNonRectangleGraph, 
+                self.PlayPauseNonRectangleButton, self.ReplayNonRectangleButton, 
+                self.ChangeColorButtonNonRectangle
+            )
+            # Add the new graph to the layout
+            self.nonrectLayout.addWidget(self.graph)
+            self.horizontalLayout_15.addWidget(self.graph)
+            
+            # Align the layout (if needed)
+            # self.horizontalLayout_15.setAlignment(self.graph, Qt.AlignCenter) # Uncomment if you need alignment
+            
+            print(f'Number of elements after: {self.horizontalLayout_15.count()}')
+
     def replay_signal(self, viewer:str):
         if viewer == '1':
             if not self.is_playing_graph1:
@@ -396,6 +468,12 @@ class Main(QMainWindow):
                         
                     # self.viewer2.play()
                     # self.viewer2.pause()
+                    scrolling_x_axis_scrollbar_viewer2_page_step = 1075
+                    self.scrolling_x_axis_scrollbar_viewer2.setMaximum(int(self.viewer2.x_axis[-1] - scrolling_x_axis_scrollbar_viewer2_page_step))
+                    self.scrolling_y_axis_scrollbar_viewer2.setMinimum(int(self.viewer2.min_signals_value))
+                    self.scrolling_y_axis_scrollbar_viewer2.setPageStep(int(self.viewer2.viewBox.viewRange()[1][1] - self.viewer2.viewBox.viewRange()[1][0]))
+                    scrolling_y_axis_scrollbar_viewer2_page_step = 325
+                    self.scrolling_y_axis_scrollbar_viewer2.setMaximum(int(self.viewer2.max_signals_value + int(self.viewer2.viewBox.viewRange()[1][1] - self.viewer2.viewBox.viewRange()[1][0]) - scrolling_y_axis_scrollbar_viewer2_page_step))
                     self.viewer1.update_x_axis()
                     if self.viewer1.x_axis[-1] < self.viewer1.viewRange()[0][1]:
                         self.replay_signal('1')
@@ -418,6 +496,12 @@ class Main(QMainWindow):
                     if len(self.viewer2.channels) == 0:
                         self.viewer2.pause()
                         self.PlayPauseButtonGraph2.setIcon(self.PlayImage)
+                    scrolling_x_axis_scrollbar_viewer1_page_step = 1075
+                    self.scrolling_x_axis_scrollbar_viewer1.setMaximum(int(self.viewer1.x_axis[-1] - scrolling_x_axis_scrollbar_viewer1_page_step))
+                    self.scrolling_y_axis_scrollbar_viewer1.setMinimum(int(self.viewer1.min_signals_value))
+                    self.scrolling_y_axis_scrollbar_viewer1.setPageStep(int(self.viewer1.viewBox.viewRange()[1][1] - self.viewer1.viewBox.viewRange()[1][0]))
+                    scrolling_y_axis_scrollbar_viewer1_page_step = 325
+                    self.scrolling_y_axis_scrollbar_viewer1.setMaximum(int(self.viewer1.max_signals_value + int(self.viewer1.viewBox.viewRange()[1][1] - self.viewer1.viewBox.viewRange()[1][0]) - scrolling_y_axis_scrollbar_viewer1_page_step))
                     self.viewer2.update_x_axis()
                     if self.viewer2.x_axis[-1] < self.viewer2.viewRange()[0][1]:
                         self.replay_signal('2')
@@ -428,9 +512,38 @@ class Main(QMainWindow):
         page_index = self.Pages.indexOf(self.findChild(QWidget, 'NonRectangleSignalPage'))
         if page_index != -1:
             self.Pages.setCurrentIndex(page_index)
+        
+        if self.graph is not None:
+                self.nonrectLayout.removeWidget(self.graph)
+                self.graph = None
+                
+        data = self.generate_phasor_data(num_points=200, frequency=2.0, amplitude=1.0, phase_shift=0.5, noise_level=0.05)
+        self.graph = PhasorGraph(data_path = data, pathFlag= False)
 
-    def go_to_home_page(self):
+        print(f'Width: {self.graph.width()}, Height: {self.graph.height()}')
+        # Recreate the controls for the new graph
+        self.phasor_graph_controls = PhasorPlotControls(
+            self.PlayImage, self.PauseImage, self.graph, self.BackButtonNonRectangle, 
+            self.NextButtonNonRectangle, self.SpeedSliderNonRectangleGraph, 
+            self.PlayPauseNonRectangleButton, self.ReplayNonRectangleButton, 
+            self.ChangeColorButtonNonRectangle
+        )
+        # Add the new graph to the layout
+        self.nonrectLayout.addWidget(self.graph)
+        self.horizontalLayout_15.addWidget(self.graph)
+        
+    def go_to_home_page_from_gluing(self):
         page_index = self.Pages.indexOf(self.findChild(QWidget, 'MainPage'))
+        self.viewer1.removeItem(self.viewer1.gluing_selected_region)
+        self.viewer2.removeItem(self.viewer2.gluing_selected_region)
+        self.isGlueRegionShowing = False
+        self.StartGluingButton.setEnabled(False)
+        if page_index != -1:
+            self.Pages.setCurrentIndex(page_index)
+            
+    def go_to_home_page_from_real_time_signal(self):
+        page_index = self.Pages.indexOf(self.findChild(QWidget, 'MainPage'))
+        self.RealTimeSignal.timer.stop()
         if page_index != -1:
             self.Pages.setCurrentIndex(page_index)
             
@@ -447,14 +560,7 @@ class Main(QMainWindow):
         self.glued_viewer.add_glued_moving_channel(self.to_be_glued_signal_2, data_x_viewer_2)
         self.glued_signal_1_x_values = data_x_viewer_1
         self.glued_signal_2_x_values = data_x_viewer_2
-        
-                
-    def set_gluing_scroll_bar_func(self):
-        self.glued_viewer.clear()
-        self.glued_viewer.remove_channel(self.to_be_glued_signal_2)
-        self.glued_signal_2_x_values = [x + 100 for x in self.glued_signal_2_x_values]
-        # self.glued_viewer.plot()
-        
+        self.update_gluing_interpolate()
         
     def play_pause_graph1(self):
         if self.is_playing_graph1:
@@ -533,10 +639,15 @@ class Main(QMainWindow):
             # print(color.name())
 
     def gluing_mode(self):
-        self.StartGluingButton.setEnabled(True)
-        self.viewer1.show_glue_rectangle_func()
-        self.viewer2.show_glue_rectangle_func()
-    
+        if(not self.isGlueRegionShowing):
+            self.StartGluingButton.setEnabled(True)
+            self.viewer1.show_glue_rectangle_func()
+            self.viewer2.show_glue_rectangle_func()
+        else:
+            self.StartGluingButton.setEnabled(False)
+            self.viewer1.removeItem(self.viewer1.gluing_selected_region)
+            self.viewer2.removeItem(self.viewer2.gluing_selected_region)
+        self.isGlueRegionShowing = not self.isGlueRegionShowing
     def start_gluing(self):
         selected_channel_index_viewer_1 = self.signals_dropdown_1.currentIndex()
         selected_channel_index_viewer_2 = self.signals_dropdown_2.currentIndex()
@@ -546,7 +657,6 @@ class Main(QMainWindow):
         
     def update_gluing_interpolate(self):
         self.glued_viewer.clear()
-        self.interpolation_order_combo_box = self.findChild(QComboBox , "comboBox_2")
         interpolation_order = self.interpolation_order_combo_box.currentIndex()
         self.gluer_interpolate = Gluer(self.to_be_glued_signal_1 , self.to_be_glued_signal_2 ,self.glued_signal_1_x_values , self.glued_signal_2_x_values )
         self.y_interpolated= self.gluer_interpolate.interpolate( interpolation_order)
@@ -575,7 +685,15 @@ class Main(QMainWindow):
                 self.glued_interpolated_overlapped_signal_x_values = np.concatenate([signal_2_x_values_before_interpolated_part , x_overlapped ,signal_1_x_values_after_interpolated_part])
                 self.glued_interpolated_overlapped_signal_y_values = np.concatenate([signal_2_y_values_before_interpolated_part , self.y_interpolated , signal_1_y_values_after_interpolated_part])
                 
-                self.glued_viewer.plot(self.glued_interpolated_overlapped_signal_x_values , self.glued_interpolated_overlapped_signal_y_values)
+                x_overlapped.insert(0 , signal_2_x_values_before_interpolated_part[-1])
+                x_overlapped.append(signal_1_x_values_after_interpolated_part[0])
+                self.y_interpolated = list(self.y_interpolated)
+                self.y_interpolated.append(signal_1_y_values_after_interpolated_part[0])
+                self.y_interpolated.insert(0, signal_2_y_values_before_interpolated_part[-1])
+                
+                self.glued_viewer.plot(signal_2_x_values_before_interpolated_part , signal_2_y_values_before_interpolated_part , pen = pg.mkPen(color = 'red'))
+                self.glued_viewer.plot(x_overlapped , self.y_interpolated , pen = pg.mkPen(color = 'blue'))
+                self.glued_viewer.plot(signal_1_x_values_after_interpolated_part ,signal_1_y_values_after_interpolated_part , pen = pg.mkPen(color = 'red'))
                 self.gluer_interpolate.get_statistics(self.glued_interpolated_overlapped_signal_x_values ,self.glued_interpolated_overlapped_signal_y_values )
                 self.update_statistics()
                 
@@ -584,7 +702,16 @@ class Main(QMainWindow):
                 self.glued_interpolated_gapped_signal_x_values = np.concatenate([self.glued_signal_2_x_values , x_gap ,self.glued_signal_1_x_values])
                 self.glued_interpolated_gapped_signal_y_values = np.concatenate([self.to_be_glued_signal_2.signal , self.y_interpolated , self.to_be_glued_signal_1.signal])
                 
-                self.glued_viewer.plot(self.glued_interpolated_gapped_signal_x_values , self.glued_interpolated_gapped_signal_y_values)
+                x_gap = list(x_gap)
+                x_gap.insert(0 , self.glued_signal_2_x_values[-1])
+                x_gap.append(self.glued_signal_1_x_values[0])
+                self.y_interpolated = list(self.y_interpolated)
+                self.y_interpolated.append(self.to_be_glued_signal_1.signal[0])
+                self.y_interpolated.insert(0, self.to_be_glued_signal_2.signal[-1])
+                
+                self.glued_viewer.plot(self.glued_signal_2_x_values , self.to_be_glued_signal_2.signal , pen = pg.mkPen(color = 'red'))
+                self.glued_viewer.plot(x_gap , self.y_interpolated , pen = pg.mkPen(color = 'blue'))
+                self.glued_viewer.plot(self.glued_signal_1_x_values , self.to_be_glued_signal_1.signal , pen = pg.mkPen(color = 'red'))
                 self.gluer_interpolate.get_statistics(self.glued_interpolated_gapped_signal_x_values ,self.glued_interpolated_gapped_signal_y_values )
                 self.update_statistics()
                 
@@ -599,25 +726,26 @@ class Main(QMainWindow):
                 signal_2_x_values_as_int = [int(x) for x in self.gluer_interpolate.signal_2_x_values]
                 x_overlapped_first_value_index_in_signal_1 = signal_1_x_values_as_int.index(int(x_overlapped[0]))
                 x_overlapped_last_value_index_in_signal_2 = signal_2_x_values_as_int.index(int(x_overlapped[-1]))
-                # print(f"x_overlapped: {x_overlapped}")
-                # print(f"signal_2_x_values: {signal_2_x_values_as_int} , length: {len(signal_2_x_values_as_int)}")
+
                 signal_1_x_values_before_interpolated_part = self.gluer_interpolate.signal_1_x_values[:x_overlapped_first_value_index_in_signal_1]
                 signal_2_x_values_after_interpolated_part = signal_2_x_values_as_int[x_overlapped_last_value_index_in_signal_2:]
-                # print(f'signal_2_x_values_after_interpoaltion: {signal_2_x_values_after_interpolated_part}')
-                
-                # signal_1_x_values_before_interpolated_part_as_int = [int(x) for x in signal_1_x_values_before_interpolated_part]
-                # signal_2_x_values_after_interpolated_part_as_int = [int(x) for x in signal_2_x_values_after_interpolated_part]
-                
-                # print(f"signal_2_y_values = {self.gluer_interpolate.signal_2.signal} , length: {len(self.gluer_interpolate.signal_2.signal)}")
-                # print(f"signal_2_x_values = {signal_2_x_values_after_interpolated_part_as_int} , length: {len(signal_2_x_values_after_interpolated_part_as_int)}")
-                
+            
                 signal_1_y_values_before_interpolated_part = self.gluer_interpolate.signal_1.signal[:x_overlapped_first_value_index_in_signal_1]
                 signal_2_y_values_after_interpolated_part = self.gluer_interpolate.signal_2.signal[x_overlapped_last_value_index_in_signal_2 : ]
                 
                 self.glued_interpolated_overlapped_signal_x_values = np.concatenate([signal_1_x_values_before_interpolated_part , x_overlapped ,signal_2_x_values_after_interpolated_part])
                 self.glued_interpolated_overlapped_signal_y_values = np.concatenate([signal_1_y_values_before_interpolated_part , self.y_interpolated , signal_2_y_values_after_interpolated_part])
-                # print(f'glued_interpolated_overlapped_signal_y_values: {glued_interpolated_overlapped_signal_y_values} , length = {len(glued_interpolated_overlapped_signal_y_values)}')
-                self.glued_viewer.plot(self.glued_interpolated_overlapped_signal_x_values , self.glued_interpolated_overlapped_signal_y_values)
+                
+                
+                x_overlapped.insert(0 , signal_1_x_values_before_interpolated_part[-1])
+                x_overlapped.append(signal_2_x_values_after_interpolated_part[0])
+                self.y_interpolated = list(self.y_interpolated)
+                self.y_interpolated.insert(0, signal_1_y_values_before_interpolated_part[-1])
+                self.y_interpolated.append(signal_2_y_values_after_interpolated_part[0])
+                
+                self.glued_viewer.plot(signal_1_x_values_before_interpolated_part , signal_1_y_values_before_interpolated_part , pen = pg.mkPen(color = 'red'))
+                self.glued_viewer.plot(x_overlapped , self.y_interpolated , pen = pg.mkPen(color = 'blue'))
+                self.glued_viewer.plot(signal_2_x_values_after_interpolated_part , signal_2_y_values_after_interpolated_part , pen = pg.mkPen(color = 'red'))
                 self.gluer_interpolate.get_statistics(self.glued_interpolated_overlapped_signal_x_values ,self.glued_interpolated_overlapped_signal_y_values )
                 self.update_statistics()
 
@@ -626,7 +754,16 @@ class Main(QMainWindow):
                 self.glued_interpolated_gapped_signal_x_values = np.concatenate([self.glued_signal_1_x_values , x_gap ,self.glued_signal_2_x_values])
                 self.glued_interpolated_gapped_signal_y_values = np.concatenate([self.to_be_glued_signal_1.signal , self.y_interpolated , self.to_be_glued_signal_2.signal])
                 
-                self.glued_viewer.plot(self.glued_interpolated_gapped_signal_x_values , self.glued_interpolated_gapped_signal_y_values)
+                x_gap = list(x_gap)
+                x_gap.insert(0 , self.glued_signal_1_x_values[-1])
+                x_gap.append(self.glued_signal_2_x_values[0])
+                self.y_interpolated = list(self.y_interpolated)
+                self.y_interpolated.insert(0,  self.to_be_glued_signal_1.signal[-1])
+                self.y_interpolated.append(self.to_be_glued_signal_2.signal[0])
+                
+                self.glued_viewer.plot(self.glued_signal_1_x_values , self.to_be_glued_signal_1.signal , pen = pg.mkPen(color = 'red'))
+                self.glued_viewer.plot(x_gap , self.y_interpolated , pen = pg.mkPen(color = 'blue'))
+                self.glued_viewer.plot(self.glued_signal_2_x_values , self.to_be_glued_signal_2.signal , pen = pg.mkPen(color = 'red'))
                 self.gluer_interpolate.get_statistics(self.glued_interpolated_gapped_signal_x_values ,self.glued_interpolated_gapped_signal_y_values )
                 self.update_statistics()
                 
@@ -644,8 +781,8 @@ class Main(QMainWindow):
     
     def add_to_pdf_report(self):
         captured_data_region_exported_image = pyqtgraph.exporters.ImageExporter(self.glued_viewer.getPlotItem())
-        captured_data_region_exported_image.parameters()['width'] = 2000  # Set the export width
-        captured_data_region_exported_image.parameters()['height'] = 1000  # Set the export height
+        captured_data_region_exported_image.parameters()['width'] = 3950  
+        captured_data_region_exported_image.parameters()['height'] = 1000  
         captured_data_region_exported_image.export(f"./captured_report_signals/captured_region{self.captured_report_images_counter}.png")
         self.captured_report_images_filenames.append(f"./captured_report_signals/captured_region{self.captured_report_images_counter}.png")
         self.captured_report_images_counter += 1
@@ -657,35 +794,46 @@ class Main(QMainWindow):
     def generate_pdf_report(self):
         doc = SimpleDocTemplate("report.pdf", pagesize=letter)
         elements = []
-        width, height = letter
+        styles = getSampleStyleSheet()
         
-        for i, (image_filename, stats) in enumerate(zip(self.captured_report_images_filenames, self.captured_report_images_statistics)):  
-            img = Image(image_filename, width=600, height=300)
+        title = Paragraph("Team 6", styles['Title'])
+        elements.append(title)
+        elements.append(Spacer(1, 20))
+        centered_style = styles['Heading2']
+        centered_style.alignment = 1
+        for i, (image_filename, stats) in enumerate(zip(self.captured_report_images_filenames, self.captured_report_images_statistics)):
+            signal_title = Paragraph(f"Signal {i + 1}", centered_style)
+            elements.append(signal_title)
+            elements.append(Spacer(1, 20))
+
+            img = Image(image_filename, width=612, height=310)
             elements.append(img)
             elements.append(Spacer(1, 20))
+
             data = [
-                ['Mean', 'Std Dev', 'Duration', 'Min', 'Max'],  
+                ['Mean', 'Std Dev', 'Duration', 'Min', 'Max'],
                 [f"{float(stats[0]):.2f}", f"{float(stats[1]):.2f}", f"{float(stats[2]):.2f}", f"{float(stats[3]):.2f}", f"{float(stats[4]):.2f}"]
             ]
 
-            # Create and style the table
-            table = Table(data, colWidths=[80, 80, 80, 80, 80])  
+            table = Table(data, colWidths=[80, 80, 80, 80, 80])
             table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),  
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke), 
+                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
                 ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'), 
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
                 ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),  
-                ('GRID', (0, 0), (-1, -1), 1, colors.black),  
+                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
             ]))
-
             elements.append(table)
+
+            if i < len(self.captured_report_images_filenames) - 1:
+                elements.append(PageBreak())
 
         doc.build(elements)
         self.captured_report_images_filenames.clear()
         self.captured_report_images_statistics.clear()
-        
+            
     def move_signal_left(self):
         self.glued_viewer.clear()
         self.glued_signal_2_x_values = [x - 50 for x in self.glued_signal_2_x_values ]
@@ -706,10 +854,10 @@ class Main(QMainWindow):
                     df = pd.read_csv(file_path)
                     for i, col in enumerate(df.columns):
                         if viewer_number == '1':
-                            signal = CustomSignal(label=f"{col}_signal_{self.number_of_viewer_1_signals}_1", signal=df[col].values )
+                            signal = CustomSignal(label=f"Untitled_{self.number_of_viewer_1_signals+1}_viewer_1", signal=df[col].values )
                             self.signals_dropdown_1.addItem(signal.label)
                         else:
-                            signal = CustomSignal(label=f"{col}_signal_{self.number_of_viewer_2_signals}_2", signal=df[col].values )
+                            signal = CustomSignal(label=f"Untitled_{self.number_of_viewer_2_signals+1}_viewer_2", signal=df[col].values )
                             self.signals_dropdown_2.addItem(signal.label)
                     ## testing ##
                         # print(f"Column Name: {col}")
@@ -719,9 +867,22 @@ class Main(QMainWindow):
                         if viewer_number == "1":
                             self.viewer1.clear()
                             self.viewer1.add_channel(signal)
+                            scrolling_x_axis_scrollbar_viewer1_page_step = 1075
+                            self.scrolling_x_axis_scrollbar_viewer1.setMaximum(int(self.viewer1.x_axis[-1] - scrolling_x_axis_scrollbar_viewer1_page_step))
+                            self.scrolling_y_axis_scrollbar_viewer1.setMinimum(int(self.viewer1.min_signals_value))
+                            self.scrolling_y_axis_scrollbar_viewer1.setPageStep(int(self.viewer1.viewBox.viewRange()[1][1] - self.viewer1.viewBox.viewRange()[1][0]))
+                            scrolling_y_axis_scrollbar_viewer1_page_step = 325
+                            self.scrolling_y_axis_scrollbar_viewer1.setMaximum(int(self.viewer1.max_signals_value + int(self.viewer1.viewBox.viewRange()[1][1] - self.viewer1.viewBox.viewRange()[1][0]) - scrolling_y_axis_scrollbar_viewer1_page_step))
+                            
                         else:
                             self.viewer2.clear()
                             self.viewer2.add_channel(signal)
+                            scrolling_x_axis_scrollbar_viewer2_page_step = 1075
+                            self.scrolling_x_axis_scrollbar_viewer2.setMaximum(int(self.viewer2.x_axis[-1] - scrolling_x_axis_scrollbar_viewer2_page_step))
+                            self.scrolling_y_axis_scrollbar_viewer2.setMinimum(int(self.viewer2.min_signals_value))
+                            self.scrolling_y_axis_scrollbar_viewer2.setPageStep(int(self.viewer2.viewBox.viewRange()[1][1] - self.viewer2.viewBox.viewRange()[1][0]))
+                            scrolling_y_axis_scrollbar_viewer2_page_step = 325
+                            self.scrolling_y_axis_scrollbar_viewer2.setMaximum(int(self.viewer2.max_signals_value + int(self.viewer2.viewBox.viewRange()[1][1] - self.viewer2.viewBox.viewRange()[1][0]) - scrolling_y_axis_scrollbar_viewer2_page_step))
                             
                     if viewer_number == "1":
                             self.number_of_viewer_1_signals+=1
@@ -742,14 +903,65 @@ class Main(QMainWindow):
         if viewer_number == '1':
             if index == 0:
                 self.viewer1.y_axis_scroll_bar_enabled = True
+                if not self.is_linked:
+                    self.viewer2.y_axis_scroll_bar_enabled = True
             else:
                 self.viewer1.y_axis_scroll_bar_enabled = False
+                if not self.is_linked:
+                    self.viewer2.y_axis_scroll_bar_enabled = False
         else:
-            if index == 0:
-                self.viewer2.y_axis_scroll_bar_enabled = True
-            else:
-                self.viewer2.y_axis_scroll_bar_enabled = False
+            if not self.is_linked:
+                if index == 0:
+                    self.viewer2.y_axis_scroll_bar_enabled = True
+                else:
+                    self.viewer2.y_axis_scroll_bar_enabled = False
+    
+    def set_viewer1_sliders_value(self , view,ranges):
+        x_axis_slider_value = ranges[0][0]
+        y_axis_slider_value = ranges[1][0]
+        self.scrolling_x_axis_scrollbar_viewer1.blockSignals(True)
+        self.scrolling_x_axis_scrollbar_viewer1.setValue(int(x_axis_slider_value))
+        self.scrolling_x_axis_scrollbar_viewer1.blockSignals(False)
+        
+        if self.viewer1.y_axis_scroll_bar_enabled :
+            if not self.viewer1.scrolling_in_y_axis:
+                self.scrolling_y_axis_scrollbar_viewer1.setEnabled(True)
+                self.viewer1.viewBox.setMouseEnabled(x = True, y =True)
+                self.viewer1.viewBox.enableAutoRange(x=False, y=False)
+                self.viewer1.viewBox.setAutoVisible(x=False, y=False)
+                self.scrolling_y_axis_scrollbar_viewer1.blockSignals(True)
+                self.scrolling_y_axis_scrollbar_viewer1.setValue(int(y_axis_slider_value))
                 
+                self.scrolling_y_axis_scrollbar_viewer1.blockSignals(False)
+        else:
+            self.scrolling_y_axis_scrollbar_viewer1.setDisabled(True)
+            self.viewer1.viewBox.setMouseEnabled(x = True, y =False)
+            self.viewer1.viewBox.enableAutoRange(x=False, y=True)
+            self.viewer1.viewBox.setAutoVisible(x=False, y=True)
+            
+    def set_viewer2_sliders_value(self , view,ranges):
+        x_axis_slider_value = ranges[0][0]
+        y_axis_slider_value = ranges[1][0]
+        self.scrolling_x_axis_scrollbar_viewer2.blockSignals(True)
+        self.scrolling_x_axis_scrollbar_viewer2.setValue(int(x_axis_slider_value))
+        self.scrolling_x_axis_scrollbar_viewer2.blockSignals(False)
+        
+        if self.viewer2.y_axis_scroll_bar_enabled :
+            if not self.viewer2.scrolling_in_y_axis:
+                self.scrolling_y_axis_scrollbar_viewer2.setEnabled(True)
+                self.viewer2.viewBox.setMouseEnabled(x = True, y =True)
+                self.viewer2.viewBox.enableAutoRange(x=False, y=False)
+                self.viewer2.viewBox.setAutoVisible(x=False, y=False)
+                self.scrolling_y_axis_scrollbar_viewer2.blockSignals(True)
+                self.scrolling_y_axis_scrollbar_viewer2.setValue(int(y_axis_slider_value))
+                
+                self.scrolling_y_axis_scrollbar_viewer2.blockSignals(False)
+        else:
+            self.scrolling_y_axis_scrollbar_viewer2.setDisabled(True)
+            self.viewer2.viewBox.setMouseEnabled(x = True, y =False)
+            self.viewer2.viewBox.enableAutoRange(x=False, y=True)
+            self.viewer2.viewBox.setAutoVisible(x=False, y=True)
+    
     def change_plot_color(self, viewer:str, color:str):
         if viewer == '1':
             dropdown_index = self.signals_dropdown_1.currentIndex()
@@ -807,10 +1019,20 @@ class Main(QMainWindow):
             if len(self.viewer1.channels) and len(self.viewer2.channels):
                 self.viewer1.setXLink(self.viewer2)
                 self.viewer1.setYLink(self.viewer2)
+                self.upload_button_2.setDisabled(True)
+                self.PlayPauseButtonGraph2.setDisabled(True)
+                self.RewindButtonGraph2.setDisabled(True)
+                self.replay_button_2.setDisabled(True)
+                self.view_modes_dropdown_2.setDisabled(True)
         else:
             self.LinkGraphsButton.setIcon(self.UnlinkImage)
             self.viewer1.setXLink(None)
             self.viewer1.setYLink(None)
+            self.upload_button_2.setEnabled(True)
+            self.PlayPauseButtonGraph2.setEnabled(True)
+            self.RewindButtonGraph2.setEnabled(True)
+            self.replay_button_2.setEnabled(True)
+            self.view_modes_dropdown_2.setEnabled(True)
         self.is_linked = not self.is_linked
     
     def show_error(self, message:str):
