@@ -13,8 +13,6 @@ The Multi-Signal Viewer is a powerful desktop application that provides many sig
   - Two synchronized signal viewers for simultaneous signal analysis
   - Independent signal loading in each viewer
   - Ability to transfer signals between viewers
-
-
 - **Playback Controls**:
   - Play, pause, and rewind functionality
   - Adjustable playback speed
@@ -26,6 +24,10 @@ The Multi-Signal Viewer is a powerful desktop application that provides many sig
 - **Viewer Synchronization**:
   - Option to link viewers for synchronized control
   - Matching time scales and playback states
+
+### Check Default Mode Demo
+https://github.com/user-attachments/assets/4a2657cf-c6c3-4e9d-b31e-efa275623fab
+
 
 ### 2. Real-Time Mode
 - **API Integration**:
