@@ -52,6 +52,9 @@ https://github.com/user-attachments/assets/4a2657cf-c6c3-4e9d-b31e-efa275623fab
 - **PDF Report Generation**:
   - Add modified segments to report
   - Generate and export professional PDF reports
+### Check Glowing Mode Demo
+https://github.com/user-attachments/assets/5a8fa4a9-dd70-4b6e-9a5c-7c52d0bcd621
+
 
 ### 4. Non-Rectangular Graph Mode
 - **Specialized Visualization**:
