@@ -37,6 +37,9 @@ https://github.com/user-attachments/assets/4a2657cf-c6c3-4e9d-b31e-efa275623fab
 - **Dynamic Controls**:
   - Play and pause functionality
   - Live data streaming display
+### Check Real-Time Mode 
+![Real-Time Mode](RealTime_Examples/RealTimeImage2.png "Real-Time Mode")
+
 
 ### 3. Glowing Mode
 - **Signal Selection**:
