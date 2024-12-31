@@ -2,7 +2,14 @@
 ![Application Overview](Images/overview.png "Overview of Multi-Signal Viewer")
 
 ## Overview
-The Multi-Signal Viewer is a powerful desktop application that provides many signal analysis capabilities through a user-friendly interface. The application features four distinct operational modes: **Default Mode**, **Real-Time Mode**, **Glowing Mode**, and **Non-Rectangular Graph Mode**.
+The **Multi-Signal Viewer** is a powerful desktop application designed for signal analysis with a user-friendly interface. It supports four distinct operational modes:
+
+- **Default Mode**
+- **Real-Time Mode**
+- **Glowing Mode**
+- **Non-Rectangular Graph Mode**
+
+Each mode provides unique features for signal manipulation, customization, and visualization.
 
 ---
 
@@ -28,6 +35,7 @@ The Multi-Signal Viewer is a powerful desktop application that provides many sig
 ### Check Default Mode Demo
 https://github.com/user-attachments/assets/4a2657cf-c6c3-4e9d-b31e-efa275623fab
 
+<br />
 
 ### 2. Real-Time Mode
 - **API Integration**:
@@ -38,8 +46,9 @@ https://github.com/user-attachments/assets/4a2657cf-c6c3-4e9d-b31e-efa275623fab
   - Play and pause functionality
   - Live data streaming display
 ### Check Real-Time Mode 
-![Real-Time Mode](RealTime_Examples/RealTimeImage2.png "Real-Time Mode")
+![RealTimeImage](https://github.com/user-attachments/assets/1a40d303-369b-49d4-a3ee-dcecf334fb33)
 
+<br />
 
 ### 3. Glowing Mode
 - **Signal Selection**:
@@ -55,6 +64,8 @@ https://github.com/user-attachments/assets/4a2657cf-c6c3-4e9d-b31e-efa275623fab
 ### Check Glowing Mode Demo
 https://github.com/user-attachments/assets/5a8fa4a9-dd70-4b6e-9a5c-7c52d0bcd621
 
+<br />
+
 
 ### 4. Non-Rectangular Graph Mode
 - **Specialized Visualization**:
@@ -63,6 +74,9 @@ https://github.com/user-attachments/assets/5a8fa4a9-dd70-4b6e-9a5c-7c52d0bcd621
   - Play/pause functionality
   - Speed control
   - Color customization
+### Check Non-Rectangle Mode Demo
+https://github.com/user-attachments/assets/5deed996-2975-421f-bb44-470d9072b078
+
 ---
 
 ## How to Use
@@ -78,7 +92,6 @@ https://github.com/user-attachments/assets/5a8fa4a9-dd70-4b6e-9a5c-7c52d0bcd621
    - Change colors
    - Adjust scaling
    - Modify names
-5. Toggle viewer synchronization as needed.
 
 ### Real-Time Mode
 1. Switch to Real-Time Mode.
@@ -148,17 +161,40 @@ The Multi-Signal Viewer relies on the following technologies and libraries to de
 
 ---
 
-## Contributors
+## Contributors <a name="Contributors"></a>
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/karreemm" target="_black">
+        <img src="https://avatars.githubusercontent.com/u/karreemm?v=4" width="150px;" alt="Kareem Abdel Nabi"/>
+        <br />
+        <sub><b>Kareem Abdel Nabi</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/AhmedXAlDeeb" target="_black">
+        <img src="https://avatars.githubusercontent.com/u/AhmedXAlDeeb?v=4" width="150px;" alt="Ahmed X AlDeeb"/>
+        <br />
+        <sub><b>Ahmed AlDeeb</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/Youssef-Abo-El-Ela" target="_black">
+        <img src="https://avatars.githubusercontent.com/u/Youssef-Abo-El-Ela?v=4" width="150px;" alt="Youssef Abo El Ela"/>
+        <br />
+        <sub><b>Youssef Abo El-Ela</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/Mostafaali3" target="_black">
+        <img src="https://avatars.githubusercontent.com/u/Mostafaali3?v=4" width="150px;" alt="Mostafa Ali"/>
+        <br />
+        <sub><b>Mostafa Ali</b></sub>
+      </a>
+    </td>
+  </tr>
+</table>
 
-Meet the amazing team behind the Multi-Signal Viewer:
-
-| **Name**            | **Role**                | **Contributions**                                     |
-|---------------------|-------------------------|------------------------------------------------------|
-| Kareem Abdel Nabi   | Lead Developer          | Core architecture, signal processing, and UI design. |
-| John Doe            | API Specialist          | Real-time mode and API integration.                 |
-| Jane Smith          | Visualization Expert    | Non-rectangular graph rendering and visual design.  |
-| Ahmed Ali           | Documentation Writer    | Comprehensive documentation and tutorials.          |
-| Emily Clark         | QA Engineer             | Ensuring application quality and user experience.   |
 
 Your feedback and contributions are always welcome! Feel free to fork the repository and make your improvements.
 
