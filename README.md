@@ -33,7 +33,7 @@ Each mode provides unique features for signal manipulation, customization, and v
   - Matching time scales and playback states
 
 ### Check Default Mode Demo
-https://github.com/user-attachments/assets/4a2657cf-c6c3-4e9d-b31e-efa275623fab
+![**Default Mode**](https://github.com/karreemm/BioSignalScope-Real-time-Biological-Signals-Viewer/blob/main/Assets/Default.gif)
 
 
 ### 2. Real-Time Mode
@@ -60,7 +60,7 @@ https://github.com/user-attachments/assets/4a2657cf-c6c3-4e9d-b31e-efa275623fab
   - Add modified segments to report
   - Generate and export professional PDF reports
 ### Check Glowing Mode Demo
-https://github.com/user-attachments/assets/5a8fa4a9-dd70-4b6e-9a5c-7c52d0bcd621
+![**Glowing Mode**](https://github.com/karreemm/BioSignalScope-Real-time-Biological-Signals-Viewer/blob/main/Assets/Glowing.gif)
 
 
 ### 4. Non-Rectangular Graph Mode
@@ -71,7 +71,7 @@ https://github.com/user-attachments/assets/5a8fa4a9-dd70-4b6e-9a5c-7c52d0bcd621
   - Speed control
   - Color customization
 ### Check Non-Rectangle Mode Demo
-https://github.com/user-attachments/assets/5deed996-2975-421f-bb44-470d9072b078
+![**Non-Rectangle Mode**](https://github.com/karreemm/BioSignalScope-Real-time-Biological-Signals-Viewer/blob/main/Assets/nonRectangle.gif)
 
 ---
 
